@@ -8,6 +8,20 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [hoveredProject, setHoveredProject] = useState(null);
   const [activeScrollZone, setActiveScrollZone] = useState('main');
+  // UI: language selector for catalog (EN / UA)
+  const [language, setLanguage] = useState('EN');
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef(null);
+  // Close language dropdown when clicking outside
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (langRef.current && !langRef.current.contains(e.target)) {
+        setLangOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, []);
 
   // Clean catalog - only 1 working + 2 coming soon
   const mockProjects = [
@@ -312,19 +326,50 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
             </div>
 
             {/* Enhanced Search */}
-            <div className="max-w-md mx-auto mb-8">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search artifacts..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-all"
-                />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+            <div className="max-w-3xl mx-auto mb-8">
+              <div className="flex items-center gap-4">
+                <div className="relative w-[70%]">
+                  <input
+                    type="text"
+                    placeholder="Search artifacts..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-all"
+                  />
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Language selector on the right */}
+                <div className="relative" ref={langRef}>
+                  <button
+                    type="button"
+                    aria-expanded={langOpen}
+                    onClick={() => setLangOpen(!langOpen)}
+                    className="px-3 py-2 rounded-md bg-white/6 text-slate-100 hover:bg-white/10 font-semibold"
+                  >
+                    {language} <span className="ml-1">▾</span>
+                  </button>
+
+                  {langOpen && (
+                    <div className="absolute right-0 mt-2 w-40 bg-slate-800 border border-slate-700 rounded-md shadow-lg z-50">
+                      <button
+                        className="w-full text-left px-4 py-2 hover:bg-slate-700"
+                        onClick={() => { setLanguage('EN'); setLangOpen(false); }}
+                      >
+                        English
+                      </button>
+                      <button
+                        className="w-full text-left px-4 py-2 hover:bg-slate-700"
+                        onClick={() => { setLanguage('UA'); setLangOpen(false); }}
+                      >
+                        Українська
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
