@@ -122,7 +122,7 @@ type StudySession = {
 };
 
 // Enhanced Helper Components
-const QuickStats = ({ logs, className = "" }) => {
+const QuickStats = ({ logs, className = "", onResetData }: { logs: BlockLog[]; className?: string; onResetData?: () => void }) => {
   const today = new Date().toISOString().split('T')[0];
   const thisWeek = logs.filter(log => {
     const logDate = new Date(log.dateISO);
@@ -155,6 +155,23 @@ const QuickStats = ({ logs, className = "" }) => {
       </Card>
       <Card className="bg-slate-800 border-amber-500/50 shadow-lg shadow-amber-500/10">
         <CardContent className="pt-4">
+          {/* Reset button above streak - confirms before clearing focus logs/statistics */}
+          <div className="flex justify-end mb-3">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                if (typeof onResetData === 'function') {
+                  if (confirm('Ви впевнені, що хочете скинути всі дані фокусу? Це очистить журнал сесій і статистику.')) {
+                    onResetData();
+                  }
+                }
+              }}
+              className="text-red-400 hover:text-red-300"
+            >
+              Скинути дані
+            </Button>
+          </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-amber-300 flex items-center justify-center">
               <Flame className="w-7 h-7 mr-1" />
@@ -1288,16 +1305,38 @@ const DeepWorkOS_UA = () => {
               <p className="text-slate-300 mt-1">Інтелектуальна система продуктивності</p>
             </div>
 
-            {/* Стильна кнопка повернення справа */}
-            <Button
-              onClick={() => window.location.href = '/'}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 border border-indigo-400/30 text-indigo-300 hover:text-indigo-200 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-indigo-500/25 font-semibold"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              На головну
-            </Button>
-            
-            <QuickStats logs={logs} className="lg:w-auto w-full" />
+            <div className="flex flex-col items-end w-full lg:w-auto">
+              <div className="flex items-center space-x-3 mb-3">
+                <Button
+                  onClick={() => window.location.href = '/'}
+                  className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 hover:from-indigo-500/30 hover:to-purple-500/30 border border-indigo-400/30 text-indigo-300 hover:text-indigo-200 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-indigo-500/25 font-semibold"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  На головну
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    if (confirm('Ви впевнені, що хочете скинути всі дані фокусу? Це очистить журнал сесій і статистику.')) {
+                      setLogs([]);
+                      setOofs(prev => prev.map(o => ({ ...o, actualMinutes: 0, completedAt: undefined })));
+                      setStarredOOFs([]);
+                      setPostBlockData({ dq: 3, ou: 0, lr: 0, energy: 3, mood: 3, interruptions: 0, flowState: false, completedOOF: false, notes: '' });
+                      setChecklists({
+                        pre: { oof: false, tabs: false, notifications: false, prep: false, energy: false },
+                        during: { singleTask: false, scratchpad: false, stuckRule: false, hydration: false },
+                        post: { artifact: false, summary: false, nextStep: false, reflect: false }
+                      });
+                    }
+                  }}
+                  className="text-red-400 hover:text-red-300"
+                >
+                  Скинути дані
+                </Button>
+              </div>
+              <QuickStats logs={logs} className="lg:w-auto w-full" />
+            </div>
           </div>
           
           {/* Переміщений таймер вгору */}

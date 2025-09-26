@@ -383,6 +383,10 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
                   key={project.id}
                   onMouseEnter={() => setHoveredProject(project.id)}
                   onMouseLeave={() => setHoveredProject(null)}
+                  onClick={() => project.component && onNavigateToArtifact?.(project.component)}
+                  onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && project.component) onNavigateToArtifact?.(project.component); }}
+                  role={project.component ? 'button' : undefined}
+                  tabIndex={project.component ? 0 : undefined}
                   className={`group cursor-pointer transform transition-all duration-300 ${
                     hoveredProject === project.id ? 'scale-105' : ''
                   }`}
@@ -464,13 +468,6 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
                           🚀 Launch
                         </button>
                       )}
-                      <a 
-                        href="./ARTIFACTS_ROADMAP.md"
-                        target="_blank"
-                        className="flex-1 px-3 py-2 bg-purple-500/20 text-purple-400 rounded-md text-sm hover:bg-purple-500/30 transition-colors text-center border border-purple-500/30"
-                      >
-                        📋 Roadmap
-                      </a>
                     </div>
                   </div>
                 </div>
