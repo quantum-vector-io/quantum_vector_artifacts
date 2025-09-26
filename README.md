@@ -84,4 +84,4 @@ Built with quantum love and digital dreams 🌌
 
 ---
 
-**Made by Quantum Developers** | [Portfolio](#) | [Twitter](#)
+**Made by Mykola Rudenko** | [LinkedIn](https://linkedin.com/in/mykola-rudenko-b3791b102) | [X/Twitter](https://x.com/nikolayrudenko8) | [Threads](https://threads.net/@vajra_dorje_8) | [Instagram](https://instagram.com/vajra_dorje_8)
