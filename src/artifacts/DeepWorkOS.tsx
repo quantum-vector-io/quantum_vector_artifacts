@@ -176,6 +176,95 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
   }
 };
 
+// additional keys used across the artifact UI
+TRANSLATIONS.EN.tabFocus = 'Focus';
+TRANSLATIONS.EN.tabTimer = 'Timer';
+TRANSLATIONS.EN.tabParking = 'Parking';
+TRANSLATIONS.EN.tabAnalytics = 'Analytics';
+TRANSLATIONS.EN.tabTemplates = 'Templates';
+TRANSLATIONS.EN.tabSettings = 'Settings';
+TRANSLATIONS.EN.pomodoro25 = 'Pomodoro 25m';
+TRANSLATIONS.EN.standard60 = 'Standard 60m';
+TRANSLATIONS.EN.deep90 = 'Deep 90m';
+TRANSLATIONS.EN.oofTitlePlaceholder = 'Task or project name';
+TRANSLATIONS.EN.oofDefinitionPlaceholder = 'Definition of Done - how will you know the task is done?';
+TRANSLATIONS.EN.constraintsPlaceholder = 'Constraints & context';
+TRANSLATIONS.EN.firstStepPlaceholder = 'Specific first step';
+TRANSLATIONS.EN.readyPrompt = 'Choose a task from the "Focus" tab or start free mode';
+TRANSLATIONS.EN.tipLabel = 'Tip:';
+TRANSLATIONS.EN.hintLongShort = 'Use templates from the Templates tab — the "To notes" button inserts them here.';
+TRANSLATIONS.EN.check_single_title = 'Single task';
+TRANSLATIONS.EN.check_single_info = 'Focus only on the current task. Close everything else.';
+TRANSLATIONS.EN.check_single_example = 'One browser tab, one editor, notifications off';
+TRANSLATIONS.EN.check_scratch_title = 'Draft ready';
+TRANSLATIONS.EN.check_scratch_info = 'Use a scratchpad for quick notes and ideas.';
+TRANSLATIONS.EN.check_scratch_example = 'Text file, notebook, or dedicated app';
+TRANSLATIONS.EN.check_5min_title = '5-minute rule';
+TRANSLATIONS.EN.check_5min_info = 'If stuck for over 5 minutes, try a micro-experiment or change approach.';
+TRANSLATIONS.EN.check_5min_example = 'New perspective, different algorithm, simplify the task';
+TRANSLATIONS.EN.check_hydration_title = 'Hydration';
+TRANSLATIONS.EN.check_hydration_info = 'Drink water regularly to maintain focus.';
+TRANSLATIONS.EN.check_hydration_example = 'A glass every 30 minutes';
+TRANSLATIONS.EN.edit = 'Edit';
+TRANSLATIONS.EN.delete = 'Delete';
+TRANSLATIONS.EN.save = 'Save';
+
+TRANSLATIONS.EN.domain = 'Domain';
+TRANSLATIONS.EN.priority = 'Priority';
+TRANSLATIONS.EN.time = 'Time (min)';
+TRANSLATIONS.EN.difficulty = 'Difficulty';
+TRANSLATIONS.EN.energy = 'Energy';
+TRANSLATIONS.EN.quickAddPlaceholder = 'Quickly jot a thought or distraction...';
+TRANSLATIONS.EN.add = 'Add';
+TRANSLATIONS.EN.categoriesLabel = 'Categories:';
+TRANSLATIONS.EN.all = 'All';
+TRANSLATIONS.EN.entries = 'entries';
+TRANSLATIONS.EN.hintLong = 'Tip: use templates from the Templates tab — the "To notes" button inserts them here.';
+
+TRANSLATIONS.UA.tabFocus = 'Фокус';
+TRANSLATIONS.UA.tabTimer = 'Таймер';
+TRANSLATIONS.UA.tabParking = 'Паркінг';
+TRANSLATIONS.UA.tabAnalytics = 'Аналітика';
+TRANSLATIONS.UA.tabTemplates = 'Шаблони';
+TRANSLATIONS.UA.tabSettings = 'Налаштування';
+TRANSLATIONS.UA.pomodoro25 = 'Pomodoro 25хв';
+TRANSLATIONS.UA.standard60 = 'Стандарт 60хв';
+TRANSLATIONS.UA.deep90 = 'Глибокий 90хв';
+TRANSLATIONS.UA.domain = 'Домен';
+TRANSLATIONS.UA.priority = 'Пріоритет';
+TRANSLATIONS.UA.time = 'Час (хв)';
+TRANSLATIONS.UA.difficulty = 'Складність';
+TRANSLATIONS.UA.energy = 'Енергія';
+TRANSLATIONS.UA.oofTitlePlaceholder = 'Назва завдання або проєкту';
+TRANSLATIONS.UA.oofDefinitionPlaceholder = 'Definition of Done - як ви зрозумієте, що завдання виконане?';
+TRANSLATIONS.UA.constraintsPlaceholder = 'Обмеження та контекст';
+TRANSLATIONS.UA.firstStepPlaceholder = 'Конкретний перший крок';
+TRANSLATIONS.UA.readyPrompt = 'Оберіть завдання з вкладки "Фокус" або запустіть вільний режим';
+TRANSLATIONS.UA.tipLabel = 'Підказка:';
+TRANSLATIONS.UA.hintLongShort = 'Використовуйте шаблони з вкладки "Шаблони" - кнопка "В нотатки" додає їх сюди автоматично';
+TRANSLATIONS.UA.check_single_title = 'Одна справа';
+TRANSLATIONS.UA.check_single_info = 'Зосередьтесь виключно на поточному завданні. Закрийте все зайве.';
+TRANSLATIONS.UA.check_single_example = 'Одна вкладка браузера, один редактор, вимкнені сповіщення';
+TRANSLATIONS.UA.check_scratch_title = 'Чернетка готова';
+TRANSLATIONS.UA.check_scratch_info = 'Використовуйте чернетку для швидких записів та ідей.';
+TRANSLATIONS.UA.check_scratch_example = 'Текстовий файл, блокнот, або спеціальний додаток';
+TRANSLATIONS.UA.check_5min_title = 'Правило 5 хвилин';
+TRANSLATIONS.UA.check_5min_info = 'При застою понад 5хв роблю мікроексперимент або змінюю підхід.';
+TRANSLATIONS.UA.check_5min_example = 'Нова перспектива, інший алгоритм, спрощення задачі';
+TRANSLATIONS.UA.check_hydration_title = 'Гідратація';
+TRANSLATIONS.UA.check_hydration_info = 'Пийте воду регулярно для підтримки концентрації.';
+TRANSLATIONS.UA.check_hydration_example = 'Скляночка води кожні 30 хвилин';
+TRANSLATIONS.UA.edit = 'Редагувати';
+TRANSLATIONS.UA.delete = 'Видалити';
+TRANSLATIONS.UA.save = 'Зберегти';
+TRANSLATIONS.UA.quickAddPlaceholder = 'Швидко запишіть думку або відволікання...';
+TRANSLATIONS.UA.add = 'Додати';
+TRANSLATIONS.UA.categoriesLabel = 'Категорії:';
+TRANSLATIONS.UA.all = 'Всі';
+TRANSLATIONS.UA.entries = 'записів';
+TRANSLATIONS.UA.hintLong = 'Підказка: використовуйте шаблони з вкладки "Шаблони" — кнопка "В нотатки" додає їх сюди.';
+
+
 const translate = (language: string, key: string, ...args: any[]) => {
   const val = TRANSLATIONS[language]?.[key];
   if (typeof val === 'function') return val(...args);
@@ -216,23 +305,7 @@ const QuickStats = ({ logs, className = "", onResetData, language = 'EN' }: { lo
       </Card>
       <Card className="bg-slate-800 border-amber-500/50 shadow-lg shadow-amber-500/10">
         <CardContent className="pt-4">
-          {/* Reset button above streak - confirms before clearing focus logs/statistics */}
-          <div className="flex justify-end mb-3">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                if (typeof onResetData === 'function') {
-                  if (confirm(translate(language,'resetConfirm'))) {
-                    onResetData();
-                  }
-                }
-              }}
-              className="text-red-400 hover:text-red-300"
-            >
-              {translate(language,'resetData')}
-            </Button>
-          </div>
+          {/* Reset button removed here to avoid duplication; top header contains the single Reset */}
           <div className="text-center">
             <div className="text-3xl font-bold text-amber-300 flex items-center justify-center">
               <Flame className="w-7 h-7 mr-1" />
@@ -246,9 +319,9 @@ const QuickStats = ({ logs, className = "", onResetData, language = 'EN' }: { lo
   );
 };
 
-const calculateStreak = (logs) => {
-  const sortedLogs = logs.sort((a, b) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
-  const uniqueDates = [...new Set(sortedLogs.map(log => log.dateISO))];
+const calculateStreak = (logs: BlockLog[]): number => {
+  const sortedLogs = logs.sort((a: BlockLog, b: BlockLog) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
+  const uniqueDates = [...new Set(sortedLogs.map((log: BlockLog) => log.dateISO))];
   
   let streak = 0;
   const today = new Date();
@@ -268,7 +341,7 @@ const calculateStreak = (logs) => {
   return streak;
 };
 
-const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec }) => {
+const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec }: { run: RunningBlock; onTogglePause: ()=>void; onReset: ()=>void; onStop: ()=>void; elapsedSec: number }) => {
   const targetSec = run.targetMinutes * 60;
   const progress = Math.min(100, Math.round((elapsedSec / targetSec) * 100));
   const remainingMin = Math.ceil((targetSec - elapsedSec) / 60);
@@ -357,7 +430,7 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec }) => {
   );
 };
 
-const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarred }) => {
+const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarred, language = 'EN' }: { oof: OOF; onStart: (oof:OOF, minutes:number)=>void; onEdit: (oof:OOF)=>void; onDelete: (id:string)=>void; onToggleStar: (id:string)=>void; isStarred:boolean; language?:string }) => {
   const priorityColors = {
     Low: { bg: 'bg-slate-800/90', text: 'text-slate-300', border: 'border-slate-600' },
     Medium: { bg: 'bg-blue-900/60', text: 'text-blue-400', border: 'border-blue-700' },
@@ -455,13 +528,22 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
             <Pencil className="w-4 h-4 mr-1" />
             Редагувати
           </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => onDelete(oof.id)}
+            className="border-slate-600 text-red-400 hover:text-red-300 ml-2"
+          >
+            <Trash2 className="w-4 h-4 mr-1" />
+            {translate(language,'delete')}
+          </Button>
         </div>
       </CardContent>
     </Card>
   );
 };
 
-const SmartParkingList = ({ parking, onAdd, onToggle, onDelete, onCategorize, currentBlockId }) => {
+const SmartParkingList = ({ parking, onAdd, onToggle, onDelete, onCategorize, currentBlockId, language = 'EN' }: { parking: ParkingItem[]; onAdd: (text:string)=>void; onToggle: (id:string, done:boolean)=>void; onDelete: (id:string)=>void; onCategorize: (id:string, category:string)=>void; currentBlockId?: string; language?: string }) => {
   const [filter, setFilter] = useState('all');
   const filteredParking = parking.filter(item => {
     if (filter === 'all') return true;
@@ -473,9 +555,10 @@ const SmartParkingList = ({ parking, onAdd, onToggle, onDelete, onCategorize, cu
       {/* Input field for quick add */}
       <div className="w-full mb-4">
         <AddInline
-          placeholder="Швидко запишіть думку або відволікання..."
+          placeholder={translate(language,'quickAddPlaceholder')}
           onAdd={onAdd}
-          buttonText="Додати"
+          buttonText={translate(language,'add')}
+          language={language}
         />
       </div>
       
@@ -608,7 +691,7 @@ const formatTime = (seconds: number) => {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 };
 
-const AddInline = ({ placeholder, onAdd, buttonText = "Додати" }) => {
+const AddInline = ({ placeholder, onAdd, buttonText = "Додати", language = 'EN' }: { placeholder?: string; onAdd: (text:string)=>void; buttonText?: string; language?: string }) => {
   const [text, setText] = useState("");
   
   const handleAdd = () => {
@@ -620,7 +703,7 @@ const AddInline = ({ placeholder, onAdd, buttonText = "Додати" }) => {
   
   return (
     <div className="flex flex-col space-y-3 w-full">
-      <Textarea
+  <Textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder={placeholder}
@@ -636,7 +719,7 @@ const AddInline = ({ placeholder, onAdd, buttonText = "Додати" }) => {
       </div>
       <div className="text-xs text-slate-400 bg-slate-800/30 px-3 py-2 rounded-lg border border-slate-700/30">
         <Lightbulb className="w-3 h-3 mr-1 inline text-indigo-400" />
-        <strong>Підказка:</strong> Використовуйте Shift+Enter для нового рядка, Enter для додавання
+        <strong>{translate(language,'tipLabel')}</strong> {language === 'EN' ? 'Use Shift+Enter for newline, Enter to add' : 'Використовуйте Shift+Enter для нового рядка, Enter для додавання'}
       </div>
     </div>
   );
@@ -753,7 +836,7 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
               </button>
               {showHint && (
                 <div className="mt-2 text-xs text-slate-300 bg-slate-800/80 p-2 rounded-md border border-slate-700/50 max-w-xs shadow-lg">
-                  <strong>Підказка:</strong> Використовуйте шаблони з вкладки "Шаблони" - кнопка "В нотатки" додає їх сюди автоматично
+                  <strong>{translate(language,'tipLabel')}</strong> {translate(language,'hintLongShort')}
                 </div>
               )}
             </div>
@@ -869,6 +952,38 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
     difficulty: 3,
     energy: 3
   });
+
+  // When editingOOF is set, populate the form with its values
+  useEffect(() => {
+    if (editingOOF) {
+      setNewOOF({
+        title: editingOOF.title,
+        domain: editingOOF.domain,
+        priority: editingOOF.priority,
+        estimatedMinutes: editingOOF.estimatedMinutes,
+        definitionOfDone: editingOOF.definitionOfDone || '',
+        constraints: editingOOF.constraints || '',
+        firstStep: editingOOF.firstStep || '',
+        tags: editingOOF.tags || [],
+        difficulty: editingOOF.difficulty || 3,
+        energy: editingOOF.energy || 3
+      });
+    } else {
+      // reset to defaults when not editing
+      setNewOOF({
+        title: '',
+        domain: 'Backend',
+        priority: 'Medium',
+        estimatedMinutes: 90,
+        definitionOfDone: '',
+        constraints: '',
+        firstStep: '',
+        tags: [],
+        difficulty: 3,
+        energy: 3
+      });
+    }
+  }, [editingOOF]);
   
   const [postBlockData, setPostBlockData] = useState({
     dq: 3,
@@ -1019,6 +1134,27 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
       difficulty: 3,
       energy: 3
     });
+  };
+
+  const saveOrUpdateOOF = () => {
+    if (editingOOF) {
+      const updated: OOF = {
+        ...editingOOF,
+        title: newOOF.title.trim(),
+        domain: newOOF.domain,
+        priority: newOOF.priority,
+        estimatedMinutes: newOOF.estimatedMinutes,
+        definitionOfDone: newOOF.definitionOfDone.trim() || undefined,
+        constraints: newOOF.constraints.trim() || undefined,
+        firstStep: newOOF.firstStep.trim() || undefined,
+        tags: newOOF.tags,
+        difficulty: newOOF.difficulty,
+        energy: newOOF.energy
+      };
+      updateOOF(updated);
+    } else {
+      addOOF();
+    }
   };
   
   const updateOOF = (updatedOOF: OOF) => {
@@ -1406,27 +1542,27 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
               <TabsList className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-6 bg-slate-800 border border-slate-700 w-full gap-0.5 md:gap-1 h-auto p-1">
                 <TabsTrigger value="focus" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
                   <Target className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
-                  <span>Фокус</span>
+                  <span>{translate(language,'tabFocus')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="timer" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
                   <Clock className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
-                  <span>Таймер</span>
+                  <span>{translate(language,'tabTimer')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="parking" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
                   <NotebookPen className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
-                  <span>Паркінг</span>
+                  <span>{translate(language,'tabParking')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="analytics" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
                   <BarChart3 className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
-                  <span>Аналітика</span>
+                  <span>{translate(language,'tabAnalytics')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="templates" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
                   <Copy className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
-                  <span>Шаблони</span>
+                  <span>{translate(language,'tabTemplates')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
                   <Settings className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
-                  <span>Налаштування</span>
+                  <span>{translate(language,'tabSettings')}</span>
                 </TabsTrigger>
               </TabsList>
               
@@ -1445,7 +1581,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div className="space-y-4">
                           <Input
-                            placeholder="Назва завдання або проєкту"
+                            placeholder={translate(language,'oofTitlePlaceholder')}
                             value={newOOF.title}
                             onChange={(e) => setNewOOF(prev => ({ ...prev, title: e.target.value }))}
                             className="bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400 focus:border-indigo-500"
@@ -1453,7 +1589,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <label className="text-slate-200 text-sm font-medium mb-2 block">Домен</label>
+                              <label className="text-slate-200 text-sm font-medium mb-2 block">{translate(language,'domain')}</label>
                               <select
                                 value={newOOF.domain}
                                 onChange={(e) => setNewOOF(prev => ({ ...prev, domain: e.target.value as Domain }))}
@@ -1471,7 +1607,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                             </div>
                             
                             <div>
-                              <label className="text-slate-200 text-sm font-medium mb-2 block">Пріоритет</label>
+                              <label className="text-slate-200 text-sm font-medium mb-2 block">{translate(language,'priority')}</label>
                               <select
                                 value={newOOF.priority}
                                 onChange={(e) => setNewOOF(prev => ({ ...prev, priority: e.target.value as Priority }))}
@@ -1487,7 +1623,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           
                           <div className="grid grid-cols-3 gap-4">
                             <div>
-                              <label className="text-slate-200 text-sm font-medium mb-2 block">Час (хв)</label>
+                              <label className="text-slate-200 text-sm font-medium mb-2 block">{translate(language,'time')}</label>
                               <Input
                                 type="number"
                                 value={newOOF.estimatedMinutes}
@@ -1497,7 +1633,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                             </div>
                             
                             <div>
-                              <label className="text-slate-200 text-sm font-medium mb-2 block">Складність</label>
+                              <label className="text-slate-200 text-sm font-medium mb-2 block">{translate(language,'difficulty')}</label>
                               <div className="px-2 mt-2">
                                 <Slider
                                   value={[newOOF.difficulty]}
@@ -1512,7 +1648,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                             </div>
                             
                             <div>
-                              <label className="text-slate-200 text-sm font-medium mb-2 block">Енергія</label>
+                              <label className="text-slate-200 text-sm font-medium mb-2 block">{translate(language,'energy')}</label>
                               <div className="px-2 mt-2">
                                 <Slider
                                   value={[newOOF.energy]}
@@ -1554,10 +1690,26 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                         </div>
                       </div>
                       
-                      <Button onClick={addOOF} className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold" size="lg">
-                        <Plus className="w-4 h-4 mr-2" />
-                        {translate(language,'createOOF')}
-                      </Button>
+                          {editingOOF ? (
+                            <div className="flex items-center space-x-3">
+                              <Button onClick={saveOrUpdateOOF} className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold" size="lg">
+                                <Save className="w-4 h-4 mr-2" />
+                                {translate(language,'save')}
+                              </Button>
+                              <Button onClick={() => { if (editingOOF) { deleteOOF(editingOOF.id); setEditingOOF(null); } }} className="bg-red-600 hover:bg-red-500 text-white font-semibold" size="lg">
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                {translate(language,'delete')}
+                              </Button>
+                              <Button onClick={() => setEditingOOF(null)} variant="outline" className="text-slate-200 border-slate-600" size="lg">
+                                Відмінити
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button onClick={addOOF} className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold" size="lg">
+                              <Plus className="w-4 h-4 mr-2" />
+                              {translate(language,'createOOF')}
+                            </Button>
+                          )}
                     </CardContent>
                   </Card>
                   
@@ -1604,6 +1756,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                         onDelete={deleteOOF}
                         onToggleStar={toggleStarOOF}
                         isStarred={starredOOFs.includes(oof.id)}
+                        language={language}
                       />
                     ))}
                   </div>
@@ -1628,7 +1781,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                               size="lg"
                             >
                               <Play className="w-4 h-4 mr-2" />
-                              <span className="whitespace-nowrap">Pomodoro 25хв</span>
+                              <span className="whitespace-nowrap">{translate(language,'pomodoro25')}</span>
                             </Button>
                             <Button
                               onClick={() => startBlock(null, 60)}
@@ -1636,7 +1789,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                               size="lg"
                             >
                               <Play className="w-4 h-4 mr-2" />
-                              <span className="whitespace-nowrap">Стандарт 60хв</span>
+                              <span className="whitespace-nowrap">{translate(language,'standard60')}</span>
                             </Button>
                             <Button
                               onClick={() => startBlock(null, 90)}
@@ -1644,7 +1797,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                               size="lg"
                             >
                               <Play className="w-4 h-4 mr-2" />
-                              <span className="whitespace-nowrap">Глибокий 90хв</span>
+                              <span className="whitespace-nowrap">{translate(language,'deep90')}</span>
                             </Button>
                           </div>
                         </div>
@@ -1935,6 +2088,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                         onDelete={deleteParking}
                         onCategorize={categorizeParking}
                         currentBlockId={run.blockId}
+                        language={language}
                       />
                     </CardContent>
                   </Card>
