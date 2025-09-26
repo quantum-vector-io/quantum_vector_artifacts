@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import * as THREE from 'three';
 
-const QuantumCatalog = () => {
+const QuantumCatalog = ({ onNavigateToArtifact }) => {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -43,6 +43,17 @@ const QuantumCatalog = () => {
     },
     {
       id: 4,
+      title: 'Deep Work OS',
+      category: 'productivity',
+      tags: ['React', 'Productivity', 'Deep Work', 'Time Tracking'],
+      description: 'Інтелектуальна система для глибокої роботи з таймерами, відстеженням завдань та аналітикою продуктивності',
+      color: '#06b6d4',
+      isTop: true,
+      isFavorite: true,
+      component: 'DeepWorkOS'
+    },
+    {
+      id: 5,
       title: 'Productivity Timer',
       category: 'web-apps',
       tags: ['React', 'Productivity', 'PWA'],
@@ -52,7 +63,7 @@ const QuantumCatalog = () => {
       isFavorite: false
     },
     {
-      id: 5,
+      id: 6,
       title: 'Quantum Tetris',
       category: 'games',
       tags: ['JavaScript', 'Canvas', 'Physics'],
@@ -62,7 +73,7 @@ const QuantumCatalog = () => {
       isFavorite: true
     },
     {
-      id: 6,
+      id: 7,
       title: 'Data Pipeline Monitor',
       category: 'ai-tools',
       tags: ['Python', 'Monitoring', 'ETL'],
@@ -72,7 +83,7 @@ const QuantumCatalog = () => {
       isFavorite: false
     },
     {
-      id: 7,
+      id: 8,
       title: 'Digital Library Manager',
       category: 'book-apps',
       tags: ['React', 'Database', 'Organization'],
@@ -82,7 +93,7 @@ const QuantumCatalog = () => {
       isFavorite: true
     },
     {
-      id: 8,
+      id: 9,
       title: 'Speed Reading Trainer',
       category: 'book-apps',
       tags: ['JavaScript', 'Education', 'Productivity'],
@@ -795,9 +806,18 @@ const QuantumCatalog = () => {
 
                       {/* Actions */}
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors">
-                          Demo
-                        </button>
+                        {project.component ? (
+                          <button 
+                            onClick={() => onNavigateToArtifact?.(project.component)}
+                            className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors"
+                          >
+                            Launch
+                          </button>
+                        ) : (
+                          <button className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors">
+                            Demo
+                          </button>
+                        )}
                         <button className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-md text-sm hover:bg-purple-500/30 transition-colors">
                           Code
                         </button>
