@@ -14,6 +14,7 @@ import {
   Zap, Brain, BookOpen, Coffee, Lightbulb, Download, Upload,
   Settings, Bell, BellOff, ChevronLeft, ChevronRight, Star,
   Award, Flame, Timer, Activity, Filter, Search, MoreHorizontal, ArrowLeft
+  ,Pencil
 } from 'lucide-react';
 
 // Recharts components used in the charts below — import to avoid runtime ReferenceErrors
@@ -47,6 +48,16 @@ type ParkingItem = {
   createdDuringBlock?: string;
   priority: 'Low' | 'Medium' | 'High';
   category: 'task' | 'idea' | 'distraction' | 'learning';
+};
+
+// Parking categories used by SmartParkingList
+const categories = ['task', 'idea', 'distraction', 'learning'] as const;
+
+const categoryIcons: Record<string, string> = {
+  task: '📝',
+  idea: '💡',
+  distraction: '🔔',
+  learning: '📚'
 };
 
 type BlockLog = {
@@ -121,8 +132,58 @@ type StudySession = {
   date: string;
 };
 
+// Simple translations for DeepWorkOS and shared components
+const TRANSLATIONS: Record<string, Record<string, any>> = {
+  EN: {
+    backToHome: 'Back to Catalog',
+    resetData: 'Reset data',
+    resetConfirm: 'Are you sure you want to reset all focus data? This will clear session logs and progress.',
+    notesTitle: 'Current session notes',
+    notesPlaceholder: 'Capture ideas, insights, questions and conclusions while working...',
+    hint: 'Hint',
+    copied: 'Copied',
+    export: 'Export',
+    clear: 'Clear',
+    today: 'Today',
+    week: 'Week',
+    streak: 'Streak',
+    words: 'words',
+    chars: 'chars',
+    createOOF: 'Create OOF',
+    launch: 'Launch',
+    show: 'Show',
+    hide: 'Hide'
+  },
+  UA: {
+    backToHome: 'На головну',
+    resetData: 'Скинути дані',
+    resetConfirm: 'Ви впевнені, що хочете скинути всі дані фокусу? Це очистить журнал сесій і статистику.',
+    notesTitle: 'Нотатки поточної сесії',
+    notesPlaceholder: 'Записуйте ідеї, інсайти, питання та висновки під час роботи...',
+    hint: 'Підказка',
+    copied: 'Скопійовано',
+    export: 'Експорт',
+    clear: 'Очистити',
+    today: 'Сьогодні',
+    week: 'Тиждень',
+    streak: 'Стрік',
+    words: 'слів',
+    chars: 'символів',
+    createOOF: 'Створити OOF',
+    launch: 'Запустити',
+    show: 'Показати',
+    hide: 'Сховати'
+  }
+};
+
+const translate = (language: string, key: string, ...args: any[]) => {
+  const val = TRANSLATIONS[language]?.[key];
+  if (typeof val === 'function') return val(...args);
+  return val ?? key;
+}
+
 // Enhanced Helper Components
-const QuickStats = ({ logs, className = "", onResetData }: { logs: BlockLog[]; className?: string; onResetData?: () => void }) => {
+const QuickStats = ({ logs, className = "", onResetData, language = 'EN' }: { logs:any[]; className?:string; onResetData?:()=>void; language?: string }) => {
   const today = new Date().toISOString().split('T')[0];
   const thisWeek = logs.filter(log => {
     const logDate = new Date(log.dateISO);
@@ -141,7 +202,7 @@ const QuickStats = ({ logs, className = "", onResetData }: { logs: BlockLog[]; c
         <CardContent className="pt-4">
           <div className="text-center">
             <div className="text-3xl font-bold text-emerald-300">{Math.round(todayTime/60 * 10)/10}h</div>
-            <div className="text-slate-200 text-sm font-medium">Сьогодні</div>
+            <div className="text-slate-200 text-sm font-medium">{translate(language,'today')}</div>
           </div>
         </CardContent>
       </Card>
@@ -149,7 +210,7 @@ const QuickStats = ({ logs, className = "", onResetData }: { logs: BlockLog[]; c
         <CardContent className="pt-4">
           <div className="text-center">
             <div className="text-3xl font-bold text-blue-300">{Math.round(weekTime/60 * 10)/10}h</div>
-            <div className="text-slate-200 text-sm font-medium">Тиждень</div>
+            <div className="text-slate-200 text-sm font-medium">{translate(language,'week')}</div>
           </div>
         </CardContent>
       </Card>
@@ -162,14 +223,14 @@ const QuickStats = ({ logs, className = "", onResetData }: { logs: BlockLog[]; c
               variant="ghost"
               onClick={() => {
                 if (typeof onResetData === 'function') {
-                  if (confirm('Ви впевнені, що хочете скинути всі дані фокусу? Це очистить журнал сесій і статистику.')) {
+                  if (confirm(translate(language,'resetConfirm'))) {
                     onResetData();
                   }
                 }
               }}
               className="text-red-400 hover:text-red-300"
             >
-              Скинути дані
+              {translate(language,'resetData')}
             </Button>
           </div>
           <div className="text-center">
@@ -177,7 +238,7 @@ const QuickStats = ({ logs, className = "", onResetData }: { logs: BlockLog[]; c
               <Flame className="w-7 h-7 mr-1" />
               {streak}
             </div>
-            <div className="text-slate-200 text-sm font-medium">Стрік</div>
+            <div className="text-slate-200 text-sm font-medium">{translate(language,'streak')}</div>
           </div>
         </CardContent>
       </Card>
@@ -384,28 +445,16 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
             <Button size="sm" onClick={() => onStart(oof, 90)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md">
               90хв
             </Button>
-            <Button size="sm" onClick={() => onStart(oof, oof.estimatedMinutes)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md">
-              {oof.estimatedMinutes}хв
-            </Button>
           </div>
-          <div className="flex space-x-1">
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              onClick={() => onEdit(oof)} 
-              className="text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 bg-transparent border border-slate-600/50"
-            >
-              <Settings className="w-4 h-4" />
-            </Button>
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              onClick={() => onDelete(oof.id)} 
-              className="text-red-400 hover:text-red-300 hover:bg-red-900/20 bg-transparent border border-slate-600/50"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onEdit(oof)}
+            className="border-slate-600 text-slate-300 hover:text-slate-100"
+          >
+            <Pencil className="w-4 h-4 mr-1" />
+            Редагувати
+          </Button>
         </div>
       </CardContent>
     </Card>
@@ -414,72 +463,62 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
 
 const SmartParkingList = ({ parking, onAdd, onToggle, onDelete, onCategorize, currentBlockId }) => {
   const [filter, setFilter] = useState('all');
-  
   const filteredParking = parking.filter(item => {
     if (filter === 'all') return true;
     return item.category === filter;
   });
   
-  const categories = ['task', 'idea', 'distraction', 'learning'];
-  const categoryIcons = {
-    task: '📋',
-    idea: '💡', 
-    distraction: '🚨',
-    learning: '📚'
-  };
-  
   return (
     <div className="space-y-4">
-      <div className="p-4 bg-gradient-to-r from-slate-800/60 to-slate-700/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
-        {/* Input поле на всю ширину */}
-        <div className="w-full mb-4">
-          <AddInline
-            placeholder="Швидко запишіть думку або відволікання..."
-            onAdd={onAdd}
-            buttonText="Додати"
-          />
-        </div>
-        
-        {/* Кнопки фільтрів внизу */}
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center space-x-3 flex-wrap">
-            <Filter className="w-5 h-5 text-slate-300" />
-            <span className="text-slate-100 text-sm font-bold">Категорії:</span>
-            <div className="flex flex-wrap gap-2">
+      {/* Input field for quick add */}
+      <div className="w-full mb-4">
+        <AddInline
+          placeholder="Швидко запишіть думку або відволікання..."
+          onAdd={onAdd}
+          buttonText="Додати"
+        />
+      </div>
+      
+      {/* Filter buttons */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center space-x-3 flex-wrap">
+          <Filter className="w-5 h-5 text-slate-300" />
+          <span className="text-slate-100 text-sm font-bold">Категорії:</span>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              onClick={() => setFilter('all')}
+              className={`text-sm font-semibold px-4 py-2 rounded-lg transition-all duration-200 shadow-md ${
+                filter === 'all' 
+                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white border-2 border-indigo-400/50 shadow-lg shadow-indigo-500/25' 
+                  : 'bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-slate-200 border-2 border-slate-600/50 hover:border-slate-500/50'
+              }`}
+            >
+              📋 Всі
+            </Button>
+            {categories.map(cat => (
               <Button
+                key={cat}
                 size="sm"
-                onClick={() => setFilter('all')}
+                onClick={() => setFilter(cat)}
                 className={`text-sm font-semibold px-4 py-2 rounded-lg transition-all duration-200 shadow-md ${
-                  filter === 'all' 
+                  filter === cat 
                     ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white border-2 border-indigo-400/50 shadow-lg shadow-indigo-500/25' 
                     : 'bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-slate-200 border-2 border-slate-600/50 hover:border-slate-500/50'
                 }`}
               >
-                📋 Всі
+                {categoryIcons[cat]}
               </Button>
-              {categories.map(cat => (
-                <Button
-                  key={cat}
-                  size="sm"
-                  onClick={() => setFilter(cat)}
-                  className={`text-sm font-semibold px-4 py-2 rounded-lg transition-all duration-200 shadow-md ${
-                    filter === cat 
-                      ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white border-2 border-indigo-400/50 shadow-lg shadow-indigo-500/25' 
-                      : 'bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-slate-200 border-2 border-slate-600/50 hover:border-slate-500/50'
-                  }`}
-                >
-                  {categoryIcons[cat]}
-                </Button>
-              ))}
-            </div>
+            ))}
           </div>
-          
-          <div className="text-slate-200 text-sm font-semibold bg-slate-800/80 px-4 py-2 rounded-lg border border-slate-700/50 shadow-md">
-            {filteredParking.length} записів
-          </div>
+        </div>
+        
+        <div className="text-slate-200 text-sm font-semibold bg-slate-800/80 px-4 py-2 rounded-lg border border-slate-700/50 shadow-md">
+          {filteredParking.length} записів
         </div>
       </div>
       
+      {/* Parking items list */}
       <div className="space-y-3 max-h-80 overflow-y-auto">
         {filteredParking.map(item => (
           <Card key={item.id} className={`bg-gradient-to-r from-slate-800/80 to-slate-700/60 backdrop-blur-sm border border-slate-600/50 shadow-lg hover:shadow-xl transition-all duration-200 ${item.createdDuringBlock === currentBlockId ? 'border-l-4 border-l-emerald-400 shadow-emerald-400/20' : ''}`}>
@@ -603,7 +642,7 @@ const AddInline = ({ placeholder, onAdd, buttonText = "Додати" }) => {
   );
 };
 
-const ChecklistTile = ({ title, checked, onChange, infoContent, example, icon }) => {
+const ChecklistTile = ({ title, checked, onChange, infoContent, example, icon, language = 'EN' }: { title:string; checked:boolean; onChange:(v:boolean)=>void; infoContent?:string; example?:string; icon?:any; language?:string }) => {
   const [showInfo, setShowInfo] = useState(false);
   
   return (
@@ -623,7 +662,7 @@ const ChecklistTile = ({ title, checked, onChange, infoContent, example, icon })
             onClick={() => setShowInfo(!showInfo)}
             className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 backdrop-blur-sm border border-slate-600/30 px-3 py-1 rounded-lg font-semibold"
           >
-            {showInfo ? 'Сховати' : 'Інфо'}
+            {showInfo ? translate(language,'hide') : translate(language,'hint')}
           </Button>
         </div>
         {showInfo && (
@@ -641,7 +680,7 @@ const ChecklistTile = ({ title, checked, onChange, infoContent, example, icon })
   );
 };
 
-const NotesSection = ({ notes, onNotesChange, className = "" }) => {
+const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }: { notes:string; onNotesChange:(v:string)=>void; className?:string; language?:string }) => {
   const [isCopied, setIsCopied] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
@@ -673,7 +712,7 @@ const NotesSection = ({ notes, onNotesChange, className = "" }) => {
     }
   };
 
-  const wordCount = notes.trim().split(/\s+/).filter(word => word.length > 0).length;
+  const wordCount = notes.trim().length ? notes.trim().split(/\s+/).filter(word => word.length > 0).length : 0;
   const charCount = notes.length;
 
   return (
@@ -682,19 +721,19 @@ const NotesSection = ({ notes, onNotesChange, className = "" }) => {
         <CardTitle className="text-slate-100 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <NotebookPen className="w-5 h-5 text-purple-400" />
-            <span>Нотатки поточної сесії</span>
+            <span>{translate(language,'notesTitle')}</span>
           </div>
-          <div className="flex items-center space-x-2 text-xs text-slate-400">
-            <span>{wordCount} слів</span>
+            <div className="flex items-center space-x-2 text-xs text-slate-400">
+            <span>{wordCount} {translate(language,'words')}</span>
             <span>•</span>
-            <span>{charCount} символів</span>
+            <span>{charCount} {translate(language,'chars')}</span>
           </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6 pb-4">
         <div className="space-y-4">
-          <Textarea
-            placeholder="Записуйте ідеї, інсайти, питання та висновки під час роботи..."
+            <Textarea
+            placeholder={translate(language,'notesPlaceholder')}
             value={notes}
             onChange={(e) => onNotesChange(e.target.value)}
             className="bg-slate-900/60 border-slate-600/50 text-slate-100 placeholder-slate-400 min-h-[100px] md:min-h-[175px] rounded-xl resize-y focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors duration-200"
@@ -710,7 +749,7 @@ const NotesSection = ({ notes, onNotesChange, className = "" }) => {
                 onClick={() => setShowHint((v) => !v)}
               >
                 <Lightbulb className="w-4 h-4 mr-1 text-purple-400" />
-                ℹ️ Підказка
+                ℹ️ {translate(language,'hint')}
               </button>
               {showHint && (
                 <div className="mt-2 text-xs text-slate-300 bg-slate-800/80 p-2 rounded-md border border-slate-700/50 max-w-xs shadow-lg">
@@ -727,15 +766,15 @@ const NotesSection = ({ notes, onNotesChange, className = "" }) => {
                 disabled={!notes.trim()}
                 className="border-slate-500 text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
               >
-                {isCopied ? (
+                    {isCopied ? (
                   <>
                     <span className="w-4 h-4 mr-1">✓</span>
-                    Скопійовано
+                    {translate(language,'copied')}
                   </>
                 ) : (
                   <>
                     <Copy className="w-4 h-4 mr-1" />
-                    Копіювати
+                    {language === 'EN' ? 'Copy' : 'Копіювати'}
                   </>
                 )}
               </Button>
@@ -747,7 +786,7 @@ const NotesSection = ({ notes, onNotesChange, className = "" }) => {
                 className="border-slate-500 text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
               >
                 <Download className="w-4 h-4 mr-1" />
-                Експорт
+                {translate(language,'export')}
               </Button>
               <Button
                 size="sm"
@@ -757,7 +796,7 @@ const NotesSection = ({ notes, onNotesChange, className = "" }) => {
                 className="border-slate-500 text-red-400 hover:text-red-200 hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
               >
                 <Trash2 className="w-4 h-4 mr-1" />
-                Очистити
+                {translate(language,'clear')}
               </Button>
             </div>
           </div>
@@ -767,7 +806,9 @@ const NotesSection = ({ notes, onNotesChange, className = "" }) => {
   );
 };
 
-const DeepWorkOS_UA = () => {
+const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
+   const t = (key: string) => (TRANSLATIONS[language] && TRANSLATIONS[language][key]) || TRANSLATIONS['EN'][key] || key;
+
   // Enhanced state management with localStorage persistence
   const [oofs, setOofs] = useState<OOF[]>(() => ls.get('dw_oofs', []));
   const [parking, setParking] = useState<ParkingItem[]>(() => ls.get('dw_parking', []));
@@ -1300,7 +1341,7 @@ const DeepWorkOS_UA = () => {
             <div>
               <h1 className="text-2xl font-bold text-slate-50 flex items-center space-x-2">
                 <Brain className="w-8 h-8 text-indigo-400" />
-                <span>Deep Work OS — UA</span>
+                <span>Deep Work OS</span>
               </h1>
               <p className="text-slate-300 mt-1">Інтелектуальна система продуктивності</p>
             </div>
@@ -1312,13 +1353,13 @@ const DeepWorkOS_UA = () => {
                   className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 hover:from-indigo-500/30 hover:to-purple-500/30 border border-indigo-400/30 text-indigo-300 hover:text-indigo-200 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-indigo-500/25 font-semibold"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  На головну
+                  {translate(language,'backToHome')}
                 </Button>
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={() => {
-                    if (confirm('Ви впевнені, що хочете скинути всі дані фокусу? Це очистить журнал сесій і статистику.')) {
+                    if (confirm(translate(language,'resetConfirm')) ) {
                       setLogs([]);
                       setOofs(prev => prev.map(o => ({ ...o, actualMinutes: 0, completedAt: undefined })));
                       setStarredOOFs([]);
@@ -1332,10 +1373,17 @@ const DeepWorkOS_UA = () => {
                   }}
                   className="text-red-400 hover:text-red-300"
                 >
-                  Скинути дані
+                  {translate(language,'resetData')}
                 </Button>
               </div>
-              <QuickStats logs={logs} className="lg:w-auto w-full" />
+              <QuickStats logs={logs} className="lg:w-auto w-full" language={language} onResetData={() => {
+                // delegate to parent reset logic
+                if (confirm(translate(language,'resetConfirm'))) {
+                  setLogs([]);
+                  setOofs(prev => prev.map(o => ({ ...o, actualMinutes: 0, completedAt: undefined })));
+                  setStarredOOFs([]);
+                }
+              }} />
             </div>
           </div>
           
@@ -1390,7 +1438,7 @@ const DeepWorkOS_UA = () => {
                     <CardHeader className="bg-slate-700/50 border-b border-slate-600">
                       <CardTitle className="text-slate-50 flex items-center space-x-2">
                         <Target className="w-5 h-5 text-indigo-400" />
-                        <span>Новий об'єкт фокусу (OOF)</span>
+                        <span>{translate(language,'createOOF')}</span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4 pt-6">
@@ -1508,7 +1556,7 @@ const DeepWorkOS_UA = () => {
                       
                       <Button onClick={addOOF} className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold" size="lg">
                         <Plus className="w-4 h-4 mr-2" />
-                        Створити OOF
+                        {translate(language,'createOOF')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -1569,8 +1617,8 @@ const DeepWorkOS_UA = () => {
                         <div className="text-center space-y-6">
                           <div className="space-y-2">
                             <Clock className="w-16 h-16 text-slate-300 mx-auto" />
-                            <h3 className="text-xl font-semibold text-slate-100">Готові розпочати глибоку роботу?</h3>
-                            <p className="text-slate-300">Оберіть завдання з вкладки "Фокус" або запустіть вільний режим</p>
+                            <h3 className="text-xl font-semibold text-slate-100 mb-2">{language === 'EN' ? 'Ready to start deep work?' : 'Готові розпочати глибоку роботу?'}</h3>
+                            <p className="text-slate-300">{language === 'EN' ? 'Choose a task from the "Focus" tab or start free mode' : 'Оберіть завдання з вкладки "Фокус" або запустіть вільний режим'}</p>
                           </div>
                           
                           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:space-x-3 px-4">
@@ -1746,9 +1794,7 @@ const DeepWorkOS_UA = () => {
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                               <div className="space-y-5">
                                 <div className="p-4 bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-600/50">
-                                  <label className="text-slate-100 text-sm font-bold mb-3 block">
-                                    Якість глибини (DQ): {postBlockData.dq}/5
-                                  </label>
+                                  <label className="text-slate-100 text-sm font-bold mb-3 block">Якість глибини (DQ): {postBlockData.dq}/5</label>
                                   <Slider
                                     value={[postBlockData.dq]}
                                     onValueChange={(vals) => setPostBlockData(prev => ({ ...prev, dq: vals[0] }))}

@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import * as THREE from 'three';
 
-const QuantumCatalog = ({ onNavigateToArtifact }) => {
-  const mountRef = useRef(null);
-  const sceneRef = useRef(null);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [hoveredProject, setHoveredProject] = useState(null);
-  const [activeScrollZone, setActiveScrollZone] = useState('main');
-  // UI: language selector for catalog (EN / UA)
-  const [language, setLanguage] = useState('EN');
+const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChange = () => {} }) => {
+   const mountRef = useRef(null);
+   const sceneRef = useRef(null);
+   const [selectedCategory, setSelectedCategory] = useState('all');
+   const [searchTerm, setSearchTerm] = useState('');
+   const [hoveredProject, setHoveredProject] = useState(null);
+   const [activeScrollZone, setActiveScrollZone] = useState('main');
+  // language dropdown state (controlled by parent for selected language)
   const [langOpen, setLangOpen] = useState(false);
   const langRef = useRef(null);
   // Close language dropdown when clicking outside
@@ -22,6 +21,31 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
     document.addEventListener('mousedown', onDocClick);
     return () => document.removeEventListener('mousedown', onDocClick);
   }, []);
+  
+  // simple translation map for catalog UI
+  const TRANS = {
+    EN: {
+      headerDesc: 'Explore the intersection of human creativity and AI assistance through interactive tools and experiments',
+      searchPlaceholder: 'Search artifacts...',
+      showingAll: (n) => `Showing all ${n} artifacts`,
+      working: 'Working',
+      comingSoon: 'Coming Soon',
+      noResults: 'No artifacts found',
+      footerStatus: (w, c, p) => `${w} working • ${c} coming soon • ${p} planned`,
+      launch: 'Launch'
+    },
+    UA: {
+      headerDesc: 'Досліджуйте перетин людської творчості та AI через інтерактивні інструменти й експерименти',
+      searchPlaceholder: 'Пошук артефактів...',
+      showingAll: (n) => `Показано ${n} артефактів`,
+      working: 'Робочі',
+      comingSoon: 'Незабаром',
+      noResults: 'Артефакти не знайдено',
+      footerStatus: (w, c, p) => `${w} робочих • ${c} незабаром • ${p} заплановано`,
+      launch: 'Запустити'
+    }
+  };
+  const L = TRANS[language] || TRANS.EN;
 
   // Clean catalog - only 1 working + 2 coming soon
   const mockProjects = [
@@ -321,57 +345,57 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
                 A R T I F A C T S
               </div>
               <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed">
-                Explore the intersection of human creativity and AI assistance through interactive tools and experiments
+                {L.headerDesc}
               </p>
             </div>
 
             {/* Enhanced Search */}
             <div className="max-w-3xl mx-auto mb-8">
-              <div className="flex items-center gap-4">
-                <div className="relative w-[70%]">
-                  <input
-                    type="text"
-                    placeholder="Search artifacts..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-all"
-                  />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+               <div className="flex items-center gap-4">
+                 <div className="relative w-[70%]">
+                   <input
+                     type="text"
+                     placeholder={L.searchPlaceholder}
+                     value={searchTerm}
+                     onChange={(e) => setSearchTerm(e.target.value)}
+                     className="w-full px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-all"
+                   />
+                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
-                </div>
+                 </div>
 
-                {/* Language selector on the right */}
-                <div className="relative" ref={langRef}>
-                  <button
-                    type="button"
-                    aria-expanded={langOpen}
-                    onClick={() => setLangOpen(!langOpen)}
-                    className="px-3 py-2 rounded-md bg-white/6 text-slate-100 hover:bg-white/10 font-semibold"
-                  >
+                 {/* Language selector on the right */}
+                 <div className="relative" ref={langRef}>
+                   <button
+                     type="button"
+                     aria-expanded={langOpen}
+                     onClick={() => setLangOpen(!langOpen)}
+                     className="px-3 py-2 rounded-md bg-white/6 text-slate-100 hover:bg-white/10 font-semibold"
+                   >
                     {language} <span className="ml-1">▾</span>
-                  </button>
+                   </button>
 
-                  {langOpen && (
+                   {langOpen && (
                     <div className="absolute right-0 mt-2 w-40 bg-slate-800 border border-slate-700 rounded-md shadow-lg z-50">
                       <button
                         className="w-full text-left px-4 py-2 hover:bg-slate-700"
-                        onClick={() => { setLanguage('EN'); setLangOpen(false); }}
+                        onClick={() => { onLanguageChange('EN'); setLangOpen(false); }}
                       >
                         English
                       </button>
                       <button
                         className="w-full text-left px-4 py-2 hover:bg-slate-700"
-                        onClick={() => { setLanguage('UA'); setLangOpen(false); }}
+                        onClick={() => { onLanguageChange('UA'); setLangOpen(false); }}
                       >
                         Українська
                       </button>
                     </div>
-                  )}
-                </div>
-              </div>
+                   )}
+                 </div>
+               </div>
             </div>
           </header>
 
@@ -400,15 +424,15 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
                 <div className="flex items-center justify-center gap-6 mb-2">
                   {selectedCategory === 'all' && (
                     <>
-                      <span>Showing all {filteredProjects.length} artifacts</span>
+                      <span>{L.showingAll(filteredProjects.length)}</span>
                       <div className="flex items-center gap-4">
                         <div className="flex flex-col items-center">
                           <div className="text-base font-bold text-emerald-400">{mockProjects.filter(p => p.status === 'working').length}</div>
-                          <div className="text-xs">Working</div>
+                          <div className="text-xs">{L.working}</div>
                         </div>
                         <div className="flex flex-col items-center">
                           <div className="text-base font-bold text-amber-400">{mockProjects.filter(p => p.status === 'coming-soon').length}</div>
-                          <div className="text-xs">Coming Soon</div>
+                          <div className="text-xs">{L.comingSoon}</div>
                         </div>
                       </div>
                     </>
@@ -428,7 +452,7 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
                   key={project.id}
                   onMouseEnter={() => setHoveredProject(project.id)}
                   onMouseLeave={() => setHoveredProject(null)}
-                  onClick={() => project.component && onNavigateToArtifact?.(project.component)}
+                  onClick={() => project.component && onNavigateToArtifact?.(project.component, language)}
                   onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && project.component) onNavigateToArtifact?.(project.component); }}
                   role={project.component ? 'button' : undefined}
                   tabIndex={project.component ? 0 : undefined}
@@ -495,14 +519,14 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
                     <div className="flex gap-2 mt-3">
                       {project.component ? (
                         <button 
-                          onClick={() => onNavigateToArtifact?.(project.component)}
-                          className="flex-1 px-3 py-2 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors font-semibold border border-cyan-500/30"
-                        >
-                          🚀 Launch
-                        </button>
+                          onClick={() => onNavigateToArtifact?.(project.component, language)}
+                           className="flex-1 px-3 py-2 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors font-semibold border border-cyan-500/30"
+                         >
+                           🚀 Launch
+                         </button>
                       ) : project.status === 'coming-soon' ? (
                         <button className="flex-1 px-3 py-2 bg-amber-500/20 text-amber-400 rounded-md text-sm cursor-default font-semibold border border-amber-500/30">
-                          🔄 Coming Soon
+                          🔄 {L.comingSoon}
                         </button>
                       ) : project.status === 'planned' ? (
                         <button className="flex-1 px-3 py-2 bg-slate-500/20 text-slate-400 rounded-md text-sm cursor-default font-semibold border border-slate-500/30">
@@ -510,7 +534,7 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
                         </button>
                       ) : (
                         <button className="flex-1 px-3 py-2 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors font-semibold border border-cyan-500/30">
-                          🚀 Launch
+                          🚀 {L.launch}
                         </button>
                       )}
                     </div>
@@ -521,10 +545,10 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
 
             {/* No Results */}
             {filteredProjects.length === 0 && (
-              <div className="text-center py-12">
+                <div className="text-center py-12">
                 <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-xl text-white mb-2">No artifacts found</h3>
-                <p className="text-gray-400">Try adjusting your search or category filter</p>
+                <h3 className="text-xl text-white mb-2">{L.noResults}</h3>
+                <p className="text-gray-400">{language === 'EN' ? 'Try adjusting your search or category filter' : 'Спробуйте змінити пошук або фільтр категорій'}</p>
               </div>
             )}
             
@@ -532,7 +556,7 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
             <div className="text-center mt-12 py-8">
               <div className="inline-flex items-center gap-2 text-sm text-gray-500 bg-white/5 backdrop-blur-md rounded-full px-4 py-2 border border-white/10">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span>1 working • 2 coming soon • 73 planned</span>
+                <span>{L.footerStatus(1,2,73)}</span>
                 <div className="ml-4 flex items-center gap-3">
                   <a href="https://github.com/quantum-vector-io/quantum_vector_artifacts" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white text-xs font-semibold">
                     🐙 GitHub
