@@ -1,48 +1,57 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import * as THREE from 'three';
 
-const QuantumCatalog = ({ onNavigateToArtifact }) => {
-  const mountRef = useRef(null);
-  const sceneRef = useRef(null);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [hoveredProject, setHoveredProject] = useState(null);
-  const [activeScrollZone, setActiveScrollZone] = useState('main');
+const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChange = () => {} }) => {
+   const mountRef = useRef(null);
+   const sceneRef = useRef(null);
+   const [selectedCategory, setSelectedCategory] = useState('all');
+   const [searchTerm, setSearchTerm] = useState('');
+   const [hoveredProject, setHoveredProject] = useState(null);
+   const [activeScrollZone, setActiveScrollZone] = useState('main');
+  // language dropdown state (controlled by parent for selected language)
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef(null);
+  // Close language dropdown when clicking outside
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (langRef.current && !langRef.current.contains(e.target)) {
+        setLangOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, []);
+  
+  // simple translation map for catalog UI
+  const TRANS = {
+    EN: {
+      headerDesc: 'Explore the intersection of human creativity and AI assistance through interactive tools and experiments',
+      searchPlaceholder: 'Search artifacts...',
+      showingAll: (n) => `Showing all ${n} artifacts`,
+      working: 'Working',
+      comingSoon: 'Coming Soon',
+      noResults: 'No artifacts found',
+      footerStatus: (w, c, p) => `${w} working • ${c} coming soon • ${p} planned`,
+      launch: 'Launch'
+    },
+    UA: {
+      headerDesc: 'Досліджуйте перетин людської творчості та AI через інтерактивні інструменти й експерименти',
+      searchPlaceholder: 'Пошук артефактів...',
+      showingAll: (n) => `Показано ${n} артефактів`,
+      working: 'Робочі',
+      comingSoon: 'Незабаром',
+      noResults: 'Артефакти не знайдено',
+      footerStatus: (w, c, p) => `${w} робочих • ${c} незабаром • ${p} заплановано`,
+      launch: 'Запустити'
+    }
+  };
+  const L = TRANS[language] || TRANS.EN;
 
-  // Expanded mock data з Book Apps
+  // Clean catalog - only 1 working + 2 coming soon
   const mockProjects = [
+    // ✅ WORKING ARTIFACTS
     {
       id: 1,
-      title: 'Quantum Data Dashboard',
-      category: 'data-viz',
-      tags: ['React', 'D3.js', 'Analytics'],
-      description: 'Interactive dashboard for quantum data visualization with real-time updates',
-      color: '#00ff88',
-      isTop: true,
-      isFavorite: true
-    },
-    {
-      id: 2,
-      title: 'AI Chat Interface',
-      category: 'ai-tools',
-      tags: ['React', 'AI', 'ChatGPT'],
-      description: 'Modern chat interface with AI capabilities and voice recognition',
-      color: '#ff3366',
-      isTop: true,
-      isFavorite: false
-    },
-    {
-      id: 3,
-      title: 'Neural Network Visualizer',
-      category: 'data-viz',
-      tags: ['Three.js', 'ML', 'Visualization'],
-      description: '3D neural network architecture viewer with interactive nodes',
-      color: '#3366ff',
-      isTop: false,
-      isFavorite: true
-    },
-    {
-      id: 4,
       title: 'Deep Work OS',
       category: 'productivity',
       tags: ['React', 'Productivity', 'Deep Work', 'Time Tracking'],
@@ -50,237 +59,32 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
       color: '#06b6d4',
       isTop: true,
       isFavorite: true,
-      component: 'DeepWorkOS'
+      component: 'DeepWorkOS',
+      status: 'working'
     },
+    
+    // 🔄 COMING SOON - TOP PRIORITY
     {
-      id: 5,
-      title: 'Productivity Timer',
+      id: 2,
+      title: 'Smart Password Generator',
       category: 'web-apps',
-      tags: ['React', 'Productivity', 'PWA'],
-      description: 'Advanced pomodoro timer with analytics and habit tracking',
-      color: '#ff8800',
-      isTop: true,
-      isFavorite: false
-    },
-    {
-      id: 6,
-      title: 'Quantum Tetris',
-      category: 'games',
-      tags: ['JavaScript', 'Canvas', 'Physics'],
-      description: 'Tetris with quantum mechanics twist and superposition blocks',
-      color: '#8800ff',
-      isTop: false,
-      isFavorite: true
-    },
-    {
-      id: 7,
-      title: 'Data Pipeline Monitor',
-      category: 'ai-tools',
-      tags: ['Python', 'Monitoring', 'ETL'],
-      description: 'Real-time data pipeline health dashboard with anomaly detection',
-      color: '#00ffff',
-      isTop: false,
-      isFavorite: false
-    },
-    {
-      id: 8,
-      title: 'Digital Library Manager',
-      category: 'book-apps',
-      tags: ['React', 'Database', 'Organization'],
-      description: 'Personal digital library with smart categorization and search',
-      color: '#8b4513',
-      isTop: true,
-      isFavorite: true
-    },
-    {
-      id: 9,
-      title: 'Speed Reading Trainer',
-      category: 'book-apps',
-      tags: ['JavaScript', 'Education', 'Productivity'],
-      description: 'Interactive speed reading exercises with comprehension tests',
+      tags: ['Security', 'Tools', 'Encryption'],
+      description: 'Advanced password generator with entropy visualization, breach checking, and secure sharing capabilities',
       color: '#ff6b6b',
-      isTop: false,
-      isFavorite: true
+      isTop: true,
+      isFavorite: true,
+      status: 'coming-soon'
     },
     {
-      id: 9,
-      title: 'Book Quote Generator',
-      category: 'book-apps',
-      tags: ['API', 'Literature', 'Inspiration'],
-      description: 'Beautiful quote generator from classic literature with sharing',
-      color: '#4ecdc4',
-      isTop: false,
-      isFavorite: false
-    },
-    {
-      id: 10,
-      title: 'Reading Progress Tracker',
-      category: 'book-apps',
-      tags: ['React', 'Analytics', 'Habits'],
-      description: 'Track reading goals, progress, and build consistent habits',
+      id: 3,
+      title: 'JSON Formatter & Validator',
+      category: 'ai-tools',
+      tags: ['JSON', 'Developer Tools', 'Validation'],
+      description: 'Beautiful JSON editing with syntax highlighting, validation, and diff comparison',
       color: '#45b7d1',
       isTop: true,
-      isFavorite: false
-    },
-    {
-      id: 11,
-      title: 'Interactive Story Builder',
-      category: 'book-apps',
-      tags: ['JavaScript', 'Creative', 'Interactive'],
-      description: 'Create branching interactive stories with visual editor',
-      color: '#96ceb4',
-      isTop: false,
-      isFavorite: true
-    },
-    {
-      id: 12,
-      title: 'Book Recommendation AI',
-      category: 'book-apps',
-      tags: ['AI', 'Machine Learning', 'Personalization'],
-      description: 'AI-powered book recommendations based on reading history',
-      color: '#feca57',
-      isTop: true,
-      isFavorite: false
-    },
-    {
-      id: 13,
-      title: 'Crypto Portfolio Tracker',
-      category: 'web-apps',
-      tags: ['React', 'API', 'Finance'],
-      description: 'Real-time cryptocurrency portfolio management with DeFi integration',
-      color: '#f39c12',
-      isTop: false,
-      isFavorite: true
-    },
-    {
-      id: 14,
-      title: 'Voice Command Assistant',
-      category: 'ai-tools',
-      tags: ['JavaScript', 'Speech API', 'AI'],
-      description: 'Voice-controlled productivity assistant with natural language processing',
-      color: '#e74c3c',
-      isTop: true,
-      isFavorite: false
-    },
-    {
-      id: 15,
-      title: 'Interactive Code Editor',
-      category: 'web-apps',
-      tags: ['React', 'Monaco', 'CodeMirror'],
-      description: 'Advanced code editor with live preview and collaborative features',
-      color: '#9b59b6',
-      isTop: false,
-      isFavorite: false
-    },
-    {
-      id: 16,
-      title: 'Weather Mood Visualizer',
-      category: 'data-viz',
-      tags: ['D3.js', 'API', 'Canvas'],
-      description: 'Artistic weather data visualization with emotional color mapping',
-      color: '#3498db',
-      isTop: false,
-      isFavorite: true
-    },
-    {
-      id: 17,
-      title: 'Memory Palace Builder',
-      category: 'games',
-      tags: ['Three.js', 'VR', 'Memory'],
-      description: '3D memory enhancement training tool with spatial mnemonics',
-      color: '#2ecc71',
-      isTop: true,
-      isFavorite: false
-    },
-    {
-      id: 18,
-      title: 'Smart Habit Tracker',
-      category: 'web-apps',
-      tags: ['React', 'LocalStorage', 'Analytics'],
-      description: 'Intelligent habit formation companion with behavioral insights',
-      color: '#f1c40f',
-      isTop: false,
-      isFavorite: false
-    },
-    {
-      id: 19,
-      title: 'Quantum Maze Generator',
-      category: 'games',
-      tags: ['JavaScript', 'Algorithms', 'Canvas'],
-      description: 'Procedural maze with quantum mechanics and entangled pathways',
-      color: '#e67e22',
-      isTop: false,
-      isFavorite: true
-    },
-    {
-      id: 20,
-      title: 'AI Code Reviewer',
-      category: 'ai-tools',
-      tags: ['Python', 'AST', 'Machine Learning'],
-      description: 'Automated code quality analysis tool with smart suggestions',
-      color: '#34495e',
-      isTop: true,
-      isFavorite: false
-    },
-    {
-      id: 21,
-      title: 'Biometric Data Explorer',
-      category: 'data-viz',
-      tags: ['React', 'Recharts', 'Health'],
-      description: 'Personal health metrics visualization with trend analysis',
-      color: '#16a085',
-      isTop: false,
-      isFavorite: false
-    },
-    {
-      id: 22,
-      title: 'Fractal Art Generator',
-      category: 'experiments',
-      tags: ['Canvas', 'Math', 'WebGL'],
-      description: 'Interactive fractal geometry creator with parameter tweaking',
-      color: '#8e44ad',
-      isTop: false,
-      isFavorite: true
-    },
-    {
-      id: 23,
-      title: 'Meditation Soundscape',
-      category: 'experiments',
-      tags: ['Web Audio', 'Ambient', 'Wellness'],
-      description: 'Generative ambient soundscape for meditation and focus',
-      color: '#95a5a6',
-      isTop: false,
-      isFavorite: true
-    },
-    {
-      id: 24,
-      title: 'Knowledge Graph Explorer',
-      category: 'data-viz',
-      tags: ['D3.js', 'Graph Theory', 'Interactive'],
-      description: 'Interactive knowledge graph with semantic relationships',
-      color: '#1abc9c',
-      isTop: false,
-      isFavorite: false
-    },
-    {
-      id: 25,
-      title: 'Space Debris Tracker',
-      category: 'experiments',
-      tags: ['Three.js', 'Space', 'Real-time'],
-      description: 'Real-time 3D visualization of space debris and satellites',
-      color: '#2c3e50',
-      isTop: true,
-      isFavorite: true
-    },
-    {
-      id: 26,
-      title: 'Quantum Chess',
-      category: 'games',
-      tags: ['JavaScript', 'Chess', 'Quantum'],
-      description: 'Chess variant with quantum superposition moves',
-      color: '#d35400',
-      isTop: false,
-      isFavorite: false
+      isFavorite: true,
+      status: 'coming-soon'
     }
   ];
 
@@ -291,331 +95,228 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
     { id: 'data-viz', name: 'Data Visualization', icon: '📊' },
     { id: 'ai-tools', name: 'AI Tools', icon: '🤖' },
     { id: 'web-apps', name: 'Web Apps', icon: '💻' },
+    { id: 'productivity', name: 'Productivity', icon: '⚡' },
     { id: 'book-apps', name: 'Book Apps', icon: '📚' },
     { id: 'games', name: 'Games', icon: '🎮' },
     { id: 'experiments', name: 'Experiments', icon: '🧪' }
   ];
 
-  // Фільтрація проектів
+  // Enhanced filtering logic
   const filteredProjects = useMemo(() => {
     return mockProjects.filter(project => {
-      let matchesCategory = false;
-      
-      if (selectedCategory === 'all') {
-        matchesCategory = true;
-      } else if (selectedCategory === 'top') {
+      // Category filter
+      let matchesCategory = true;
+      if (selectedCategory === 'top') {
         matchesCategory = project.isTop;
       } else if (selectedCategory === 'favorites') {
         matchesCategory = project.isFavorite;
-      } else {
+      } else if (selectedCategory !== 'all') {
         matchesCategory = project.category === selectedCategory;
       }
       
+      // Search filter
       const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            project.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      
       return matchesCategory && matchesSearch;
     });
-  }, [selectedCategory, searchTerm]);
+  }, [mockProjects, selectedCategory, searchTerm]);
 
-  // Scroll zone management
-  useEffect(() => {
-    const handleMouseEnter = (e) => {
-      const target = e.currentTarget;
-      if (target.classList.contains('scroll-zone-main')) {
-        setActiveScrollZone('main');
-      } else if (target.classList.contains('scroll-zone-sidebar')) {
-        setActiveScrollZone('sidebar');
-      } else if (target.classList.contains('scroll-zone-header')) {
-        setActiveScrollZone('header');
-      }
-    };
-
-    const scrollZones = document.querySelectorAll('.scroll-zone-main, .scroll-zone-sidebar, .scroll-zone-header');
-    scrollZones.forEach(zone => {
-      zone.addEventListener('mouseenter', handleMouseEnter);
-    });
-
-    return () => {
-      scrollZones.forEach(zone => {
-        zone.removeEventListener('mouseenter', handleMouseEnter);
-      });
-    };
-  }, []);
-
-  // Quantum Vector Field Manifold
+  // 3D Scene Setup
   useEffect(() => {
     if (!mountRef.current) return;
 
+    // Scene setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000511, 0.95);
+    renderer.setClearColor(0x000000, 0);
     mountRef.current.appendChild(renderer.domElement);
+    sceneRef.current = { scene, camera, renderer };
 
-    // Quantum foam bubbles
+    // Camera position
+    camera.position.z = 50;
+
+    // Quantum Foam Background
     const foamBubbles = [];
-    for (let i = 0; i < 60; i++) {
-      const geometry = new THREE.SphereGeometry(Math.random() * 0.4 + 0.1, 8, 6);
-      const material = new THREE.MeshBasicMaterial({
-        color: new THREE.Color().setHSL(0.6 + Math.random() * 0.2, 0.7, 0.3),
+    for (let i = 0; i < 200; i++) {
+      const geometry = new THREE.SphereGeometry(Math.random() * 0.5 + 0.1, 8, 6);
+      const material = new THREE.MeshBasicMaterial({ 
+        color: new THREE.Color().setHSL(0.6 + Math.random() * 0.4, 0.7, 0.5),
         transparent: true,
-        opacity: Math.random() * 0.3 + 0.1,
-        blending: THREE.AdditiveBlending
+        opacity: 0.3
       });
       const bubble = new THREE.Mesh(geometry, material);
+      
       bubble.position.set(
+        (Math.random() - 0.5) * 200,
+        (Math.random() - 0.5) * 200,
+        (Math.random() - 0.5) * 200
+      );
+      
+      foamBubbles.push(bubble);
+      scene.add(bubble);
+    }
+
+    // Sacred Geometry - Particle System
+    const particleCount = 1000;
+    const positions = [];
+    const colors = [];
+    
+    for (let i = 0; i < particleCount; i++) {
+      // Golden ratio spiral
+      const phi = (1 + Math.sqrt(5)) / 2;
+      const theta = 2 * Math.PI * i / phi;
+      const r = Math.sqrt(i) * 2;
+      
+      positions.push(
+        r * Math.cos(theta),
+        r * Math.sin(theta),
+        (Math.random() - 0.5) * 50
+      );
+      
+      colors.push(0.3, 0.7, 1.0);
+    }
+    
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    particleGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    
+    const particleMaterial = new THREE.PointsMaterial({
+      size: 2,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.6
+    });
+    
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particles);
+
+    // Tesseract (4D cube projection)
+    const tesseracts = [];
+    for (let i = 0; i < 3; i++) {
+      const tesseractGroup = new THREE.Group();
+      
+      // Create multiple cubes for 4D projection
+      for (let j = 0; j < 8; j++) {
+        const geometry = new THREE.BoxGeometry(2, 2, 2);
+        const material = new THREE.MeshBasicMaterial({
+          color: new THREE.Color().setHSL(0.1 + i * 0.3, 0.8, 0.6),
+          wireframe: true,
+          transparent: true,
+          opacity: 0.4
+        });
+        const cube = new THREE.Mesh(geometry, material);
+        
+        const angle = (j / 8) * Math.PI * 2;
+        cube.position.set(
+          Math.cos(angle) * 5,
+          Math.sin(angle) * 5,
+          Math.cos(angle * 0.5) * 3
+        );
+        
+        tesseractGroup.add(cube);
+      }
+      
+      tesseractGroup.position.set(
         (Math.random() - 0.5) * 100,
         (Math.random() - 0.5) * 100,
         (Math.random() - 0.5) * 100
       );
-      bubble.userData = {
-        originalOpacity: bubble.material.opacity,
-        phase: Math.random() * Math.PI * 2,
-        speed: 0.008 + Math.random() * 0.015
-      };
-      scene.add(bubble);
-      foamBubbles.push(bubble);
+      
+      tesseracts.push(tesseractGroup);
+      scene.add(tesseractGroup);
     }
 
-    // Tesseract wireframes
-    const createTesseract = (size, position) => {
-      const vertices = [];
-      for (let i = 0; i < 16; i++) {
-        const x = ((i & 1) ? 1 : -1) * size;
-        const y = ((i & 2) ? 1 : -1) * size;
-        const z = ((i & 4) ? 1 : -1) * size;
-        const w = ((i & 8) ? 1 : -1) * size;
-        const perspective = 2 / (2 - w * 0.3);
-        vertices.push(new THREE.Vector3(x * perspective, y * perspective, z * perspective));
+    // Hyperbolic Space Curves
+    const curves = [];
+    for (let i = 0; i < 5; i++) {
+      const points = [];
+      for (let t = 0; t <= 1; t += 0.01) {
+        const x = Math.sinh(t * 4 - 2) * Math.cos(t * Math.PI * 4);
+        const y = Math.sinh(t * 4 - 2) * Math.sin(t * Math.PI * 4);
+        const z = Math.cosh(t * 4 - 2) * 0.5;
+        points.push(new THREE.Vector3(x * 5, y * 5, z * 2));
       }
-
-      const geometry = new THREE.BufferGeometry();
-      const positions = [];
-      const colors = [];
-
-      const edges = [
-        [0,1],[1,3],[3,2],[2,0], [4,5],[5,7],[7,6],[6,4],
-        [8,9],[9,11],[11,10],[10,8], [12,13],[13,15],[15,14],[14,12],
-        [0,4],[1,5],[2,6],[3,7], [8,12],[9,13],[10,14],[11,15]
-      ];
-
-      edges.forEach(([a, b]) => {
-        positions.push(vertices[a].x, vertices[a].y, vertices[a].z);
-        positions.push(vertices[b].x, vertices[b].y, vertices[b].z);
-        
-        const hue = 0.65 + Math.sin(a * 0.3) * 0.15;
-        const color = new THREE.Color().setHSL(hue, 0.8, 0.5);
-        colors.push(color.r, color.g, color.b);
-        colors.push(color.r, color.g, color.b);
-      });
-
-      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-      const material = new THREE.LineBasicMaterial({
-        vertexColors: true,
+      
+      const curve = new THREE.CatmullRomCurve3(points);
+      const tubeGeometry = new THREE.TubeGeometry(curve, 100, 0.1, 8, false);
+      const tubeMaterial = new THREE.MeshBasicMaterial({
+        color: new THREE.Color().setHSL(0.8, 0.9, 0.7),
         transparent: true,
-        opacity: 0.3,
-        blending: THREE.AdditiveBlending
+        opacity: 0.5
       });
-
-      const tesseract = new THREE.LineSegments(geometry, material);
-      tesseract.position.copy(position);
-      return tesseract;
-    };
-
-    const tesseracts = [];
-    for (let i = 0; i < 3; i++) {
-      const tesseract = createTesseract(
-        6 + i * 2, 
-        new THREE.Vector3(
-          (Math.random() - 0.5) * 50, 
-          (Math.random() - 0.5) * 50, 
-          (Math.random() - 0.5) * 50
-        )
+      const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+      
+      tube.position.set(
+        (Math.random() - 0.5) * 80,
+        (Math.random() - 0.5) * 80,
+        (Math.random() - 0.5) * 80
       );
-      scene.add(tesseract);
-      tesseracts.push(tesseract);
+      tube.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+      
+      curves.push(tube);
+      scene.add(tube);
     }
-
-    // Sacred geometry mandala
-    const createMandala = (radius, complexity) => {
-      const geometry = new THREE.BufferGeometry();
-      const positions = [];
-      const colors = [];
-
-      for (let layer = 0; layer < 4; layer++) {
-        const layerRadius = radius * (0.3 + layer * 0.2);
-        const points = complexity * (layer + 1);
-        
-        for (let i = 0; i <= points; i++) {
-          const angle = (i / points) * Math.PI * 2;
-          const goldenAngle = angle * 1.618;
-          
-          const x = Math.cos(angle) * layerRadius * (1 + 0.2 * Math.sin(goldenAngle * 3));
-          const y = Math.sin(angle) * layerRadius * (1 + 0.2 * Math.cos(goldenAngle * 2));
-          const z = Math.sin(goldenAngle) * 1.5;
-
-          positions.push(x, y, z);
-
-          const hue = (layer * 0.2 + i / points * 0.3) % 1;
-          const color = new THREE.Color().setHSL(0.7 + hue * 0.15, 0.8, 0.4);
-          colors.push(color.r, color.g, color.b);
-        }
-      }
-
-      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-      const material = new THREE.PointsMaterial({
-        size: 2,
-        vertexColors: true,
-        blending: THREE.AdditiveBlending,
-        transparent: true,
-        opacity: 0.6
-      });
-
-      return new THREE.Points(geometry, material);
-    };
-
-    const mandala = createMandala(20, 6);
-    mandala.position.z = -25;
-    scene.add(mandala);
-
-    // Vector field ribbons
-    const createVectorField = () => {
-      const curves = [];
-      for (let i = 0; i < 8; i++) {
-        const points = [];
-        const startPoint = new THREE.Vector3(
-          (Math.random() - 0.5) * 80,
-          (Math.random() - 0.5) * 80,
-          (Math.random() - 0.5) * 80
-        );
-        
-        for (let j = 0; j < 40; j++) {
-          const t = j / 39;
-          const x = startPoint.x + Math.sin(t * Math.PI * 2.5 + i) * 15;
-          const y = startPoint.y + Math.cos(t * Math.PI * 1.8 + i * 0.7) * 15;
-          const z = startPoint.z + Math.sin(t * Math.PI * 3 + i * 1.1) * 10;
-          points.push(new THREE.Vector3(x, y, z));
-        }
-
-        const curve = new THREE.CatmullRomCurve3(points);
-        const geometry = new THREE.TubeGeometry(curve, 40, 0.08, 4, false);
-        
-        const hue = 0.55 + i * 0.04;
-        const material = new THREE.MeshBasicMaterial({
-          color: new THREE.Color().setHSL(hue, 0.7, 0.3),
-          transparent: true,
-          opacity: 0.25,
-          blending: THREE.AdditiveBlending
-        });
-
-        const ribbon = new THREE.Mesh(geometry, material);
-        scene.add(ribbon);
-        curves.push(ribbon);
-      }
-      return curves;
-    };
-
-    const vectorField = createVectorField();
-
-    camera.position.z = 35;
-    let mouseX = 0, mouseY = 0;
-    let time = 0;
-
-    sceneRef.current = { 
-      scene, camera, renderer, tesseracts, foamBubbles, mandala, vectorField
-    };
 
     // Animation loop
     const animate = () => {
       requestAnimationFrame(animate);
-      time += 0.004;
 
-      // Quantum foam breathing
-      foamBubbles.forEach((bubble, i) => {
-        bubble.userData.phase += bubble.userData.speed;
-        const breath = Math.sin(bubble.userData.phase) * 0.5 + 0.5;
-        bubble.material.opacity = bubble.userData.originalOpacity * (0.3 + breath * 0.7);
-        bubble.scale.setScalar(0.8 + breath * 0.3);
+      // Rotate tesseracts
+      tesseracts.forEach((tesseract, index) => {
+        tesseract.rotation.x += 0.005 * (index + 1);
+        tesseract.rotation.y += 0.007 * (index + 1);
+        tesseract.rotation.z += 0.003 * (index + 1);
         
-        if (Math.random() < 0.0003) {
-          bubble.position.set(
-            (Math.random() - 0.5) * 100,
-            (Math.random() - 0.5) * 100,
-            (Math.random() - 0.5) * 100
-          );
-        }
+        tesseract.children.forEach((cube, cubeIndex) => {
+          cube.rotation.x += 0.01;
+          cube.rotation.y += 0.015;
+        });
       });
 
-      // Tesseract calm breathing rotation
-      tesseracts.forEach((tesseract, i) => {
-        tesseract.rotation.x += 0.0004 * (i + 1);
-        tesseract.rotation.y += 0.0006 * (i + 1);
-        tesseract.rotation.z += 0.0002 * (i + 1);
-        
-        const breathPhase = time * 0.6 + i * 1.5;
-        const breathScale = 1 + Math.sin(breathPhase) * 0.08;
-        const floatY = Math.sin(breathPhase * 0.8) * 1.5;
-        const floatX = Math.cos(breathPhase * 0.6) * 1;
-        
-        tesseract.scale.setScalar(breathScale);
-        tesseract.position.y += floatY * 0.015;
-        tesseract.position.x += floatX * 0.01;
+      // Animate foam bubbles
+      foamBubbles.forEach((bubble, index) => {
+        bubble.position.y += Math.sin(Date.now() * 0.001 + index) * 0.02;
+        bubble.rotation.x += 0.005;
+        bubble.rotation.y += 0.007;
       });
 
-      // Sacred geometry mandala
-      mandala.rotation.z += 0.0008;
-      const positions = mandala.geometry.attributes.position.array;
-      for (let i = 0; i < positions.length; i += 3) {
-        positions[i + 2] += Math.sin(time * 1.5 + i * 0.008) * 0.5;
-      }
-      mandala.geometry.attributes.position.needsUpdate = true;
+      // Rotate particle spiral
+      particles.rotation.z += 0.002;
+      particles.rotation.y += 0.001;
 
-      // Vector field flow
-      vectorField.forEach((ribbon, i) => {
-        ribbon.rotation.x += 0.0008 * (i % 3 + 1);
-        ribbon.rotation.y += 0.001 * (i % 2 + 1);
+      // Animate curves
+      curves.forEach((curve, index) => {
+        curve.rotation.x += 0.003 * (index + 1);
+        curve.rotation.y += 0.004 * (index + 1);
       });
 
-      // Subtle camera movement
-      camera.position.x += (mouseX - camera.position.x) * 0.003;
-      camera.position.y += (mouseY - camera.position.y) * 0.003;
-      camera.lookAt(0, 0, 0);
+      // Camera gentle movement
+      const time = Date.now() * 0.0005;
+      camera.position.x = Math.sin(time) * 5;
+      camera.position.y = Math.cos(time * 0.7) * 3;
+      camera.lookAt(scene.position);
 
       renderer.render(scene, camera);
     };
+
     animate();
 
-    // Mouse interaction
-    const handleMouseMove = (event) => {
-      mouseX = (event.clientX / window.innerWidth - 0.5) * 8;
-      mouseY = -(event.clientY / window.innerHeight - 0.5) * 8;
-      
-      tesseracts.forEach((tesseract, i) => {
-        const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
-        const gravityWell = Math.max(0, (8 - distance) / 8);
-        tesseract.scale.setScalar(1 + gravityWell * 0.15);
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-
+    // Handle resize
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
+
     window.addEventListener('resize', handleResize);
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', handleMouseMove);
       if (mountRef.current && renderer.domElement) {
         mountRef.current.removeChild(renderer.domElement);
       }
@@ -624,243 +325,256 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
   }, []);
 
   return (
-    <div className="relative w-full min-h-screen overflow-x-hidden bg-black">
-      {/* Global Styles */}
-      <style jsx global>{`
-        html {
-          scroll-behavior: smooth;
-        }
-        body {
-          overflow-x: hidden;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.3);
-          border-radius: 3px;
-          transition: background 0.3s ease;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(255, 255, 255, 0.5);
-        }
-        /* Ensure scrolling works */
-        #root {
-          min-height: 100vh;
-        }
-      `}</style>
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* 3D Background */}
+      <div ref={mountRef} className="fixed inset-0 -z-10" />
+      
+      {/* Gradient Overlay */}
+      <div className="fixed inset-0 bg-gradient-to-b from-transparent via-slate-950/40 to-slate-950/80 -z-5" />
 
-      {/* Three.js Background - Fixed */}
-      <div ref={mountRef} className="fixed inset-0 z-0" />
-
-      {/* Glassmorphism UI Overlay - Scrollable */}
-      <div className="relative z-10 w-full">
-        {/* Header - Sticky */}
-        <header className="sticky top-0 z-30 p-6 backdrop-blur-md">
-          <div className="backdrop-blur-md bg-white/10 rounded-2xl border border-white/20 p-6 shadow-2xl">
-            <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              Quantum Vector Artifacts
-            </h1>
-            <p className="text-gray-300">AI-Human collaboration experiments in interactive development</p>
-            
-            <div className="mt-4">
-              <input
-                type="text"
-                placeholder="Search artifacts..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
-              />
+      {/* Main Content */}
+      <div className="relative z-10">
+        <div className="container mx-auto px-4 py-8">
+          {/* Enhanced Header */}
+          <header className="text-center mb-12">
+            <div className="mb-6">
+              <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 tracking-tight">
+                Quantum Vector
+              </h1>
+              <div className="text-2xl text-cyan-300 font-light mb-2 tracking-wider">
+                A R T I F A C T S
+              </div>
+              <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed">
+                {L.headerDesc}
+              </p>
             </div>
-          </div>
-        </header>
 
-        {/* Main Content Area */}
-        <div className="flex px-6 pb-6 gap-6">
-          {/* Sidebar - Sticky */}
-          <aside className="w-80 flex-shrink-0">
-            <div className="sticky top-36 backdrop-blur-md bg-white/10 rounded-2xl border border-white/20 p-6 shadow-2xl">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                Categories
-                <span className="text-yellow-400 text-sm">📂</span>
-              </h3>
-              <div className="space-y-2">
-                {categories.map((category, index) => {
-                  let projectCount;
-                  if (category.id === 'all') {
-                    projectCount = mockProjects.length;
-                  } else if (category.id === 'top') {
-                    projectCount = mockProjects.filter(p => p.isTop).length;
-                  } else if (category.id === 'favorites') {
-                    projectCount = mockProjects.filter(p => p.isFavorite).length;
-                  } else {
-                    projectCount = mockProjects.filter(p => p.category === category.id).length;
-                  }
+            {/* Enhanced Search */}
+            <div className="max-w-3xl mx-auto mb-8">
+               <div className="flex items-center gap-4">
+                 <div className="relative w-[70%]">
+                   <input
+                     type="text"
+                     placeholder={L.searchPlaceholder}
+                     value={searchTerm}
+                     onChange={(e) => setSearchTerm(e.target.value)}
+                     className="w-full px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-all"
+                   />
+                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                 </div>
 
-                  const isLastSpecial = category.special && index < categories.length - 1 && !categories[index + 1]?.special;
+                 {/* Language selector on the right */}
+                 <div className="relative" ref={langRef}>
+                   <button
+                     type="button"
+                     aria-expanded={langOpen}
+                     onClick={() => setLangOpen(!langOpen)}
+                     className="px-3 py-2 rounded-md bg-white/6 text-slate-100 hover:bg-white/10 font-semibold"
+                   >
+                    {language} <span className="ml-1">▾</span>
+                   </button>
 
-                  return (
-                    <div key={category.id}>
+                   {langOpen && (
+                    <div className="absolute right-0 mt-2 w-40 bg-slate-800 border border-slate-700 rounded-md shadow-lg z-50">
                       <button
-                        onClick={() => setSelectedCategory(category.id)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
-                          selectedCategory === category.id
-                            ? category.special 
-                              ? 'bg-gradient-to-r from-yellow-500/20 to-red-500/20 text-white border border-yellow-400/50 shadow-lg'
-                              : 'bg-white/20 text-white border border-white/30'
-                            : 'text-gray-300 hover:bg-white/10 hover:text-white'
-                        }`}
+                        className="w-full text-left px-4 py-2 hover:bg-slate-700"
+                        onClick={() => { onLanguageChange('EN'); setLangOpen(false); }}
                       >
-                        <span className={`text-xl ${category.special ? 'animate-pulse' : ''}`}>
-                          {category.icon}
-                        </span>
-                        <span className={`font-medium ${category.special ? 'font-bold' : ''}`}>
-                          {category.name}
-                        </span>
-                        <span className="ml-auto text-sm opacity-60">
-                          {projectCount}
-                        </span>
+                        English
                       </button>
-                      {isLastSpecial && (
-                        <div className="my-4 border-t border-white/10"></div>
-                      )}
+                      <button
+                        className="w-full text-left px-4 py-2 hover:bg-slate-700"
+                        onClick={() => { onLanguageChange('UA'); setLangOpen(false); }}
+                      >
+                        Українська
+                      </button>
                     </div>
-                  );
-                })}
-              </div>
+                   )}
+                 </div>
+               </div>
             </div>
-          </aside>
+          </header>
 
-          {/* Main Content - Scrollable */}
-          <main className="flex-1 min-w-0">
-            <div className="backdrop-blur-md bg-white/5 rounded-2xl border border-white/10 p-6 shadow-2xl">
-              {/* Projects Header */}
-              <div className="flex items-center justify-between mb-6 text-sm text-gray-400">
-                <span className="text-lg font-semibold text-white">
-                  Showing {filteredProjects.length} projects
-                </span>
-                <span className="flex items-center gap-2">
-                  <span>Scroll page to explore</span>
-                  <div className="w-1 h-4 bg-gradient-to-b from-white/40 to-transparent rounded-full animate-pulse"></div>
-                  <span className="text-cyan-400">📊</span>
-                </span>
-              </div>
-              
-              {/* Projects Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProjects.map(project => (
-                  <div
-                    key={project.id}
-                    onMouseEnter={() => setHoveredProject(project.id)}
-                    onMouseLeave={() => setHoveredProject(null)}
-                    className={`group cursor-pointer transform transition-all duration-300 ${
-                      hoveredProject === project.id ? 'scale-105' : ''
+          <main className="max-w-7xl mx-auto">
+            {/* Enhanced Category Pills */}
+            <div className="mb-8">
+              <div className="flex flex-wrap justify-center gap-3 mb-6">
+                {categories.map(category => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 backdrop-blur-md border ${
+                      selectedCategory === category.id
+                        ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-cyan-400/50 shadow-lg shadow-cyan-500/25'
+                        : 'bg-white/10 text-gray-300 border-white/20 hover:bg-white/20 hover:text-white hover:border-white/40'
                     }`}
                   >
-                    <div className="backdrop-blur-md bg-white/10 rounded-xl border border-white/20 p-6 shadow-xl hover:bg-white/15 transition-all duration-300 h-full">
-                      {/* Project Header */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <div 
-                            className="w-4 h-4 rounded-full"
-                            style={{ backgroundColor: project.color }}
-                          />
-                          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {project.isTop && (
-                            <div className="w-6 h-6 flex items-center justify-center bg-yellow-500/20 rounded-full border border-yellow-400/50">
-                              <span className="text-yellow-400 text-xs">⭐</span>
-                            </div>
-                          )}
-                          {project.isFavorite && (
-                            <div className="w-6 h-6 flex items-center justify-center bg-red-500/20 rounded-full border border-red-400/50">
-                              <span className="text-red-400 text-xs">❤️</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <h4 className="text-xl font-semibold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                        {project.title}
-                      </h4>
-                      
-                      <p className="text-gray-300 mb-4 text-sm leading-relaxed">
-                        {project.description}
-                      </p>
-
-                      {/* Tags */}
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {project.tags.map(tag => (
-                          <span
-                            key={tag}
-                            className="px-2 py-1 bg-white/10 rounded-md text-xs text-gray-300 border border-white/20"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {project.component ? (
-                          <button 
-                            onClick={() => onNavigateToArtifact?.(project.component)}
-                            className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors"
-                          >
-                            Launch
-                          </button>
-                        ) : (
-                          <button className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors">
-                            Demo
-                          </button>
-                        )}
-                        <button className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-md text-sm hover:bg-purple-500/30 transition-colors">
-                          Code
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                    <span className="mr-2">{category.icon}</span>
+                    {category.name}
+                  </button>
                 ))}
               </div>
+              
+              {/* Category Description with Stats */}
+              <div className="text-center text-gray-400 text-sm">
+                <div className="flex items-center justify-center gap-6 mb-2">
+                  {selectedCategory === 'all' && (
+                    <>
+                      <span>{L.showingAll(filteredProjects.length)}</span>
+                      <div className="flex items-center gap-4">
+                        <div className="flex flex-col items-center">
+                          <div className="text-base font-bold text-emerald-400">{mockProjects.filter(p => p.status === 'working').length}</div>
+                          <div className="text-xs">{L.working}</div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <div className="text-base font-bold text-amber-400">{mockProjects.filter(p => p.status === 'coming-soon').length}</div>
+                          <div className="text-xs">{L.comingSoon}</div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  {selectedCategory === 'top' && `Top ${filteredProjects.length} featured projects`}
+                  {selectedCategory === 'favorites' && `${filteredProjects.length} favorite picks`}
+                  {!['all', 'top', 'favorites'].includes(selectedCategory) && 
+                    `${filteredProjects.length} artifacts in ${categories.find(c => c.id === selectedCategory)?.name}`}
+                </div>
+              </div>
+            </div>
+            
+            {/* Projects Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProjects.map(project => (
+                <div
+                  key={project.id}
+                  onMouseEnter={() => setHoveredProject(project.id)}
+                  onMouseLeave={() => setHoveredProject(null)}
+                  onClick={() => project.component && onNavigateToArtifact?.(project.component, language)}
+                  onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && project.component) onNavigateToArtifact?.(project.component); }}
+                  role={project.component ? 'button' : undefined}
+                  tabIndex={project.component ? 0 : undefined}
+                  className={`group cursor-pointer transform transition-all duration-300 ${
+                    hoveredProject === project.id ? 'scale-105' : ''
+                  }`}
+                >
+                  <div className="backdrop-blur-md bg-white/10 rounded-xl border border-white/20 p-6 shadow-xl hover:bg-white/15 transition-all duration-300 h-full">
+                    {/* Project Header */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: project.color }}
+                        />
+                        <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {project.isTop && (
+                          <div className="w-6 h-6 flex items-center justify-center bg-yellow-500/20 rounded-full border border-yellow-400/50">
+                            <span className="text-yellow-400 text-xs">⭐</span>
+                          </div>
+                        )}
+                        {project.isFavorite && (
+                          <div className="w-6 h-6 flex items-center justify-center bg-red-500/20 rounded-full border border-red-400/50">
+                            <span className="text-red-400 text-xs">❤️</span>
+                          </div>
+                        )}
+                        {/* Status indicator */}
+                        {project.status === 'working' && (
+                          <div className="w-6 h-6 flex items-center justify-center bg-green-500/20 rounded-full border border-green-400/50">
+                            <span className="text-green-400 text-xs">✓</span>
+                          </div>
+                        )}
+                        {project.status === 'coming-soon' && (
+                          <div className="w-6 h-6 flex items-center justify-center bg-amber-500/20 rounded-full border border-amber-400/50">
+                            <span className="text-amber-400 text-xs">⏳</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
-              {/* End indicator */}
-              {filteredProjects.length > 12 && (
-                <div className="mt-12 text-center py-8">
-                  <div className="inline-flex items-center gap-2 text-sm text-gray-500">
-                    <div className="w-12 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-                    <span>End of catalog</span>
-                    <div className="w-12 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+                    <h4 className="text-xl font-semibold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+                      {project.title}
+                    </h4>
+                    
+                    <p className="text-gray-300 mb-4 text-sm leading-relaxed">
+                      {project.description}
+                    </p>
+
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {project.tags.map(tag => (
+                        <span
+                          key={tag}
+                          className="px-2 py-1 bg-white/10 rounded-md text-xs text-gray-300 border border-white/20"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Actions - Always Visible */}
+                    <div className="flex gap-2 mt-3">
+                      {project.component ? (
+                        <button 
+                          onClick={() => onNavigateToArtifact?.(project.component, language)}
+                           className="flex-1 px-3 py-2 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors font-semibold border border-cyan-500/30"
+                         >
+                           🚀 Launch
+                         </button>
+                      ) : project.status === 'coming-soon' ? (
+                        <button className="flex-1 px-3 py-2 bg-amber-500/20 text-amber-400 rounded-md text-sm cursor-default font-semibold border border-amber-500/30">
+                          🔄 {L.comingSoon}
+                        </button>
+                      ) : project.status === 'planned' ? (
+                        <button className="flex-1 px-3 py-2 bg-slate-500/20 text-slate-400 rounded-md text-sm cursor-default font-semibold border border-slate-500/30">
+                          📋 Planned
+                        </button>
+                      ) : (
+                        <button className="flex-1 px-3 py-2 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors font-semibold border border-cyan-500/30">
+                          🚀 {L.launch}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              )}
-
-              {/* No Results */}
-              {filteredProjects.length === 0 && (
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">🔍</div>
-                  <h3 className="text-xl text-white mb-2">No artifacts found</h3>
-                  <p className="text-gray-400">Try adjusting your search or category filter</p>
-                </div>
-              )}
+              ))}
             </div>
 
-            {/* Extra spacing at the bottom */}
-            <div className="h-20"></div>
+            {/* No Results */}
+            {filteredProjects.length === 0 && (
+                <div className="text-center py-12">
+                <div className="text-6xl mb-4">🔍</div>
+                <h3 className="text-xl text-white mb-2">{L.noResults}</h3>
+                <p className="text-gray-400">{language === 'EN' ? 'Try adjusting your search or category filter' : 'Спробуйте змінити пошук або фільтр категорій'}</p>
+              </div>
+            )}
+            
+            {/* Footer Info */}
+            <div className="text-center mt-12 py-8">
+              <div className="inline-flex items-center gap-2 text-sm text-gray-500 bg-white/5 backdrop-blur-md rounded-full px-4 py-2 border border-white/10">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span>{L.footerStatus(1,2,73)}</span>
+                <div className="ml-4 flex items-center gap-3">
+                  <a href="https://github.com/quantum-vector-io/quantum_vector_artifacts" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white text-xs font-semibold">
+                    🐙 GitHub
+                  </a>
+                  <a href="https://linkedin.com/in/mykola-rudenko-b3791b102" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white text-xs font-semibold">
+                    🔗 LinkedIn
+                  </a>
+                  <a href="https://threads.net/@vajra_dorje_8" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white text-xs font-semibold">
+                    🧵 Threads
+                  </a>
+                </div>
+              </div>
+            </div>
           </main>
         </div>
       </div>
 
-      {/* Enhanced Floating Stats - Fixed Position */}
-      <div className="fixed top-6 right-6 z-40 space-y-3">
-        <div className="backdrop-blur-md bg-white/10 rounded-xl border border-white/20 p-4 shadow-xl">
-          <div className="text-2xl font-bold text-white">{filteredProjects.length}</div>
-          <div className="text-sm text-gray-300">Active Experiments</div>
-        </div>
-      </div>
+
     </div>
   );
 };
