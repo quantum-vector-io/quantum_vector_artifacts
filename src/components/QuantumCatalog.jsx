@@ -442,32 +442,32 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
                       ))}
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* Actions - Always Visible */}
+                    <div className="flex gap-2 mt-3">
                       {project.component ? (
                         <button 
                           onClick={() => onNavigateToArtifact?.(project.component)}
-                          className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors font-semibold"
+                          className="flex-1 px-3 py-2 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors font-semibold border border-cyan-500/30"
                         >
                           🚀 Launch
                         </button>
                       ) : project.status === 'coming-soon' ? (
-                        <button className="px-3 py-1 bg-amber-500/20 text-amber-400 rounded-md text-sm cursor-default font-semibold">
+                        <button className="flex-1 px-3 py-2 bg-amber-500/20 text-amber-400 rounded-md text-sm cursor-default font-semibold border border-amber-500/30">
                           🔄 Coming Soon
                         </button>
                       ) : project.status === 'planned' ? (
-                        <button className="px-3 py-1 bg-slate-500/20 text-slate-400 rounded-md text-sm cursor-default font-semibold">
+                        <button className="flex-1 px-3 py-2 bg-slate-500/20 text-slate-400 rounded-md text-sm cursor-default font-semibold border border-slate-500/30">
                           📋 Planned
                         </button>
                       ) : (
-                        <button className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors">
-                          Demo
+                        <button className="flex-1 px-3 py-2 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors font-semibold border border-cyan-500/30">
+                          🚀 Launch
                         </button>
                       )}
                       <a 
                         href="./ARTIFACTS_ROADMAP.md"
                         target="_blank"
-                        className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-md text-sm hover:bg-purple-500/30 transition-colors"
+                        className="flex-1 px-3 py-2 bg-purple-500/20 text-purple-400 rounded-md text-sm hover:bg-purple-500/30 transition-colors text-center border border-purple-500/30"
                       >
                         📋 Roadmap
                       </a>
@@ -491,12 +491,17 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
               <div className="inline-flex items-center gap-2 text-sm text-gray-500 bg-white/5 backdrop-blur-md rounded-full px-4 py-2 border border-white/10">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                 <span>1 working • 2 coming soon • 73 planned</span>
-                <a 
-                  href="./ARTIFACTS_ROADMAP.md"
-                  className="text-cyan-400 hover:text-cyan-300 underline ml-2"
-                >
-                  View Full Roadmap
-                </a>
+                <div className="ml-4 flex items-center gap-3">
+                  <a href="https://github.com/quantum-vector-io/quantum_vector_artifacts" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white text-xs font-semibold">
+                    🐙 GitHub
+                  </a>
+                  <a href="https://linkedin.com/in/mykola-rudenko-b3791b102" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white text-xs font-semibold">
+                    🔗 LinkedIn
+                  </a>
+                  <a href="https://threads.net/@vajra_dorje_8" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white text-xs font-semibold">
+                    🧵 Threads
+                  </a>
+                </div>
               </div>
             </div>
           </main>
