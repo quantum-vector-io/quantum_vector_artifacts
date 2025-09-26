@@ -518,6 +518,11 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
             <Button size="sm" onClick={() => onStart(oof, 90)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md">
               90хв
             </Button>
+            {oof.estimatedMinutes && ![60,90].includes(oof.estimatedMinutes) && (
+              <Button size="sm" onClick={() => onStart(oof, oof.estimatedMinutes)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md">
+                {oof.estimatedMinutes}хв
+              </Button>
+            )}
           </div>
           <Button
             size="sm"
@@ -944,7 +949,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
     title: '',
     domain: 'Backend' as Domain,
     priority: 'Medium' as Priority,
-    estimatedMinutes: 90,
+    estimatedMinutes: '90',
     definitionOfDone: '',
     constraints: '',
     firstStep: '',
@@ -960,7 +965,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
         title: editingOOF.title,
         domain: editingOOF.domain,
         priority: editingOOF.priority,
-        estimatedMinutes: editingOOF.estimatedMinutes,
+        estimatedMinutes: String(editingOOF.estimatedMinutes),
         definitionOfDone: editingOOF.definitionOfDone || '',
         constraints: editingOOF.constraints || '',
         firstStep: editingOOF.firstStep || '',
@@ -974,7 +979,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
         title: '',
         domain: 'Backend',
         priority: 'Medium',
-        estimatedMinutes: 90,
+        estimatedMinutes: '90',
         definitionOfDone: '',
         constraints: '',
         firstStep: '',
@@ -1109,7 +1114,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
       title: newOOF.title.trim(),
       domain: newOOF.domain,
       priority: newOOF.priority,
-      estimatedMinutes: newOOF.estimatedMinutes,
+      estimatedMinutes: parseInt(String(newOOF.estimatedMinutes)) || 90,
       actualMinutes: 0,
       definitionOfDone: newOOF.definitionOfDone.trim() || undefined,
       constraints: newOOF.constraints.trim() || undefined,
@@ -1126,7 +1131,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
       title: '', 
       domain: 'Backend', 
       priority: 'Medium', 
-      estimatedMinutes: 90,
+      estimatedMinutes: '90',
       definitionOfDone: '', 
       constraints: '', 
       firstStep: '',
@@ -1143,7 +1148,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
         title: newOOF.title.trim(),
         domain: newOOF.domain,
         priority: newOOF.priority,
-        estimatedMinutes: newOOF.estimatedMinutes,
+        estimatedMinutes: parseInt(String(newOOF.estimatedMinutes)) || 90,
         definitionOfDone: newOOF.definitionOfDone.trim() || undefined,
         constraints: newOOF.constraints.trim() || undefined,
         firstStep: newOOF.firstStep.trim() || undefined,
@@ -1626,8 +1631,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                               <label className="text-slate-200 text-sm font-medium mb-2 block">{translate(language,'time')}</label>
                               <Input
                                 type="number"
-                                value={newOOF.estimatedMinutes}
-                                onChange={(e) => setNewOOF(prev => ({ ...prev, estimatedMinutes: parseInt(e.target.value) || 90 }))}
+                                value={newOOF.estimatedMinutes as unknown as number}
+                                onChange={(e) => setNewOOF(prev => ({ ...prev, estimatedMinutes: e.target.value }))}
                                 className="bg-slate-700 border-slate-600 text-slate-100"
                               />
                             </div>
