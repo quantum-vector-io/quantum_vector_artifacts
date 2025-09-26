@@ -9,40 +9,11 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
   const [hoveredProject, setHoveredProject] = useState(null);
   const [activeScrollZone, setActiveScrollZone] = useState('main');
 
-  // Expanded mock data з Book Apps
+  // Current artifacts - working and planned
   const mockProjects = [
+    // ✅ WORKING ARTIFACTS
     {
       id: 1,
-      title: 'Quantum Data Dashboard',
-      category: 'data-viz',
-      tags: ['React', 'D3.js', 'Analytics'],
-      description: 'Interactive dashboard for quantum data visualization with real-time updates',
-      color: '#00ff88',
-      isTop: true,
-      isFavorite: true
-    },
-    {
-      id: 2,
-      title: 'AI Chat Interface',
-      category: 'ai-tools',
-      tags: ['React', 'AI', 'ChatGPT'],
-      description: 'Modern chat interface with AI capabilities and voice recognition',
-      color: '#ff3366',
-      isTop: true,
-      isFavorite: false
-    },
-    {
-      id: 3,
-      title: 'Neural Network Visualizer',
-      category: 'data-viz',
-      tags: ['Three.js', 'ML', 'Visualization'],
-      description: '3D neural network architecture viewer with interactive nodes',
-      color: '#3366ff',
-      isTop: false,
-      isFavorite: true
-    },
-    {
-      id: 4,
       title: 'Deep Work OS',
       category: 'productivity',
       tags: ['React', 'Productivity', 'Deep Work', 'Time Tracking'],
@@ -50,11 +21,49 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
       color: '#06b6d4',
       isTop: true,
       isFavorite: true,
-      component: 'DeepWorkOS'
+      component: 'DeepWorkOS',
+      status: 'working'
+    },
+    
+    // 🔄 COMING SOON - HIGH PRIORITY
+    {
+      id: 2,
+      title: 'Smart Password Generator',
+      category: 'web-apps',
+      tags: ['Security', 'Tools', 'Encryption'],
+      description: 'Advanced password generator with entropy visualization, breach checking, and secure sharing capabilities',
+      color: '#ff6b6b',
+      isTop: true,
+      isFavorite: true,
+      status: 'coming-soon'
     },
     {
+      id: 3,
+      title: 'QR Code Studio',
+      category: 'web-apps',
+      tags: ['QR', 'Generator', 'Analytics'],
+      description: 'Generate, customize, and track QR codes with analytics, bulk generation, and design templates',
+      color: '#4ecdc4',
+      isTop: true,
+      isFavorite: false,
+      status: 'coming-soon'
+    },
+    {
+      id: 4,
+      title: 'JSON Formatter & Validator',
+      category: 'ai-tools',
+      tags: ['JSON', 'Developer Tools', 'Validation'],
+      description: 'Beautiful JSON editing with syntax highlighting, validation, and diff comparison',
+      color: '#45b7d1',
+      isTop: false,
+      isFavorite: true,
+      status: 'coming-soon'
+    },
+    
+    // 📋 FUTURE PLANNED ARTIFACTS (See ARTIFACTS_ROADMAP.md for full list)
+    {
       id: 5,
-      title: 'Productivity Timer',
+      title: 'Color Palette Generator',
       category: 'web-apps',
       tags: ['React', 'Productivity', 'PWA'],
       description: 'Advanced pomodoro timer with analytics and habit tracking',
@@ -809,18 +818,30 @@ const QuantumCatalog = ({ onNavigateToArtifact }) => {
                         {project.component ? (
                           <button 
                             onClick={() => onNavigateToArtifact?.(project.component)}
-                            className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors"
+                            className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors font-semibold"
                           >
-                            Launch
+                            🚀 Launch
+                          </button>
+                        ) : project.status === 'coming-soon' ? (
+                          <button className="px-3 py-1 bg-amber-500/20 text-amber-400 rounded-md text-sm cursor-default font-semibold">
+                            🔄 Coming Soon
+                          </button>
+                        ) : project.status === 'planned' ? (
+                          <button className="px-3 py-1 bg-slate-500/20 text-slate-400 rounded-md text-sm cursor-default font-semibold">
+                            📋 Planned
                           </button>
                         ) : (
                           <button className="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors">
                             Demo
                           </button>
                         )}
-                        <button className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-md text-sm hover:bg-purple-500/30 transition-colors">
-                          Code
-                        </button>
+                        <a 
+                          href="./ARTIFACTS_ROADMAP.md"
+                          target="_blank"
+                          className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-md text-sm hover:bg-purple-500/30 transition-colors"
+                        >
+                          📋 Roadmap
+                        </a>
                       </div>
                     </div>
                   </div>

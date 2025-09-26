@@ -63,6 +63,15 @@ export default YourTool;
 - **🎮 Games** - Interactive entertainment, educational games
 - **🧪 Experiments** - Proof of concepts, creative coding, research
 
+## 🗺️ Development Roadmap
+
+📋 **[View Full Artifacts Roadmap](./ARTIFACTS_ROADMAP.md)** - Complete list of 76 planned artifacts across 10 tiers
+
+**Current Status:**
+- ✅ **Implemented:** Deep Work OS (Productivity System)
+- 🔄 **Next Priority:** Smart Password Generator, QR Code Studio, Color Palette Generator
+- 📋 **Total Planned:** 76 artifacts across all categories
+
 ## 🌟 Contributing
 
 1. Fork the repository
