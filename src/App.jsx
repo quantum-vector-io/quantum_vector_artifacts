@@ -103,7 +103,7 @@ function App() {
     )
   }
 
-  return <QuantumCatalog onNavigateToArtifact={navigateToArtifact} />
+  return <QuantumCatalog onNavigateToArtifact={navigateToArtifact} language={currentLanguage} onLanguageChange={(lang) => setCurrentLanguage(lang)} />
 }
 
 export default App
