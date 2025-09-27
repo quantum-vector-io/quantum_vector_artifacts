@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfix(deep-work): improve mobile layout for iPhone 12 Pro Max\n\n- Fix delete button overflow in task cards by using flex-col on mobile\n- Fix timer buttons (pause/reset/stop) overflow with responsive layout\n- Add proper mobile-first design with flex-1 sm:flex-none pattern\n- Update header buttons to use flex-col on mobile devices\n- Remove conflicting space-x and gap CSS classes\n- Add px-4 padding to prevent edge overflow on mobile screens\n\n🤖 Generated with [Claude Code](https://claude.ai/code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
