@@ -85,7 +85,47 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
       comingSoon: 'Coming Soon',
       noResults: 'No artifacts found',
       footerStatus: (w, c, p) => `${w} working • ${c} coming soon • ${p} planned`,
-      launch: 'Launch'
+      launch: 'Launch',
+      // Categories
+      catTopProjects: 'Top Projects',
+      catMyFavourite: 'My Favourite',
+      catAllProjects: 'All Projects',
+      catDataVisualization: 'Data Visualization',
+      catAiTools: 'AI Tools',
+      catWebApps: 'Web Apps',
+      catProductivity: 'Productivity',
+      catBookApps: 'Book Apps',
+      catGames: 'Games',
+      catExperiments: 'Experiments',
+      // Status descriptions
+      topFeatured: 'Top featured projects',
+      favoritePicks: 'favorite picks',
+      artifactsIn: 'artifacts in',
+      planned: 'Planned',
+      tryAdjusting: 'Try adjusting your search or category filter',
+      english: 'English',
+      ukrainian: 'Українська',
+      swipeToSee: 'Swipe to see all',
+      categoriesArrow: 'categories →',
+      // Project descriptions
+      deepWorkDesc: 'Intelligent system for deep work with timers, task tracking and productivity analytics',
+      passwordGenDesc: 'Advanced password generator with entropy visualization, breach checking, and secure sharing capabilities',
+      jsonFormatterDesc: 'Beautiful JSON editing with syntax highlighting, validation, and diff comparison',
+      // Project titles
+      deepWorkTitle: 'Deep Work OS',
+      passwordGenTitle: 'Smart Password Generator',
+      jsonFormatterTitle: 'JSON Formatter & Validator',
+      // Tags
+      tagReact: 'React',
+      tagProductivity: 'Productivity',
+      tagDeepWork: 'Deep Work',
+      tagTimeTracking: 'Time Tracking',
+      tagSecurity: 'Security',
+      tagTools: 'Tools',
+      tagEncryption: 'Encryption',
+      tagJSON: 'JSON',
+      tagDeveloperTools: 'Developer Tools',
+      tagValidation: 'Validation'
     },
     UA: {
       headerDesc: 'Досліджуйте перетин людської творчості та AI через інтерактивні інструменти й експерименти',
@@ -95,7 +135,47 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
       comingSoon: 'Незабаром',
       noResults: 'Артефакти не знайдено',
       footerStatus: (w, c, p) => `${w} робочих • ${c} незабаром • ${p} заплановано`,
-      launch: 'Запустити'
+      launch: 'Запустити',
+      // Categories
+      catTopProjects: 'Топ Проєкти',
+      catMyFavourite: 'Мої Улюблені',
+      catAllProjects: 'Всі Проєкти',
+      catDataVisualization: 'Візуалізація Даних',
+      catAiTools: 'AI Інструменти',
+      catWebApps: 'Веб Додатки',
+      catProductivity: 'Продуктивність',
+      catBookApps: 'Книжкові Додатки',
+      catGames: 'Ігри',
+      catExperiments: 'Експерименти',
+      // Status descriptions
+      topFeatured: 'Топ рекомендовані проєкти',
+      favoritePicks: 'улюблених вибірок',
+      artifactsIn: 'артефактів в',
+      planned: 'Заплановано',
+      tryAdjusting: 'Спробуйте змінити пошук або фільтр категорій',
+      english: 'English',
+      ukrainian: 'Українська',
+      swipeToSee: 'Гортайте, щоб побачити всі',
+      categoriesArrow: 'категорії →',
+      // Project descriptions
+      deepWorkDesc: 'Інтелектуальна система для глибокої роботи з таймерами, відстеженням завдань та аналітикою продуктивності',
+      passwordGenDesc: 'Розширений генератор паролів з візуалізацією ентропії, перевіркою витоків та безпечним обміном',
+      jsonFormatterDesc: 'Красивий редактор JSON з підсвічуванням синтаксису, валідацією та порівнянням різниць',
+      // Project titles
+      deepWorkTitle: 'Deep Work OS',
+      passwordGenTitle: 'Розумний Генератор Паролів',
+      jsonFormatterTitle: 'JSON Форматер та Валідатор',
+      // Tags
+      tagReact: 'React',
+      tagProductivity: 'Продуктивність',
+      tagDeepWork: 'Глибока Робота',
+      tagTimeTracking: 'Відстеження Часу',
+      tagSecurity: 'Безпека',
+      tagTools: 'Інструменти',
+      tagEncryption: 'Шифрування',
+      tagJSON: 'JSON',
+      tagDeveloperTools: 'Інструменти Розробника',
+      tagValidation: 'Валідація'
     }
   };
   const L = TRANS[language] || TRANS.EN;
@@ -105,24 +185,24 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
     // ✅ WORKING ARTIFACTS
     {
       id: 1,
-      title: 'Deep Work OS',
+      title: L.deepWorkTitle,
       category: 'productivity',
-      tags: ['React', 'Productivity', 'Deep Work', 'Time Tracking'],
-      description: 'Інтелектуальна система для глибокої роботи з таймерами, відстеженням завдань та аналітикою продуктивності',
+      tags: [L.tagReact, L.tagProductivity, L.tagDeepWork, L.tagTimeTracking],
+      description: L.deepWorkDesc,
       color: '#06b6d4',
       isTop: true,
       isFavorite: true,
       component: 'DeepWorkOS',
       status: 'working'
     },
-    
+
     // 🔄 COMING SOON - TOP PRIORITY
     {
       id: 2,
-      title: 'Smart Password Generator',
+      title: L.passwordGenTitle,
       category: 'web-apps',
-      tags: ['Security', 'Tools', 'Encryption'],
-      description: 'Advanced password generator with entropy visualization, breach checking, and secure sharing capabilities',
+      tags: [L.tagSecurity, L.tagTools, L.tagEncryption],
+      description: L.passwordGenDesc,
       color: '#ff6b6b',
       isTop: true,
       isFavorite: true,
@@ -130,10 +210,10 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
     },
     {
       id: 3,
-      title: 'JSON Formatter & Validator',
+      title: L.jsonFormatterTitle,
       category: 'ai-tools',
-      tags: ['JSON', 'Developer Tools', 'Validation'],
-      description: 'Beautiful JSON editing with syntax highlighting, validation, and diff comparison',
+      tags: [L.tagJSON, L.tagDeveloperTools, L.tagValidation],
+      description: L.jsonFormatterDesc,
       color: '#45b7d1',
       isTop: true,
       isFavorite: true,
@@ -142,16 +222,16 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
   ];
 
   const categories = [
-    { id: 'top', name: 'Top Projects', icon: '⭐', special: true },
-    { id: 'favorites', name: 'My Favourite', icon: '❤️', special: true },
-    { id: 'all', name: 'All Projects', icon: '🌐' },
-    { id: 'data-viz', name: 'Data Visualization', icon: '📊' },
-    { id: 'ai-tools', name: 'AI Tools', icon: '🤖' },
-    { id: 'web-apps', name: 'Web Apps', icon: '💻' },
-    { id: 'productivity', name: 'Productivity', icon: '⚡' },
-    { id: 'book-apps', name: 'Book Apps', icon: '📚' },
-    { id: 'games', name: 'Games', icon: '🎮' },
-    { id: 'experiments', name: 'Experiments', icon: '🧪' }
+    { id: 'top', name: L.catTopProjects, icon: '⭐', special: true },
+    { id: 'favorites', name: L.catMyFavourite, icon: '❤️', special: true },
+    { id: 'all', name: L.catAllProjects, icon: '🌐' },
+    { id: 'data-viz', name: L.catDataVisualization, icon: '📊' },
+    { id: 'ai-tools', name: L.catAiTools, icon: '🤖' },
+    { id: 'web-apps', name: L.catWebApps, icon: '💻' },
+    { id: 'productivity', name: L.catProductivity, icon: '⚡' },
+    { id: 'book-apps', name: L.catBookApps, icon: '📚' },
+    { id: 'games', name: L.catGames, icon: '🎮' },
+    { id: 'experiments', name: L.catExperiments, icon: '🧪' }
   ];
 
   // Enhanced filtering logic
@@ -546,13 +626,13 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
                         className="w-full text-left px-4 py-2 hover:bg-slate-700"
                         onClick={() => { onLanguageChange('EN'); setLangOpen(false); }}
                       >
-                        English
+                        {L.english}
                       </button>
                       <button
                         className="w-full text-left px-4 py-2 hover:bg-slate-700"
                         onClick={() => { onLanguageChange('UA'); setLangOpen(false); }}
                       >
-                        Українська
+                        {L.ukrainian}
                       </button>
                     </div>
                    )}
@@ -567,7 +647,7 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
               {/* Debug: Show total categories on mobile */}
               {deviceSettings.isMobile && (
                 <div className="text-center mb-2 text-xs text-gray-400">
-                  Swipe to see all {categories.length} categories →
+                  {L.swipeToSee} {categories.length} {L.categoriesArrow}
                 </div>
               )}
               <div className={`mb-6 relative ${
@@ -620,10 +700,10 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
                       </div>
                     </>
                   )}
-                  {selectedCategory === 'top' && `Top ${filteredProjects.length} featured projects`}
-                  {selectedCategory === 'favorites' && `${filteredProjects.length} favorite picks`}
-                  {!['all', 'top', 'favorites'].includes(selectedCategory) && 
-                    `${filteredProjects.length} artifacts in ${categories.find(c => c.id === selectedCategory)?.name}`}
+                  {selectedCategory === 'top' && `${L.topFeatured} ${filteredProjects.length}`}
+                  {selectedCategory === 'favorites' && `${filteredProjects.length} ${L.favoritePicks}`}
+                  {!['all', 'top', 'favorites'].includes(selectedCategory) &&
+                    `${filteredProjects.length} ${L.artifactsIn} ${categories.find(c => c.id === selectedCategory)?.name}`}
                 </div>
               </div>
             </div>
@@ -642,7 +722,7 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
                   onMouseEnter={() => setHoveredProject(project.id)}
                   onMouseLeave={() => setHoveredProject(null)}
                   onClick={() => project.component && onNavigateToArtifact?.(project.component, language)}
-                  onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && project.component) onNavigateToArtifact?.(project.component); }}
+                  onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && project.component) onNavigateToArtifact?.(project.component, language); }}
                   role={project.component ? 'button' : undefined}
                   tabIndex={project.component ? 0 : undefined}
                   className={`group cursor-pointer transform transition-all duration-300 ${
@@ -719,7 +799,7 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
                           onClick={() => onNavigateToArtifact?.(project.component, language)}
                            className="flex-1 px-3 py-2 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors font-semibold border border-cyan-500/30"
                          >
-                           🚀 Launch
+                           🚀 {L.launch}
                          </button>
                       ) : project.status === 'coming-soon' ? (
                         <button className="flex-1 px-3 py-2 bg-amber-500/20 text-amber-400 rounded-md text-sm cursor-default font-semibold border border-amber-500/30">
@@ -727,7 +807,7 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
                         </button>
                       ) : project.status === 'planned' ? (
                         <button className="flex-1 px-3 py-2 bg-slate-500/20 text-slate-400 rounded-md text-sm cursor-default font-semibold border border-slate-500/30">
-                          📋 Planned
+                          📋 {L.planned}
                         </button>
                       ) : (
                         <button className="flex-1 px-3 py-2 bg-cyan-500/20 text-cyan-400 rounded-md text-sm hover:bg-cyan-500/30 transition-colors font-semibold border border-cyan-500/30">
@@ -745,7 +825,7 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
                 <div className="text-center py-12">
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-xl text-white mb-2">{L.noResults}</h3>
-                <p className="text-gray-400">{language === 'EN' ? 'Try adjusting your search or category filter' : 'Спробуйте змінити пошук або фільтр категорій'}</p>
+                <p className="text-gray-400">{L.tryAdjusting}</p>
               </div>
             )}
             

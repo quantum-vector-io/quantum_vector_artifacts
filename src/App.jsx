@@ -49,9 +49,12 @@ function App() {
   const [currentLanguage, setCurrentLanguage] = useState('EN')
 
   // Accepts artifactComponent and optional language param
-  const navigateToArtifact = (artifactComponent, lang = 'EN') => {
+  const navigateToArtifact = (artifactComponent, lang = null) => {
     setCurrentArtifact(artifactComponent)
-    setCurrentLanguage(lang)
+    // If no language is provided, use current language
+    if (lang !== null) {
+      setCurrentLanguage(lang)
+    }
     setCurrentView('artifact')
   }
 
@@ -63,18 +66,22 @@ function App() {
   const renderArtifact = (componentName) => {
     switch (componentName) {
       case 'DeepWorkOS':
-        return <DeepWorkOS_UA language={currentLanguage} />
+        return <DeepWorkOS_UA language={currentLanguage} onBackToCatalog={navigateToCatalog} />
       default:
         return (
           <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex items-center justify-center">
             <div className="text-center">
-              <h1 className="text-2xl font-bold mb-4">Component Not Available</h1>
-              <p className="text-slate-300 mb-6">The requested artifact is not yet implemented.</p>
+              <h1 className="text-2xl font-bold mb-4">
+                {currentLanguage === 'EN' ? 'Component Not Available' : 'Компонент недоступний'}
+              </h1>
+              <p className="text-slate-300 mb-6">
+                {currentLanguage === 'EN' ? 'The requested artifact is not yet implemented.' : 'Запитаний артефакт ще не реалізований.'}
+              </p>
               <button
                 onClick={navigateToCatalog}
                 className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-lg font-semibold hover:from-cyan-500 hover:to-blue-500 transition-all"
               >
-                ← Back to Catalog
+                {currentLanguage === 'EN' ? '← Back to Catalog' : '← Назад до Каталогу'}
               </button>
             </div>
           </div>
