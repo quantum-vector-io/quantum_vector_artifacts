@@ -8,6 +8,24 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
    const [searchTerm, setSearchTerm] = useState('');
    const [hoveredProject, setHoveredProject] = useState(null);
    const [activeScrollZone, setActiveScrollZone] = useState('main');
+
+   // Device detection and adaptive settings
+   const [deviceSettings, setDeviceSettings] = useState(() => {
+     const isMobile = window.innerWidth <= 768;
+     const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
+     const isDesktop = window.innerWidth > 1024;
+
+     return {
+       isMobile,
+       isTablet,
+       isDesktop,
+       particles: isMobile ? 50 : isTablet ? 200 : 1000,
+       foamBubbles: isMobile ? 5 : isTablet ? 10 : 20,
+       tesseracts: isMobile ? 1 : isTablet ? 2 : 3,
+       quality: isMobile ? 'performance' : isTablet ? 'balanced' : 'beauty',
+       frameRate: isMobile ? 30 : 60
+     };
+   });
   // language dropdown state (controlled by parent for selected language)
   const [langOpen, setLangOpen] = useState(false);
   const langRef = useRef(null);
@@ -20,6 +38,29 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
     };
     document.addEventListener('mousedown', onDocClick);
     return () => document.removeEventListener('mousedown', onDocClick);
+  }, []);
+
+  // Responsive device detection with resize listener
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth <= 768;
+      const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
+      const isDesktop = window.innerWidth > 1024;
+
+      setDeviceSettings({
+        isMobile,
+        isTablet,
+        isDesktop,
+        particles: isMobile ? 50 : isTablet ? 200 : 1000,
+        foamBubbles: isMobile ? 5 : isTablet ? 10 : 20,
+        tesseracts: isMobile ? 1 : isTablet ? 2 : 3,
+        quality: isMobile ? 'performance' : isTablet ? 'balanced' : 'beauty',
+        frameRate: isMobile ? 30 : 60
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
   
   // simple translation map for catalog UI
@@ -140,10 +181,13 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
     // Camera position
     camera.position.z = 50;
 
-    // Quantum Foam Background
+    // Quantum Foam Background - Adaptive density
     const foamBubbles = [];
-    for (let i = 0; i < 200; i++) {
-      const geometry = new THREE.SphereGeometry(Math.random() * 0.5 + 0.1, 8, 6);
+    for (let i = 0; i < deviceSettings.foamBubbles; i++) {
+      // Adaptive geometry complexity based on device
+      const segments = deviceSettings.quality === 'performance' ? 4 :
+                      deviceSettings.quality === 'balanced' ? 6 : 8;
+      const geometry = new THREE.SphereGeometry(Math.random() * 0.5 + 0.1, segments, segments);
       const material = new THREE.MeshBasicMaterial({ 
         color: new THREE.Color().setHSL(0.6 + Math.random() * 0.4, 0.7, 0.5),
         transparent: true,
@@ -161,8 +205,8 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
       scene.add(bubble);
     }
 
-    // Sacred Geometry - Particle System
-    const particleCount = 1000;
+    // Sacred Geometry - Adaptive Particle System
+    const particleCount = deviceSettings.particles;
     const positions = [];
     const colors = [];
     
@@ -185,19 +229,23 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
     particleGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     particleGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
     
+    // Adaptive particle material settings
+    const particleSize = deviceSettings.quality === 'performance' ? 1.5 :
+                        deviceSettings.quality === 'balanced' ? 2 : 2.5;
     const particleMaterial = new THREE.PointsMaterial({
-      size: 2,
+      size: particleSize,
       vertexColors: true,
       transparent: true,
-      opacity: 0.6
+      opacity: deviceSettings.quality === 'performance' ? 0.4 : 0.6,
+      sizeAttenuation: deviceSettings.quality !== 'performance'
     });
     
     const particles = new THREE.Points(particleGeometry, particleMaterial);
     scene.add(particles);
 
-    // Tesseract (4D cube projection)
+    // Tesseract (4D cube projection) - Adaptive complexity
     const tesseracts = [];
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < deviceSettings.tesseracts; i++) {
       const tesseractGroup = new THREE.Group();
       
       // Create multiple cubes for 4D projection
@@ -262,9 +310,13 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
       scene.add(tube);
     }
 
-    // Animation loop
-    const animate = () => {
-      requestAnimationFrame(animate);
+    // Adaptive animation loop with frame rate control
+    let lastTime = 0;
+    const targetInterval = 1000 / deviceSettings.frameRate; // Convert FPS to interval
+
+    const animate = (currentTime) => {
+      if (currentTime - lastTime >= targetInterval) {
+        lastTime = currentTime;
 
       // Rotate tesseracts
       tesseracts.forEach((tesseract, index) => {
@@ -301,10 +353,12 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
       camera.position.y = Math.cos(time * 0.7) * 3;
       camera.lookAt(scene.position);
 
-      renderer.render(scene, camera);
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(animate);
     };
 
-    animate();
+    animate(0);
 
     // Handle resize
     const handleResize = () => {
@@ -322,12 +376,33 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
       }
       renderer.dispose();
     };
-  }, []);
+  }, [deviceSettings]); // Recreate 3D scene when device settings change
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* 3D Background */}
-      <div ref={mountRef} className="fixed inset-0 -z-10" />
+    <>
+      {/* Global styles for mobile optimizations */}
+      <style jsx>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .touch-manipulation {
+          touch-action: manipulation;
+        }
+        .transform-gpu {
+          transform: translateZ(0);
+        }
+        .will-change-transform {
+          will-change: transform;
+        }
+      `}</style>
+
+      <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        {/* 3D Background */}
+        <div ref={mountRef} className="fixed inset-0 -z-10" />
       
       {/* Gradient Overlay */}
       <div className="fixed inset-0 bg-gradient-to-b from-transparent via-slate-950/40 to-slate-950/80 -z-5" />
@@ -402,21 +477,36 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
           <main className="max-w-7xl mx-auto">
             {/* Enhanced Category Pills */}
             <div className="mb-8">
-              <div className="flex flex-wrap justify-center gap-3 mb-6">
+              <div className={`mb-6 ${
+                deviceSettings.isMobile
+                  ? 'overflow-x-auto scrollbar-hide'
+                  : 'flex flex-wrap justify-center gap-3'
+              }`}>
+                <div className={`${
+                  deviceSettings.isMobile
+                    ? 'flex gap-3 px-4 pb-2 min-w-max'
+                    : 'flex flex-wrap justify-center gap-3'
+                }`}>
                 {categories.map(category => (
                   <button
                     key={category.id}
                     onClick={() => setSelectedCategory(category.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 backdrop-blur-md border ${
-                      selectedCategory === category.id
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 backdrop-blur-md border
+                      ${deviceSettings.isMobile ? 'touch-manipulation active:scale-95 min-h-[44px] flex items-center' : 'hover:scale-105'}
+                      ${selectedCategory === category.id
                         ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-cyan-400/50 shadow-lg shadow-cyan-500/25'
-                        : 'bg-white/10 text-gray-300 border-white/20 hover:bg-white/20 hover:text-white hover:border-white/40'
-                    }`}
+                        : `bg-white/10 text-gray-300 border-white/20 ${
+                            deviceSettings.isMobile
+                              ? 'active:bg-white/20 active:text-white active:border-white/40'
+                              : 'hover:bg-white/20 hover:text-white hover:border-white/40'
+                          }`
+                      }`}
                   >
                     <span className="mr-2">{category.icon}</span>
                     {category.name}
                   </button>
                 ))}
+                </div>
               </div>
               
               {/* Category Description with Stats */}
@@ -446,7 +536,13 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
             </div>
             
             {/* Projects Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className={`grid gap-6 ${
+              deviceSettings.isMobile
+                ? 'grid-cols-1 px-4'
+                : deviceSettings.isTablet
+                ? 'grid-cols-2 px-6'
+                : 'grid-cols-3'
+            }`}>
               {filteredProjects.map(project => (
                 <div
                   key={project.id}
@@ -460,7 +556,13 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
                     hoveredProject === project.id ? 'scale-105' : ''
                   }`}
                 >
-                  <div className="backdrop-blur-md bg-white/10 rounded-xl border border-white/20 p-6 shadow-xl hover:bg-white/15 transition-all duration-300 h-full">
+                  <div className={`backdrop-blur-md bg-white/10 rounded-xl border border-white/20 p-6 shadow-xl transition-all duration-300 h-full
+                    ${deviceSettings.isMobile
+                      ? 'active:bg-white/20 active:shadow-2xl active:scale-[0.98] active:border-cyan-400/40 touch-manipulation'
+                      : 'hover:bg-white/15 hover:shadow-2xl hover:scale-[1.02] hover:border-cyan-400/30'
+                    }
+                    ${hoveredProject === project.id ? 'transform-gpu will-change-transform' : ''}
+                  `}>
                     {/* Project Header */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
@@ -573,9 +675,7 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
           </main>
         </div>
       </div>
-
-
-    </div>
+    </>
   );
 };
 
