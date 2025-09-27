@@ -85,16 +85,6 @@ function App() {
   if (currentView === 'artifact') {
     return (
       <div className="relative">
-        {/* Back button overlay */}
-        <div className="fixed top-6 left-6 z-50">
-          <button
-            onClick={navigateToCatalog}
-            className="flex items-center px-4 py-2 bg-slate-800/90 backdrop-blur-sm border border-slate-600/50 rounded-lg text-slate-200 hover:text-slate-100 hover:bg-slate-700/90 transition-all shadow-xl"
-          >
-            <span className="mr-2">←</span>
-            Back to Catalog
-          </button>
-        </div>
         
         <ErrorBoundary>
           {renderArtifact(currentArtifact)}

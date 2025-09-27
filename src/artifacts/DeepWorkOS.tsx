@@ -20,6 +20,9 @@ import {
 // Recharts components used in the charts below — import to avoid runtime ReferenceErrors
 import { ResponsiveContainer, ComposedChart, Area, Bar, CartesianGrid, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts';
 
+// Three.js for quantum background
+import * as THREE from 'three';
+
 type OOF = {
   id: string;
   title: string;
@@ -288,7 +291,7 @@ const QuickStats = ({ logs, className = "", onResetData, language = 'EN' }: { lo
   
   return (
     <div className={`grid grid-cols-3 gap-4 ${className}`}>
-      <Card className="bg-slate-800 border-emerald-500/50 shadow-lg shadow-emerald-500/10">
+      <Card className="bg-slate-800/5 backdrop-blur-md border-emerald-500/60 shadow-2xl shadow-emerald-500/20">
         <CardContent className="pt-4">
           <div className="text-center">
             <div className="text-3xl font-bold text-emerald-300">{Math.round(todayTime/60 * 10)/10}h</div>
@@ -296,7 +299,7 @@ const QuickStats = ({ logs, className = "", onResetData, language = 'EN' }: { lo
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-slate-800 border-blue-500/50 shadow-lg shadow-blue-500/10">
+      <Card className="bg-slate-800/5 backdrop-blur-md border-blue-500/60 shadow-2xl shadow-blue-500/20">
         <CardContent className="pt-4">
           <div className="text-center">
             <div className="text-3xl font-bold text-blue-300">{Math.round(weekTime/60 * 10)/10}h</div>
@@ -304,7 +307,7 @@ const QuickStats = ({ logs, className = "", onResetData, language = 'EN' }: { lo
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-slate-800 border-amber-500/50 shadow-lg shadow-amber-500/10">
+      <Card className="bg-slate-800/5 backdrop-blur-md border-amber-500/60 shadow-2xl shadow-amber-500/20">
         <CardContent className="pt-4">
           {/* Reset button removed here to avoid duplication; top header contains the single Reset */}
           <div className="text-center">
@@ -352,7 +355,7 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec }: { run: 
   const isOvertime = progress > 100;
   
   return (
-    <Card className={`bg-slate-800 border-2 ${isOvertime ? 'border-amber-500' : isNearComplete ? 'border-emerald-500' : 'border-slate-700'}`}>
+    <Card className={`bg-transparent border-2 ${isOvertime ? 'border-amber-500/70' : isNearComplete ? 'border-emerald-500/70' : 'border-slate-600/50'} shadow-2xl`}>
       <CardContent className="pt-6">
         <div className="text-center space-y-6">
           <div>
@@ -433,7 +436,7 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec }: { run: 
 
 const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarred, language = 'EN' }: { oof: OOF; onStart: (oof:OOF, minutes:number)=>void; onEdit: (oof:OOF)=>void; onDelete: (id:string)=>void; onToggleStar: (id:string)=>void; isStarred:boolean; language?:string }) => {
   const priorityColors = {
-    Low: { bg: 'bg-slate-800/90', text: 'text-slate-300', border: 'border-slate-600' },
+    Low: { bg: 'bg-slate-800/10', text: 'text-slate-300', border: 'border-slate-600' },
     Medium: { bg: 'bg-blue-900/60', text: 'text-blue-400', border: 'border-blue-700' },
     High: { bg: 'bg-amber-900/60', text: 'text-amber-400', border: 'border-amber-700' },
     Critical: { bg: 'bg-red-900/60', text: 'text-red-400', border: 'border-red-700' }
@@ -465,7 +468,7 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
                 {oof.priority}
               </Badge>
               {oof.tags.map(tag => (
-                <Badge key={tag} className="text-xs border border-slate-500/50 text-slate-300 bg-slate-800/60 px-2 py-1">
+                <Badge key={tag} className="text-xs border border-slate-500/50 text-slate-300 bg-slate-800/10 px-2 py-1">
                   {tag}
                 </Badge>
               ))}
@@ -479,7 +482,7 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
               </div>
               {completionRate > 0 && (
                 <div className="flex items-center">
-                  <div className="w-full bg-slate-700/80 rounded-full h-2 mr-2">
+                  <div className="w-full bg-slate-700/10 rounded-full h-2 mr-2">
                     <div 
                       className={`h-2 rounded-full ${completionRate >= 100 ? 'bg-emerald-500' : 'bg-blue-500'}`}
                       style={{ width: `${Math.min(completionRate, 100)}%` }}
@@ -494,19 +497,19 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
             size="sm"
             variant="ghost"
             onClick={() => onToggleStar(oof.id)}
-            className={`${isStarred ? 'text-yellow-400 hover:text-yellow-300' : 'text-slate-500 hover:text-yellow-400'} bg-transparent hover:bg-slate-700/50`}
+            className={`${isStarred ? 'text-yellow-400 hover:text-yellow-300' : 'text-slate-500 hover:text-yellow-400'} bg-transparent hover:bg-slate-700/10`}
           >
             <Star className={`w-4 h-4 ${isStarred ? 'fill-current' : ''}`} />
           </Button>
         </div>
         
         {oof.definitionOfDone && (
-          <p className="text-slate-300 text-sm mb-2 bg-slate-800/40 p-2 rounded-lg border border-slate-700/50">
+          <p className="text-slate-300 text-sm mb-2 bg-slate-800/5 p-2 rounded-lg border border-slate-700/50">
             ✅ DoD: {oof.definitionOfDone}
           </p>
         )}
         {oof.firstStep && (
-          <p className="text-slate-300 text-sm mb-3 bg-slate-800/40 p-2 rounded-lg border border-slate-700/50">
+          <p className="text-slate-300 text-sm mb-3 bg-slate-800/5 p-2 rounded-lg border border-slate-700/50">
             🚀 Наступний крок: {oof.firstStep}
           </p>
         )}
@@ -602,7 +605,7 @@ const SmartParkingList = ({ parking, onAdd, onToggle, onDelete, onCategorize, cu
           </div>
         </div>
         
-        <div className="text-slate-200 text-sm font-semibold bg-slate-800/80 px-4 py-2 rounded-lg border border-slate-700/50 shadow-md">
+        <div className="text-slate-200 text-sm font-semibold bg-slate-800/10 px-4 py-2 rounded-lg border border-slate-700/50 shadow-md">
           {filteredParking.length} записів
         </div>
       </div>
@@ -648,7 +651,7 @@ const SmartParkingList = ({ parking, onAdd, onToggle, onDelete, onCategorize, cu
                   <select
                     value={item.category}
                     onChange={(e) => onCategorize(item.id, e.target.value)}
-                    className="text-xs md:text-sm bg-slate-700/90 border border-slate-600/50 rounded-lg px-2 md:px-3 py-1 md:py-2 text-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 backdrop-blur-sm flex-1 md:flex-none"
+                    className="text-xs md:text-sm bg-slate-700/10 border border-slate-600/50 rounded-lg px-2 md:px-3 py-1 md:py-2 text-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 backdrop-blur-sm flex-1 md:flex-none"
                   >
                     {categories.map(cat => (
                       <option key={cat} value={cat}>{categoryIcons[cat]} {cat}</option>
@@ -749,16 +752,16 @@ const ChecklistTile = ({ title, checked, onChange, infoContent, example, icon, l
             variant="ghost"
             size="sm"
             onClick={() => setShowInfo(!showInfo)}
-            className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 backdrop-blur-sm border border-slate-600/30 px-3 py-1 rounded-lg font-semibold"
+            className="text-slate-300 hover:text-slate-100 hover:bg-slate-700/10 backdrop-blur-sm border border-slate-600/30 px-3 py-1 rounded-lg font-semibold"
           >
             {showInfo ? translate(language,'hide') : translate(language,'hint')}
           </Button>
         </div>
         {showInfo && (
-          <div className="mt-4 p-4 bg-slate-900/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
+          <div className="mt-4 p-4 bg-slate-900/5 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
             <p className="text-slate-200 text-sm mb-3 leading-relaxed font-medium">{infoContent}</p>
             {example && (
-              <p className="text-slate-300 text-xs italic bg-slate-800/40 p-2 rounded-lg border border-slate-700/30">
+              <p className="text-slate-300 text-xs italic bg-slate-800/5 p-2 rounded-lg border border-slate-700/30">
                 <strong>Приклад:</strong> {example}
               </p>
             )}
@@ -805,8 +808,8 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
   const charCount = notes.length;
 
   return (
-    <Card className={`bg-slate-800/90 border-slate-600/70 shadow-xl ${className}`}>
-      <CardHeader className="bg-slate-700/50 border-b border-slate-600">
+    <Card className={`bg-slate-800/10 border-slate-600/70 shadow-xl ${className}`}>
+      <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
         <CardTitle className="text-slate-100 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <NotebookPen className="w-5 h-5 text-purple-400" />
@@ -825,7 +828,7 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
             placeholder={translate(language,'notesPlaceholder')}
             value={notes}
             onChange={(e) => onNotesChange(e.target.value)}
-            className="bg-slate-900/60 border-slate-600/50 text-slate-100 placeholder-slate-400 min-h-[100px] md:min-h-[175px] rounded-xl resize-y focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors duration-200"
+            className="bg-slate-900/5 border-slate-600/50 text-slate-100 placeholder-slate-400 min-h-[100px] md:min-h-[175px] rounded-xl resize-y focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors duration-200"
             style={{ minHeight: '100px', maxHeight: '400px' }}
           />
 
@@ -841,7 +844,7 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
                 ℹ️ {translate(language,'hint')}
               </button>
               {showHint && (
-                <div className="mt-2 text-xs text-slate-300 bg-slate-800/80 p-2 rounded-md border border-slate-700/50 max-w-xs shadow-lg">
+                <div className="mt-2 text-xs text-slate-300 bg-slate-800/10 p-2 rounded-md border border-slate-700/50 max-w-xs shadow-lg">
                   <strong>{translate(language,'tipLabel')}</strong> {translate(language,'hintLongShort')}
                 </div>
               )}
@@ -853,7 +856,7 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
                 variant="outline"
                 onClick={handleCopy}
                 disabled={!notes.trim()}
-                className="border-slate-500 text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
+                className="border-slate-500 text-slate-300 hover:text-slate-100 hover:bg-slate-700/10 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
               >
                     {isCopied ? (
                   <>
@@ -872,7 +875,7 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
                 variant="outline"
                 onClick={handleExport}
                 disabled={!notes.trim()}
-                className="border-slate-500 text-slate-300 hover:text-slate-100 hover:bg-slate-700/50 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
+                className="border-slate-500 text-slate-300 hover:text-slate-100 hover:bg-slate-700/10 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
               >
                 <Download className="w-4 h-4 mr-1" />
                 {translate(language,'export')}
@@ -1014,6 +1017,10 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
   // Timer management
   const intervalRef = useRef<number | null>(null);
   const activityTimeoutRef = useRef<number | null>(null);
+
+  // Quantum background refs
+  const quantumMountRef = useRef<HTMLDivElement>(null);
+  const quantumSceneRef = useRef<any>(null);
   
   // Persist state changes to localStorage
   useEffect(() => ls.set('dw_oofs', oofs), [oofs]);
@@ -1024,7 +1031,137 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
   useEffect(() => ls.set('dw_templates', templates), [templates]);
   useEffect(() => ls.set('dw_settings', settings), [settings]);
   useEffect(() => ls.set('dw_starred', starredOOFs), [starredOOFs]);
-  
+
+  // Quantum Background 3D Scene Setup
+  useEffect(() => {
+    if (!quantumMountRef.current) return;
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: false, antialias: true });
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // Create dark cosmic background
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 512;
+    canvas.height = 512;
+
+    const gradient = context.createRadialGradient(256, 256, 0, 256, 256, 256);
+    gradient.addColorStop(0, '#020308');
+    gradient.addColorStop(0.5, '#010203');
+    gradient.addColorStop(1, '#000000');
+
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 512, 512);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    scene.background = texture;
+    renderer.setClearColor(0x000000, 1);
+
+    quantumMountRef.current.appendChild(renderer.domElement);
+    quantumSceneRef.current = { scene, camera, renderer };
+
+    camera.position.set(0, 0, 80);
+    camera.lookAt(0, 0, 0);
+
+    // Smaller quantum particles for DeepWork focus
+    const quantumParticles = [];
+    const quantumCount = 30; // Fewer particles for focus
+
+    const noise = (x, y, z, t) => {
+      return Math.sin(x * 0.01 + t) * Math.cos(y * 0.01 + t) * Math.sin(z * 0.01 + t * 0.5);
+    };
+
+    for (let i = 0; i < quantumCount; i++) {
+      const particle = {
+        basePosition: new THREE.Vector3(
+          (Math.random() - 0.5) * 100,
+          (Math.random() - 0.5) * 100,
+          (Math.random() - 0.5) * 100
+        ),
+        uncertainty: Math.random() * 3 + 1,
+        wavePhase: Math.random() * Math.PI * 2,
+        quantumNumber: Math.floor(Math.random() * 3) + 1
+      };
+
+      const geometry = new THREE.SphereGeometry(0.15, 6, 6);
+      const material = new THREE.MeshBasicMaterial({
+        color: new THREE.Color().setHSL(
+          0.6 + particle.quantumNumber * 0.1, // Blue-purple range for focus
+          0.7,
+          0.5
+        ),
+        transparent: true,
+        opacity: 0.6
+      });
+
+      particle.mesh = new THREE.Mesh(geometry, material);
+      particle.mesh.position.copy(particle.basePosition);
+
+      quantumParticles.push(particle);
+      scene.add(particle.mesh);
+    }
+
+    // Animation loop - slower for focus
+    let lastTime = 0;
+    const animate = (currentTime) => {
+      if (currentTime - lastTime >= 50) { // 20 FPS for calm effect
+        lastTime = currentTime;
+
+        const time = Date.now() * 0.0005; // Slower time
+
+        quantumParticles.forEach((particle, index) => {
+          const uncertaintyX = noise(particle.basePosition.x, 0, 0, time + particle.wavePhase) * particle.uncertainty;
+          const uncertaintyY = noise(0, particle.basePosition.y, 0, time + particle.wavePhase) * particle.uncertainty;
+          const uncertaintyZ = noise(0, 0, particle.basePosition.z, time + particle.wavePhase) * particle.uncertainty;
+
+          particle.mesh.position.set(
+            particle.basePosition.x + uncertaintyX,
+            particle.basePosition.y + uncertaintyY,
+            particle.basePosition.z + uncertaintyZ
+          );
+
+          const waveFunction = Math.sin(time * particle.quantumNumber + particle.wavePhase);
+          particle.mesh.material.opacity = 0.2 + Math.abs(waveFunction) * 0.4;
+
+          const hue = 0.6 + particle.quantumNumber * 0.1 + Math.sin(time * 0.3) * 0.05;
+          particle.mesh.material.color.setHSL(hue, 0.7, 0.5);
+        });
+
+        // Gentle camera movement
+        const cameraTime = Date.now() * 0.0003;
+        camera.position.x = Math.sin(cameraTime) * 3;
+        camera.position.y = Math.cos(cameraTime * 0.7) * 2;
+        camera.lookAt(scene.position);
+
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(animate);
+    };
+
+    animate(0);
+
+    // Handle resize
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (quantumMountRef.current && renderer.domElement) {
+        quantumMountRef.current.removeChild(renderer.domElement);
+      }
+      renderer.dispose();
+    };
+  }, []);
+
   // Background-resistant timer using timestamps
   useEffect(() => {
     if (run.active && !run.paused) {
@@ -1543,9 +1680,15 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
   }, [oofs, oofFilter, starredOOFs]);
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+    <div className="min-h-screen text-slate-100" style={{ backgroundColor: '#000000' }}>
+      {/* Quantum Background */}
+      <div
+        ref={quantumMountRef}
+        className="fixed inset-0"
+        style={{ pointerEvents: 'none', zIndex: 0 }}
+      />
       {/* Enhanced Header with Quick Stats */}
-      <div className="bg-slate-900 backdrop-blur-sm border-b border-slate-700 sticky top-0 z-50 shadow-lg">
+      <div className="bg-transparent border-b border-slate-600/20 sticky top-0 z-50 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-4 lg:space-y-0">
             <div>
@@ -1613,7 +1756,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
           {/* Enhanced Tab Navigation - Mobile Responsive */}
           <div className="mt-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-6 bg-slate-800 border border-slate-700 w-full gap-0.5 md:gap-1 h-auto p-1">
+              <TabsList className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-6 bg-slate-800/5 backdrop-blur-md border border-slate-600/50 w-full gap-0.5 md:gap-1 h-auto p-1">
                 <TabsTrigger value="focus" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
                   <Target className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
                   <span>{translate(language,'tabFocus')}</span>
@@ -1644,8 +1787,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                 {/* Focus Tab - Enhanced OOF Management */}
                 <TabsContent value="focus" className="space-y-6">
                   {/* OOF Creation Form */}
-                  <Card className="bg-slate-800 border-slate-600 backdrop-blur-sm shadow-xl">
-                    <CardHeader className="bg-slate-700/50 border-b border-slate-600">
+                  <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
+                    <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                       <CardTitle className="text-slate-50 flex items-center space-x-2">
                         <Target className="w-5 h-5 text-indigo-400" />
                         <span>{translate(language,'createOOF')}</span>
@@ -1788,7 +1931,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                   </Card>
                   
                   {/* Виправлений OOF Filter - темніший */}
-                  <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-slate-900/80 backdrop-blur-sm rounded-xl border border-slate-700/70 shadow-xl">
+                  <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-transparent rounded-xl border border-slate-700/30 shadow-xl">
                     <div className="flex items-center space-x-3 flex-wrap">
                       <Filter className="w-5 h-5 text-slate-300" />
                       <span className="text-slate-100 text-sm font-bold">Фільтр:</span>
@@ -1814,7 +1957,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                       </div>
                     </div>
                     
-                    <div className="text-slate-200 text-sm font-semibold bg-slate-800/80 px-4 py-2 rounded-lg border border-slate-700/50 shadow-md">
+                    <div className="text-slate-200 text-sm font-semibold bg-slate-800/10 px-4 py-2 rounded-lg border border-slate-700/50 shadow-md">
                       {filteredOOFs.length} з {oofs.length} завдань
                     </div>
                   </div>
@@ -1839,7 +1982,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                 {/* Timer Tab - Виправлена секція з нотатками */}
                 <TabsContent value="timer" className="space-y-6">
                   {!run.active ? (
-                    <Card className="bg-slate-800 border-slate-600 shadow-xl">
+                    <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
                       <CardContent className="pt-8">
                         <div className="text-center space-y-6">
                           <div className="space-y-2">
@@ -1891,7 +2034,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           <Button
                             variant="ghost"
                             onClick={() => setShowHints(!showHints)}
-                            className="w-full justify-between text-slate-100 hover:text-slate-50 hover:bg-slate-700/50 p-4 rounded-lg border border-slate-600/30"
+                            className="w-full justify-between text-slate-100 hover:text-slate-50 hover:bg-slate-700/10 p-4 rounded-lg border border-slate-600/30"
                           >
                             <span className="flex items-center font-semibold">
                               <Lightbulb className="w-5 h-5 mr-2 text-yellow-400" />
@@ -2020,7 +2163,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           <CardContent className="space-y-6 pt-6">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                               <div className="space-y-5">
-                                <div className="p-4 bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-600/50">
+                                <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
                                   <label className="text-slate-100 text-sm font-bold mb-3 block">Якість глибини (DQ): {postBlockData.dq}/5</label>
                                   <Slider
                                     value={[postBlockData.dq]}
@@ -2033,7 +2176,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                 </div>
                                 
                                 <div className="grid grid-cols-2 gap-4">
-                                  <div className="p-4 bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-600/50">
+                                  <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
                                     <label className="text-slate-100 text-sm font-bold mb-3 block">ОВ (Одиниці виходу)</label>
                                     <div className="flex items-center justify-center space-x-3">
                                       <Button
@@ -2056,7 +2199,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                     </div>
                                   </div>
                                   
-                                  <div className="p-4 bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-600/50">
+                                  <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
                                     <label className="text-slate-100 text-sm font-bold mb-3 block">ПН (Повторення навчання)</label>
                                     <div className="flex items-center justify-center space-x-3">
                                       <Button
@@ -2081,7 +2224,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                 </div>
                                 
                                 <div className="grid grid-cols-2 gap-4">
-                                  <div className="p-4 bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-600/50">
+                                  <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
                                     <label className="text-slate-100 text-sm font-bold mb-3 block">
                                       Настрій: {postBlockData.mood}/5
                                     </label>
@@ -2095,7 +2238,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                     />
                                   </div>
                                   
-                                  <div className="p-4 bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-600/50">
+                                  <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
                                     <label className="text-slate-100 text-sm font-bold mb-3 block">Перерви</label>
                                     <div className="flex items-center justify-center space-x-3">
                                       <Button
@@ -2119,7 +2262,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                   </div>
                                 </div>
                                 
-                                <div className="flex items-center justify-center space-x-8 p-4 bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
+                                <div className="flex items-center justify-center space-x-8 p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                                   <div className="flex items-center space-x-3">
                                     <Switch
                                       checked={postBlockData.flowState}
@@ -2147,8 +2290,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                 
                 {/* Parking Tab - Enhanced Distraction Management */}
                 <TabsContent value="parking" className="space-y-6">
-                  <Card className="bg-slate-800 border-slate-600 shadow-xl">
-                    <CardHeader className="bg-slate-700/50 border-b border-slate-600">
+                  <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
+                    <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                       <CardTitle className="text-slate-50 flex items-center space-x-2">
                         <NotebookPen className="w-5 h-5 text-amber-400" />
                         <span>Розумний паркувальний список</span>
@@ -2172,8 +2315,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                 <TabsContent value="analytics" className="space-y-6">
                   {/* Key Metrics Dashboard */}
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <Card className="lg:col-span-2 bg-slate-800 border-slate-600 shadow-xl">
-                      <CardHeader className="bg-slate-700/50">
+                    <Card className="lg:col-span-2 bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
+                      <CardHeader className="bg-slate-700/10">
                         <CardTitle className="text-slate-100 flex items-center space-x-2">
                           <Activity className="w-5 h-5 text-emerald-400" />
                           <span>Сьогоднішня продуктивність</span>
@@ -2216,7 +2359,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                       </CardContent>
                     </Card>
                     
-                    <Card className="bg-slate-800 border-amber-600/50 shadow-xl shadow-amber-600/10">
+                    <Card className="bg-slate-800/5 backdrop-blur-md border-amber-600/50 shadow-xl shadow-amber-600/10">
                       <CardHeader className="bg-amber-900/20 border-b border-amber-700/50">
                         <CardTitle className="text-slate-100 flex items-center space-x-2">
                           <Award className="w-5 h-5 text-amber-400" />
@@ -2248,7 +2391,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                         
                         <div className="p-4 bg-slate-700 border border-slate-600 rounded-lg">
                           <div className="text-slate-100 font-semibold mb-2">Краща пора дня</div>
-                          <div className="text-slate-200 text-lg capitalize bg-slate-800 px-3 py-1 rounded inline-block">
+                          <div className="text-slate-200 text-lg capitalize bg-slate-800/5 backdrop-blur-md px-3 py-1 rounded inline-block">
                             {analytics.bestTimeOfDay === 'morning' && '🌅 Ранок'}
                             {analytics.bestTimeOfDay === 'afternoon' && '☀️ День'}  
                             {analytics.bestTimeOfDay === 'evening' && '🌙 Вечір'}
@@ -2260,8 +2403,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                   
                   {/* Enhanced Charts */}
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <Card className="bg-slate-800 border-slate-600 shadow-xl">
-                      <CardHeader className="bg-slate-700/50 border-b border-slate-600">
+                    <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
+                      <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                         <CardTitle className="text-slate-50 flex items-center space-x-2">
                           <BarChart3 className="w-5 h-5 text-indigo-400" />
                           <span>Динаміка продуктивності (14 днів)</span>
@@ -2310,8 +2453,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                       </CardContent>
                     </Card>
                     
-                    <Card className="bg-slate-800 border-slate-600 shadow-xl">
-                      <CardHeader className="bg-slate-700/50 border-b border-slate-600">
+                    <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
+                      <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                         <CardTitle className="text-slate-50 flex items-center space-x-2">
                           <TrendingUp className="w-5 h-5 text-emerald-400" />
                           <span>Якість та настрій</span>
@@ -2372,8 +2515,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                   </div>
                   
                   {/* Enhanced Journal */}
-                  <Card className="bg-slate-800 border-slate-600 shadow-xl">
-                    <CardHeader className="bg-slate-700/50 border-b border-slate-600">
+                  <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
+                    <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                       <CardTitle className="text-slate-50 flex items-center space-x-2">
                         <NotebookPen className="w-5 h-5 text-slate-400" />
                         <span>Журнал глибоких блоків</span>
@@ -2383,7 +2526,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                       <div className="bg-slate-900/50 rounded-xl border border-slate-700/50 backdrop-blur-sm shadow-lg overflow-hidden">
                         <div className="overflow-x-auto max-h-[500px] pb-2">
                           <table className="min-w-[900px] w-full text-sm">
-                            <thead className="sticky top-0 bg-slate-800 border-b-2 border-slate-600">
+                            <thead className="sticky top-0 bg-slate-800/5 backdrop-blur-xl border-b-2 border-slate-600/50">
                               <tr>
                                 <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">Дата/Час</th>
                                 <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">OOF</th>
@@ -2397,10 +2540,10 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                             </thead>
                             <tbody>
                               {logs.map((log, index) => (
-                                <tr key={log.id} className={`border-b border-slate-700/50 transition-colors hover:bg-slate-800/30 ${index % 2 === 0 ? 'bg-slate-900/20' : ''}`}>
+                                <tr key={log.id} className={`border-b border-slate-700/50 transition-colors hover:bg-slate-800/30 ${index % 2 === 0 ? 'bg-slate-900/5' : ''}`}>
                                   <td className="py-4 px-4">
                                     <div className="text-slate-200 font-medium">{log.dateISO.slice(5)}</div>
-                                    <div className="text-xs text-slate-400 capitalize bg-slate-800/60 px-2 py-1 rounded-md mt-1 inline-block">
+                                    <div className="text-xs text-slate-400 capitalize bg-slate-800/10 px-2 py-1 rounded-md mt-1 inline-block">
                                       {log.timeOfDay === 'morning' && '🌅 Ранок'}
                                       {log.timeOfDay === 'afternoon' && '☀️ День'}  
                                       {log.timeOfDay === 'evening' && '🌙 Вечір'}
@@ -2411,16 +2554,16 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                     {log.completedOOF && <span className="text-emerald-400 text-xs font-semibold bg-emerald-900/30 px-2 py-1 rounded-md mt-1 inline-block">✅ Завершено</span>}
                                   </td>
                                   <td className="py-4 px-4">
-                                    <span className="text-slate-200 font-semibold bg-slate-800/60 px-2 py-1 rounded-md">{log.minutes}</span>
+                                    <span className="text-slate-200 font-semibold bg-slate-800/10 px-2 py-1 rounded-md">{log.minutes}</span>
                                   </td>
                                   <td className="py-4 px-4">
-                                    <span className="text-slate-200 font-semibold bg-slate-800/60 px-2 py-1 rounded-md">{log.dq}</span>
+                                    <span className="text-slate-200 font-semibold bg-slate-800/10 px-2 py-1 rounded-md">{log.dq}</span>
                                   </td>
                                   <td className="py-4 px-4">
-                                    <span className="text-slate-200 font-semibold bg-slate-800/60 px-2 py-1 rounded-md">{log.ou}</span>
+                                    <span className="text-slate-200 font-semibold bg-slate-800/10 px-2 py-1 rounded-md">{log.ou}</span>
                                   </td>
                                   <td className="py-4 px-4">
-                                    <span className="text-slate-200 font-semibold bg-slate-800/60 px-2 py-1 rounded-md">{log.lr}</span>
+                                    <span className="text-slate-200 font-semibold bg-slate-800/10 px-2 py-1 rounded-md">{log.lr}</span>
                                   </td>
                                   <td className="py-4 px-4 text-center">
                                     {log.flowState && (
@@ -2429,7 +2572,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                   </td>
                                   <td className="py-4 px-4 text-slate-300 break-words max-w-[300px] leading-relaxed">
                                     {log.notes ? (
-                                      <div className="bg-slate-800/40 p-2 rounded-lg border border-slate-700/30">
+                                      <div className="bg-slate-800/5 p-2 rounded-lg border border-slate-700/30">
                                         {log.notes.substring(0, 100)}{log.notes.length > 100 ? '...' : ''}
                                       </div>
                                     ) : (
@@ -2448,8 +2591,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                 
                 {/* Templates Tab - Enhanced Template Management */}
                 <TabsContent value="templates" className="space-y-6">
-                  <Card className="bg-slate-800 border-slate-600 shadow-xl">
-                    <CardHeader className="bg-slate-700/50 border-b border-slate-600">
+                  <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
+                    <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                       <CardTitle className="text-slate-50 flex items-center space-x-2">
                         <Copy className="w-5 h-5 text-purple-400" />
                         <span>Шаблони та плейбуки</span>
@@ -2457,7 +2600,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                     </CardHeader>
                     <CardContent className="pt-6">
                       <Tabs defaultValue="all" className="w-full">
-                        <TabsList className="grid w-full grid-cols-3 bg-slate-700/90 border border-slate-600/50 shadow-lg">
+                        <TabsList className="grid w-full grid-cols-3 bg-slate-700/10 border border-slate-600/50 shadow-lg">
                           <TabsTrigger value="all" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 font-semibold">
                             Всі шаблони
                           </TabsTrigger>
@@ -2478,10 +2621,10 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                     <div className="flex-1 min-w-0">
                                       <h4 className="text-slate-100 font-bold text-lg mb-2">{template.title}</h4>
                                       <div className="flex flex-wrap items-center gap-2 text-sm text-slate-300">
-                                        <span className="bg-slate-700/60 px-2 py-1 rounded-md border border-slate-600/50">📂 {template.category}</span>
-                                        <span className="bg-slate-700/60 px-2 py-1 rounded-md border border-slate-600/50">🔄 {template.useCount}</span>
+                                        <span className="bg-slate-700/10 px-2 py-1 rounded-md border border-slate-600/50">📂 {template.category}</span>
+                                        <span className="bg-slate-700/10 px-2 py-1 rounded-md border border-slate-600/50">🔄 {template.useCount}</span>
                                         {template.lastUsed > 0 && (
-                                          <span className="bg-slate-700/60 px-2 py-1 rounded-md border border-slate-600/50">⏰ {new Date(template.lastUsed).toLocaleDateString('uk-UA')}</span>
+                                          <span className="bg-slate-700/10 px-2 py-1 rounded-md border border-slate-600/50">⏰ {new Date(template.lastUsed).toLocaleDateString('uk-UA')}</span>
                                         )}
                                       </div>
                                     </div>
@@ -2507,7 +2650,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                           }));
                                           useTemplate(template.id);
                                         }}
-                                        className="border-slate-500 text-slate-200 hover:bg-slate-700/50 backdrop-blur-sm flex-1 sm:flex-none"
+                                        className="border-slate-500 text-slate-200 hover:bg-slate-700/10 backdrop-blur-sm flex-1 sm:flex-none"
                                       >
                                         В нотатки
                                       </Button>
@@ -2524,7 +2667,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                     </div>
                                   </div>
                                   <div 
-                                    className="bg-slate-900/60 backdrop-blur-sm border border-slate-600/50 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:bg-slate-800/60 hover:border-slate-500/50 shadow-lg"
+                                    className="bg-slate-900/5 backdrop-blur-sm border border-slate-600/50 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:bg-slate-800/10 hover:border-slate-500/50 shadow-lg"
                                     onClick={() => {
                                       copyToClipboard(template.body);
                                       useTemplate(template.id);
@@ -2556,7 +2699,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                             🔥 {template.useCount}
                                           </Badge>
                                         </h4>
-                                        <p className="text-slate-300 text-sm mt-2 bg-slate-700/60 px-2 py-1 rounded-md border border-slate-600/50 inline-block">
+                                        <p className="text-slate-300 text-sm mt-2 bg-slate-700/10 px-2 py-1 rounded-md border border-slate-600/50 inline-block">
                                           Категорія: {template.category}
                                         </p>
                                       </div>
@@ -2573,7 +2716,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                       </Button>
                                     </div>
                                     <div 
-                                      className="bg-slate-900/60 backdrop-blur-sm border border-slate-600/50 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:bg-slate-800/60 hover:border-slate-500/50 shadow-lg"
+                                      className="bg-slate-900/5 backdrop-blur-sm border border-slate-600/50 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:bg-slate-800/10 hover:border-slate-500/50 shadow-lg"
                                       onClick={() => {
                                         copyToClipboard(template.body);
                                         useTemplate(template.id);
@@ -2602,26 +2745,26 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                   placeholder="Унікальний ID"
                                   value={newTemplate.id}
                                   onChange={(e) => setNewTemplate(prev => ({ ...prev, id: e.target.value }))}
-                                  className="bg-slate-700/90 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                  className="bg-slate-700/10 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                 />
                                 <Input
                                   placeholder="Назва шаблону"
                                   value={newTemplate.title}
                                   onChange={(e) => setNewTemplate(prev => ({ ...prev, title: e.target.value }))}
-                                  className="bg-slate-700/90 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                  className="bg-slate-700/10 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                 />
                                 <Input
                                   placeholder="Категорія"
                                   value={newTemplate.category}
                                   onChange={(e) => setNewTemplate(prev => ({ ...prev, category: e.target.value }))}
-                                  className="bg-slate-700/90 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                  className="bg-slate-700/10 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                 />
                               </div>
                               <Textarea
                                 placeholder="Тіло шаблону (кроки, інструкції, код тощо)..."
                                 value={newTemplate.body}
                                 onChange={(e) => setNewTemplate(prev => ({ ...prev, body: e.target.value }))}
-                                className="bg-slate-700/90 border-slate-600/50 text-slate-100 placeholder-slate-400 h-32 mb-6 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl"
+                                className="bg-slate-700/10 border-slate-600/50 text-slate-100 placeholder-slate-400 h-32 mb-6 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl"
                               />
                               <Button onClick={addTemplate} className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold shadow-lg">
                                 <Plus className="w-4 h-4 mr-2" />
@@ -2640,7 +2783,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                     <div className="flex items-center justify-between mb-4">
                                       <div>
                                         <h4 className="text-slate-100 font-bold text-lg">{template.title}</h4>
-                                        <p className="text-slate-300 text-sm mt-2 bg-slate-700/60 px-2 py-1 rounded-md border border-slate-600/50 inline-block">
+                                        <p className="text-slate-300 text-sm mt-2 bg-slate-700/10 px-2 py-1 rounded-md border border-slate-600/50 inline-block">
                                           Категорія: {template.category}
                                         </p>
                                       </div>
@@ -2667,7 +2810,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                       </div>
                                     </div>
                                     <div 
-                                      className="bg-slate-900/60 backdrop-blur-sm border border-slate-600/50 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:bg-slate-800/60 hover:border-slate-500/50 shadow-lg"
+                                      className="bg-slate-900/5 backdrop-blur-sm border border-slate-600/50 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:bg-slate-800/10 hover:border-slate-500/50 shadow-lg"
                                       onClick={() => {
                                         copyToClipboard(template.body);
                                         useTemplate(template.id);
@@ -2698,8 +2841,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                 
                 {/* Settings Tab - System Configuration */}
                 <TabsContent value="settings" className="space-y-6">
-                  <Card className="bg-slate-800 border-slate-600 shadow-xl">
-                    <CardHeader className="bg-slate-700/50 border-b border-slate-600">
+                  <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
+                    <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                       <CardTitle className="text-slate-50 flex items-center space-x-2">
                         <Settings className="w-5 h-5 text-slate-400" />
                         <span>Налаштування системи</span>
@@ -2754,7 +2897,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                             <select
                               value={settings.preferredBlockSize}
                               onChange={(e) => setSettings(prev => ({ ...prev, preferredBlockSize: parseInt(e.target.value) }))}
-                              className="w-full bg-slate-800/90 border border-slate-600/50 rounded-lg px-4 py-3 text-slate-100 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                              className="w-full bg-slate-800/10 border border-slate-600/50 rounded-lg px-4 py-3 text-slate-100 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             >
                               <option value={25}>25 хвилин (Pomodoro)</option>
                               <option value={60}>60 хвилин</option>
@@ -2776,7 +2919,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                               type="number"
                               value={settings.dailyGoal}
                               onChange={(e) => setSettings(prev => ({ ...prev, dailyGoal: parseInt(e.target.value) || 240 }))}
-                              className="bg-slate-800/90 border-slate-600/50 text-slate-100 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                              className="bg-slate-800/10 border-slate-600/50 text-slate-100 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             />
                             <div className="text-slate-300 text-xs bg-slate-800/50 px-2 py-1 rounded-md">
                               Поточна ціль: {settings.dailyGoal / 60} годин на день
@@ -2789,7 +2932,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                               type="number"
                               value={settings.weeklyGoal}
                               onChange={(e) => setSettings(prev => ({ ...prev, weeklyGoal: parseInt(e.target.value) || 1200 }))}
-                              className="bg-slate-800/90 border-slate-600/50 text-slate-100 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                              className="bg-slate-800/10 border-slate-600/50 text-slate-100 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             />
                             <div className="text-slate-300 text-xs bg-slate-800/50 px-2 py-1 rounded-md">
                               Поточна ціль: {settings.weeklyGoal / 60} годин на тиждень
@@ -2882,7 +3025,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           <Button
                             onClick={() => document.getElementById('import-file')?.click()}
                             variant="outline"
-                            className="border-slate-500 text-slate-200 hover:bg-slate-700/50 backdrop-blur-sm font-bold"
+                            className="border-slate-500 text-slate-200 hover:bg-slate-700/10 backdrop-blur-sm font-bold"
                             size="lg"
                           >
                             <Upload className="w-4 h-4 mr-2" />
