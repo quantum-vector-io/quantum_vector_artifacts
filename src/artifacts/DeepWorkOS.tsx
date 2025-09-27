@@ -401,12 +401,12 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec }: { run: 
             </div>
           </div>
           
-          <div className="flex justify-center space-x-3">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 px-4">
             <Button
               onClick={onTogglePause}
               variant="outline"
               size="lg"
-              className="border-slate-600 text-slate-300 hover:text-slate-100"
+              className="border-slate-600 text-slate-300 hover:text-slate-100 flex-1 sm:flex-none"
             >
               {run.paused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
             </Button>
@@ -414,7 +414,7 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec }: { run: 
               onClick={onReset}
               variant="outline"
               size="lg"
-              className="border-slate-600 text-slate-300 hover:text-slate-100"
+              className="border-slate-600 text-slate-300 hover:text-slate-100 flex-1 sm:flex-none"
             >
               <RotateCcw className="w-5 h-5" />
             </Button>
@@ -422,7 +422,7 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec }: { run: 
               onClick={onStop}
               variant="default"
               size="lg"
-              className="bg-cyan-600 hover:bg-cyan-700"
+              className="bg-cyan-600 hover:bg-cyan-700 flex-1 sm:flex-none"
             >
               <Square className="w-5 h-5 mr-2" />
               Завершити
@@ -514,38 +514,40 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
           </p>
         )}
         
-        <div className="flex items-center justify-between">
-          <div className="flex space-x-2">
-            <Button size="sm" onClick={() => onStart(oof, 60)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+            <Button size="sm" onClick={() => onStart(oof, 60)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md flex-1 sm:flex-none">
               60хв
             </Button>
-            <Button size="sm" onClick={() => onStart(oof, 90)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md">
+            <Button size="sm" onClick={() => onStart(oof, 90)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md flex-1 sm:flex-none">
               90хв
             </Button>
             {oof.estimatedMinutes && ![60,90].includes(oof.estimatedMinutes) && (
-              <Button size="sm" onClick={() => onStart(oof, oof.estimatedMinutes)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md">
+              <Button size="sm" onClick={() => onStart(oof, oof.estimatedMinutes)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md flex-1 sm:flex-none">
                 {oof.estimatedMinutes}хв
               </Button>
             )}
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onEdit(oof)}
-            className="border-slate-600 text-slate-300 hover:text-slate-100"
-          >
-            <Pencil className="w-4 h-4 mr-1" />
-            Редагувати
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => onDelete(oof.id)}
-            className="border-slate-600 text-red-400 hover:text-red-300 ml-2"
-          >
-            <Trash2 className="w-4 h-4 mr-1" />
-            {translate(language,'delete')}
-          </Button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onEdit(oof)}
+              className="border-slate-600 text-slate-300 hover:text-slate-100 flex-1 sm:flex-none"
+            >
+              <Pencil className="w-4 h-4 mr-1" />
+              Редагувати
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onDelete(oof.id)}
+              className="border-slate-600 text-red-400 hover:text-red-300 flex-1 sm:flex-none"
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              {translate(language,'delete')}
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -1700,7 +1702,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
             </div>
 
             <div className="flex flex-col items-end w-full lg:w-auto">
-              <div className="flex items-center space-x-3 mb-3">
+              <div className="flex flex-col sm:flex-row items-center gap-3 mb-3">
                 <Button
                   onClick={() => window.location.href = '/'}
                   className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 hover:from-indigo-500/30 hover:to-purple-500/30 border border-indigo-400/30 text-indigo-300 hover:text-indigo-200 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-indigo-500/25 font-semibold"
@@ -1991,7 +1993,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                             <p className="text-slate-300">{language === 'EN' ? 'Choose a task from the "Focus" tab or start free mode' : 'Оберіть завдання з вкладки "Фокус" або запустіть вільний режим'}</p>
                           </div>
                           
-                          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:space-x-3 px-4">
+                          <div className="flex flex-col sm:flex-row justify-center gap-3 px-4">
                             <Button
                               onClick={() => startBlock(null, 25)}
                               className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
