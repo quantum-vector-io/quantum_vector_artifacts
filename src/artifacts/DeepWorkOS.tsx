@@ -338,6 +338,27 @@ TRANSLATIONS.EN.minutes = 'Min';
 TRANSLATIONS.EN.dq = 'DQ';
 TRANSLATIONS.EN.dayLabel = 'Day';
 
+// Post-Block Summary translations
+TRANSLATIONS.EN.blockCompleted = 'Block Completed!';
+TRANSLATIONS.EN.wellDone = 'Well done!';
+TRANSLATIONS.EN.timeSpent = 'Time Spent';
+TRANSLATIONS.EN.qualityRating = 'Quality Rating';
+TRANSLATIONS.EN.energyLevel = 'Energy Level';
+TRANSLATIONS.EN.dailyProgress = 'Daily Progress';
+TRANSLATIONS.EN.achievement = 'Achievement';
+TRANSLATIONS.EN.streak = 'Streak';
+TRANSLATIONS.EN.blocks = 'blocks';
+TRANSLATIONS.EN.startNewBlock = 'Start New Block';
+TRANSLATIONS.EN.viewAnalytics = 'View Analytics';
+TRANSLATIONS.EN.oofCompleted = 'OOF Completed';
+TRANSLATIONS.EN.oofProgress = 'OOF Progress';
+TRANSLATIONS.EN.greatWork = 'Great Work!';
+TRANSLATIONS.EN.keepGoing = 'Keep going!';
+TRANSLATIONS.EN.almostThere = 'Almost there!';
+TRANSLATIONS.EN.goalReached = 'Daily goal reached!';
+TRANSLATIONS.EN.onTrack = 'You\'re on track!';
+TRANSLATIONS.EN.close = 'Close';
+
 // Smart tips translations
 TRANSLATIONS.EN.microExperiment = 'Micro-experiment > 5min';
 TRANSLATIONS.EN.microExperimentDesc = 'If stuck for more than 5 minutes, try:';
@@ -541,6 +562,27 @@ TRANSLATIONS.UA.oof = 'OOF';
 TRANSLATIONS.UA.minutes = 'Хв';
 TRANSLATIONS.UA.dq = 'DQ';
 TRANSLATIONS.UA.dayLabel = 'День';
+
+// Post-Block Summary translations
+TRANSLATIONS.UA.blockCompleted = 'Блок завершено!';
+TRANSLATIONS.UA.wellDone = 'Молодець!';
+TRANSLATIONS.UA.timeSpent = 'Проведено часу';
+TRANSLATIONS.UA.qualityRating = 'Оцінка якості';
+TRANSLATIONS.UA.energyLevel = 'Рівень енергії';
+TRANSLATIONS.UA.dailyProgress = 'Денний прогрес';
+TRANSLATIONS.UA.achievement = 'Досягнення';
+TRANSLATIONS.UA.streak = 'Серія';
+TRANSLATIONS.UA.blocks = 'блоків';
+TRANSLATIONS.UA.startNewBlock = 'Почати новий блок';
+TRANSLATIONS.UA.viewAnalytics = 'Переглянути Аналітику';
+TRANSLATIONS.UA.oofCompleted = 'OOF завершено';
+TRANSLATIONS.UA.oofProgress = 'Прогрес OOF';
+TRANSLATIONS.UA.greatWork = 'Відмінна робота!';
+TRANSLATIONS.UA.keepGoing = 'Продовжуй!';
+TRANSLATIONS.UA.almostThere = 'Майже досягли!';
+TRANSLATIONS.UA.goalReached = 'Денна ціль досягнута!';
+TRANSLATIONS.UA.onTrack = 'Ви на правильному шляху!';
+TRANSLATIONS.UA.close = 'Закрити';
 
 
 const translate = (language: string, key: string, ...args: any[]) => {
@@ -757,6 +799,444 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec, language 
         </div>
       </CardContent>
     </Card>
+  );
+};
+
+const PostBlockSummary = ({ block, analytics, settings, onStartNew, onViewAnalytics, onClose, language = 'EN' }: {
+  block: BlockLog;
+  analytics: any;
+  settings: any;
+  onStartNew: () => void;
+  onViewAnalytics: () => void;
+  onClose: () => void;
+  language?: string;
+}) => {
+  const t = (key: string) => translate(language, key);
+  const summaryQuantumRef = useRef<HTMLDivElement>(null);
+
+  // Calculate achievements and progress
+  const dailyProgress = Math.round((analytics.today.dh / (settings.dailyGoal / 60)) * 100);
+  const isGoalReached = dailyProgress >= 100;
+  const streakDays = analytics.streakDays || 0;
+
+  // Motivational messages
+  const getMotivationalMessage = () => {
+    if (isGoalReached) return t('goalReached');
+    if (dailyProgress >= 80) return t('almostThere');
+    if (dailyProgress >= 50) return t('onTrack');
+    return t('keepGoing');
+  };
+
+  // Energy indicators
+  const getEnergyColor = (energy: number) => {
+    if (energy >= 4) return 'text-green-400';
+    if (energy >= 3) return 'text-yellow-400';
+    return 'text-red-400';
+  };
+
+  // Quantum Background for Summary
+  useEffect(() => {
+    if (!summaryQuantumRef.current) return;
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: false, antialias: true });
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // Create beautiful dark cosmic background
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 512;
+    canvas.height = 512;
+
+    // Create gradient background
+    const gradient = context.createRadialGradient(256, 256, 0, 256, 256, 256);
+    gradient.addColorStop(0, '#020308');
+    gradient.addColorStop(0.5, '#010203');
+    gradient.addColorStop(1, '#000000');
+
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 512, 512);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    scene.background = texture;
+    renderer.setClearColor(0x000000, 1);
+
+    summaryQuantumRef.current.appendChild(renderer.domElement);
+
+    camera.position.set(0, 0, 80);
+    camera.lookAt(0, 0, 0);
+
+    // WOW EFFECT: Explosion-Convergence Cycle
+    const particles = [];
+    const particleCount = 400; // Even more particles for spectacular effect!
+    const centerPoint = new THREE.Vector3(0, 0, 0); // Screen center explosion
+
+    // Golden ratio for natural distribution
+    const phi = (1 + Math.sqrt(5)) / 2;
+    const goldenAngle = Math.PI * 2 / phi;
+
+    for (let i = 0; i < particleCount; i++) {
+      // Explosive radial pattern - random directions for WOW effect
+      const angle = i * goldenAngle + Math.random() * 0.5; // Slight randomness
+      const elevation = Math.asin((2 * i / particleCount) - 1) + Math.random() * 0.3;
+      const explosionRadius = 150 + Math.random() * 100; // Varied explosion distance
+
+      // Convert to cartesian - explosion targets
+      const explosionX = explosionRadius * Math.cos(elevation) * Math.cos(angle);
+      const explosionY = explosionRadius * Math.cos(elevation) * Math.sin(angle);
+      const explosionZ = explosionRadius * Math.sin(elevation);
+
+      const particle = {
+        centerPosition: centerPoint.clone(), // Always return here
+        explosionPosition: new THREE.Vector3(explosionX, explosionY, explosionZ),
+        currentPosition: centerPoint.clone(),
+
+        // Animation timing for visible expansion
+        explosionDelay: (i / particleCount) * 1.2, // Staggered for visible wave
+        convergenceDelay: 6 + (i / particleCount) * 2, // Delayed convergence
+
+        // Animation states
+        phase: 'expansion', // 'expansion' -> 'floating' -> 'convergence' -> 'repeat'
+        cycleProgress: 0,
+
+        // Movement properties for visible expansion
+        expansionDuration: 2.0, // 2 seconds to fully expand (faster after 1s)
+        convergenceSpeed: 1.0 + Math.random() * 0.5, // Convergence speed
+        floatRadius: 3 + Math.random() * 4,
+        floatPhase: Math.random() * Math.PI * 2,
+
+        // Visual properties
+        layer: Math.floor(i / (particleCount / 6)), // 6 layers for depth
+        trailIntensity: Math.random() * 0.5 + 0.5
+      };
+
+      // Create WOW particle - much bigger center point, varied sizes for dramatic effect
+      const size = 2.5 + (particle.layer * 0.5) + Math.random() * 1.0; // 15x bigger base size!
+      const geometry = new THREE.SphereGeometry(size, 8, 8);
+
+      // Dramatic color progression through explosion-convergence cycle
+      const hue = (i / particleCount * 0.8) + (particle.layer * 0.12) + 0.1;
+      const saturation = 0.9 + Math.random() * 0.1; // High saturation for WOW
+      const lightness = 0.7 + (particle.layer * 0.05);
+
+      const material = new THREE.MeshBasicMaterial({
+        color: new THREE.Color().setHSL(hue, saturation, lightness),
+        transparent: true,
+        opacity: 0.9 + Math.random() * 0.1 // Higher visibility
+      });
+
+      particle.mesh = new THREE.Mesh(geometry, material);
+      particle.mesh.position.copy(centerPoint); // All start at center for WOW explosion
+
+      particles.push(particle);
+      scene.add(particle.mesh);
+    }
+
+
+    // Celebration animation loop
+    const animate = () => {
+      const time = Date.now() * 0.001;
+
+      // WOW EFFECT: Explosion-Convergence Cycle Animation
+      particles.forEach((particle, index) => {
+        const cycleTime = time % 13; // 13-second cycle with big center and fast expansion
+        const adjustedTime = cycleTime - particle.explosionDelay;
+
+        if (adjustedTime > 0) {
+          // PHASE 1: VISIBLE EXPANSION (0-2s) - Big center point then fast spread
+          if (particle.phase === 'expansion' && adjustedTime <= particle.expansionDuration) {
+            let expansionProgress;
+
+            if (adjustedTime <= 1.0) {
+              // First second: slow start, big visible center
+              expansionProgress = Math.min(0.2, adjustedTime * 0.2); // Only 20% in first second
+            } else {
+              // After 1 second: fast expansion
+              const fastTime = adjustedTime - 1.0;
+              expansionProgress = 0.2 + (fastTime / 1.0) * 0.8; // Remaining 80% in 1 second
+            }
+
+            const easeOut = 1 - Math.pow(1 - expansionProgress, 1.5); // Sharper expansion after delay
+
+            // Visible expansion from center to target
+            particle.currentPosition.lerpVectors(
+              particle.centerPosition,
+              particle.explosionPosition,
+              easeOut
+            );
+
+            particle.mesh.position.copy(particle.currentPosition);
+
+            // Growing intensity as particles spread
+            const intensity = 0.3 + expansionProgress * 0.7; // Grow brighter as they expand
+            particle.mesh.material.opacity = intensity * particle.trailIntensity;
+
+            // Scale - start bigger, then grow even more
+            particle.mesh.scale.setScalar(1.0 + expansionProgress * 1.5); // Much bigger scale!
+
+            // Add slight sparkle during expansion
+            const sparkle = Math.sin(adjustedTime * 4 + index * 0.1) * 0.2 + 0.8;
+            particle.mesh.material.opacity *= sparkle;
+
+            if (expansionProgress >= 1) {
+              particle.phase = 'floating';
+            }
+          }
+
+          // PHASE 2: FLOATING DANCE (2-7s)
+          else if (particle.phase === 'floating' && adjustedTime > 2 && adjustedTime <= 7) {
+            const floatTime = (adjustedTime - 2) * 1.0;
+
+            // Beautiful floating patterns - MORE ACTIVE
+            const floatX = Math.cos(floatTime * 1.5 + particle.floatPhase) * particle.floatRadius;
+            const floatY = Math.sin(floatTime * 1.2 + particle.floatPhase) * particle.floatRadius;
+            const floatZ = Math.sin(floatTime * 0.8 + particle.floatPhase) * particle.floatRadius * 0.8;
+
+            particle.mesh.position.set(
+              particle.currentPosition.x + floatX,
+              particle.currentPosition.y + floatY,
+              particle.currentPosition.z + floatZ
+            );
+
+            // Gentle sparkle during float
+            const sparkle = Math.sin(floatTime * 3 + particle.layer);
+            particle.mesh.material.opacity = 0.4 + Math.abs(sparkle) * 0.6;
+            particle.mesh.scale.setScalar(1 + Math.sin(floatTime * 2) * 0.2);
+
+            // Prepare for convergence
+            if (adjustedTime >= 7) {
+              particle.phase = 'convergence';
+            }
+          }
+
+          // PHASE 3: CONVERGENCE MAGIC (7-11s)
+          else if (particle.phase === 'convergence' && adjustedTime > 7 && adjustedTime <= 11) {
+            const convergenceProgress = Math.min(1, (adjustedTime - 7) / 4 * particle.convergenceSpeed);
+            const easeIn = Math.pow(convergenceProgress, 2); // Smooth convergence
+
+            // Get current position and lerp back to center
+            const currentPos = particle.mesh.position.clone();
+            particle.mesh.position.lerpVectors(
+              currentPos,
+              particle.centerPosition,
+              easeIn * 0.02 // Slow convergence
+            );
+
+            // Convergence glow effect
+            const convergenceGlow = 1 - convergenceProgress;
+            particle.mesh.material.opacity = convergenceGlow * 0.8 + 0.2;
+            particle.mesh.scale.setScalar(1 + convergenceGlow * 0.5);
+
+            if (convergenceProgress >= 0.95) {
+              particle.phase = 'reset';
+            }
+          }
+
+          // PHASE 4: RESET FOR NEXT CYCLE (11-13s)
+          else if (particle.phase === 'reset' && adjustedTime > 11) {
+            // Quick fade and reset to center
+            particle.mesh.position.copy(particle.centerPosition);
+            particle.currentPosition.copy(particle.centerPosition);
+
+            const fadeOut = Math.max(0, 1 - (adjustedTime - 11) / 2);
+            particle.mesh.material.opacity = fadeOut * 0.3;
+            particle.mesh.scale.setScalar(fadeOut * 2.0 + 1.0); // Bigger during reset
+
+            // Reset for next cycle
+            if (adjustedTime >= 13) {
+              particle.phase = 'expansion';
+            }
+          }
+
+          // Continuous rotation for all phases
+          particle.mesh.rotation.x += 0.01 * (particle.layer + 1);
+          particle.mesh.rotation.y += 0.015 * (particle.layer + 1);
+          particle.mesh.rotation.z += 0.008 * (particle.layer + 1);
+        }
+      });
+
+
+      // Fractal camera movement
+      camera.position.x = Math.sin(time * 0.2) * 12;
+      camera.position.y = Math.cos(time * 0.15) * 8 + 3;
+      camera.position.z = 80 + Math.sin(time * 0.1) * 8; // More dynamic zoom
+      camera.lookAt(new THREE.Vector3(
+        Math.sin(time * 0.18) * 3,
+        Math.cos(time * 0.12) * 2,
+        0
+      )); // More active fractal focus
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    // Handle resize
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (summaryQuantumRef.current && renderer.domElement) {
+        summaryQuantumRef.current.removeChild(renderer.domElement);
+      }
+      renderer.dispose();
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'transparent' }}>
+      {/* Quantum Background for Celebration */}
+      <div
+        ref={summaryQuantumRef}
+        className="fixed inset-0"
+        style={{ pointerEvents: 'none', zIndex: 0 }}
+      />
+      <Card className="relative z-10 w-full max-w-2xl mx-auto bg-transparent border-slate-700/20 shadow-2xl">
+        <CardHeader className="text-center bg-transparent border-b border-slate-700/20">
+          <div className="mb-4">
+            <div className="text-6xl mb-2">🎉</div>
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+              {t('blockCompleted')}
+            </CardTitle>
+            <p className="text-slate-300 text-lg mt-2">{t('wellDone')}</p>
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-8">
+          {/* Main Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            <div className="text-center p-4 bg-transparent rounded-xl border border-slate-600/20">
+              <div className="text-3xl font-bold text-emerald-400 mb-1">{block.minutes}</div>
+              <div className="text-slate-300 text-sm">{t('minutes')}</div>
+              <div className="text-xs text-slate-400 mt-1">{t('timeSpent')}</div>
+            </div>
+
+            <div className="text-center p-4 bg-transparent rounded-xl border border-slate-600/20">
+              <div className="text-3xl font-bold text-blue-400 mb-1">{block.dq}</div>
+              <div className="text-slate-300 text-sm">DQ</div>
+              <div className="text-xs text-slate-400 mt-1">{t('qualityRating')}</div>
+            </div>
+
+            <div className="text-center p-4 bg-transparent rounded-xl border border-slate-600/20">
+              <div className={`text-3xl font-bold mb-1 ${getEnergyColor(block.energy)}`}>{block.energy}</div>
+              <div className="text-slate-300 text-sm">{t('energy')}</div>
+              <div className="text-xs text-slate-400 mt-1">{t('energyLevel')}</div>
+            </div>
+
+            <div className="text-center p-4 bg-transparent rounded-xl border border-slate-600/20">
+              <div className="text-3xl font-bold text-purple-400 mb-1">{dailyProgress}%</div>
+              <div className="text-slate-300 text-sm">{t('dailyProgress')}</div>
+              <div className="text-xs text-slate-400 mt-1">{Math.round(analytics.today.dh * 10) / 10}h / {settings.dailyGoal / 60}h</div>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-slate-300 font-semibold">{t('dailyProgress')}</span>
+              <span className="text-slate-400 text-sm">{getMotivationalMessage()}</span>
+            </div>
+            <div className="w-full bg-slate-700/10 rounded-full h-3">
+              <div
+                className={`h-3 rounded-full transition-all duration-500 ${
+                  isGoalReached ? 'bg-gradient-to-r from-emerald-400 to-green-500' :
+                  dailyProgress >= 50 ? 'bg-gradient-to-r from-cyan-400 to-blue-500' :
+                  'bg-gradient-to-r from-yellow-400 to-orange-500'
+                }`}
+                style={{ width: `${Math.min(dailyProgress, 100)}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Special Achievements */}
+          <div className="space-y-3 mb-8">
+            {block.completedOOF && (
+              <div className="flex items-center p-3 bg-transparent border border-emerald-700/20 rounded-lg">
+                <div className="text-2xl mr-3">✅</div>
+                <div>
+                  <div className="text-emerald-400 font-semibold">{t('oofCompleted')}</div>
+                  <div className="text-slate-300 text-sm">{block.oofTitle}</div>
+                </div>
+              </div>
+            )}
+
+            {block.flowState && (
+              <div className="flex items-center p-3 bg-transparent border border-purple-700/20 rounded-lg">
+                <div className="text-2xl mr-3">⚡</div>
+                <div>
+                  <div className="text-purple-400 font-semibold">{t('flowState')}</div>
+                  <div className="text-slate-300 text-sm">{t('greatWork')}</div>
+                </div>
+              </div>
+            )}
+
+            {streakDays > 1 && (
+              <div className="flex items-center p-3 bg-transparent border border-orange-700/20 rounded-lg">
+                <div className="text-2xl mr-3">🔥</div>
+                <div>
+                  <div className="text-orange-400 font-semibold">{streakDays} {t('dayLabel')} {t('streak')}</div>
+                  <div className="text-slate-300 text-sm">{t('keepGoing')}</div>
+                </div>
+              </div>
+            )}
+
+            {isGoalReached && (
+              <div className="flex items-center p-3 bg-transparent border border-yellow-700/20 rounded-lg">
+                <div className="text-2xl mr-3">🏆</div>
+                <div>
+                  <div className="text-yellow-400 font-semibold">{t('achievement')}</div>
+                  <div className="text-slate-300 text-sm">{t('goalReached')}</div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button
+              onClick={onStartNew}
+              className="flex-1 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-semibold py-3"
+              size="lg"
+            >
+              <Play className="w-5 h-5 mr-2" />
+              {t('startNewBlock')}
+            </Button>
+
+            <Button
+              onClick={onViewAnalytics}
+              variant="outline"
+              className="flex-1 border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-700 py-3"
+              size="lg"
+            >
+              <BarChart3 className="w-5 h-5 mr-2" />
+              {t('viewAnalytics')}
+            </Button>
+          </div>
+
+          {/* Close Button */}
+          <div className="text-center mt-6">
+            <Button
+              onClick={onClose}
+              variant="ghost"
+              className="text-slate-400 hover:text-slate-200"
+              size="sm"
+            >
+              {translate(language, 'close')}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
@@ -1256,6 +1736,8 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     lastActivityTs: 0
   }));
   const [logs, setLogs] = useState<BlockLog[]>(() => ls.get('dw_logs', []));
+  const [showSummary, setShowSummary] = useState(false);
+  const [lastCompletedBlock, setLastCompletedBlock] = useState<BlockLog | null>(null);
   const [templates, setTemplates] = useState<Template[]>(() => {
     const stored = ls.get('dw_templates', []);
     return stored.length > 0 ? stored : getDefaultTemplates(language);
@@ -1857,7 +2339,11 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     };
     
     setLogs(prev => [blockLog, ...prev]);
-    
+
+    // Show summary screen
+    setLastCompletedBlock(blockLog);
+    setShowSummary(true);
+
     // Update OOF actual minutes
     if (run.oofId) {
       setOofs(prev => prev.map(oof => 
@@ -2079,6 +2565,29 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     });
   }, [oofs, oofFilter, starredOOFs]);
   
+  // Show summary if available
+  if (showSummary && lastCompletedBlock) {
+    return (
+      <PostBlockSummary
+        block={lastCompletedBlock}
+        analytics={analytics}
+        settings={settings}
+        onStartNew={() => {
+          setShowSummary(false);
+          setActiveTab('focus');
+        }}
+        onViewAnalytics={() => {
+          setShowSummary(false);
+          setActiveTab('analytics');
+        }}
+        onClose={() => {
+          setShowSummary(false);
+        }}
+        language={language}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen text-slate-100" style={{ backgroundColor: '#000000' }}>
       {/* Quantum Background */}
