@@ -802,10 +802,11 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec, language 
   );
 };
 
-const PostBlockSummary = ({ block, analytics, settings, onStartNew, onViewAnalytics, onClose, language = 'EN' }: {
+const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onViewAnalytics, onClose, language = 'EN' }: {
   block: BlockLog;
   analytics: any;
   settings: any;
+  parking: ParkingItem[];
   onStartNew: () => void;
   onViewAnalytics: () => void;
   onClose: () => void;
@@ -1139,6 +1140,38 @@ const PostBlockSummary = ({ block, analytics, settings, onStartNew, onViewAnalyt
               <div className="text-xs text-slate-400 mt-1">{Math.round(analytics.today.dh * 10) / 10}h / {settings.dailyGoal / 60}h</div>
             </div>
           </div>
+
+          {/* Parking Lot Ideas */}
+          {parking && parking.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center mb-4">
+                <NotebookPen className="w-5 h-5 text-amber-400 mr-2" />
+                <span className="text-slate-300 font-semibold">{translate(language, 'smartParkingList')}</span>
+              </div>
+              <div className="space-y-2 max-h-32 overflow-y-auto">
+                {parking.slice(0, 5).map((item) => (
+                  <div key={item.id} className="flex items-center p-2 bg-transparent border border-slate-600/20 rounded-lg">
+                    <div className="flex-1">
+                      <div className={`text-sm ${item.done ? 'text-slate-400 line-through' : 'text-slate-300'}`}>
+                        {item.text}
+                      </div>
+                      {item.category && (
+                        <div className="text-xs text-slate-500 mt-1">
+                          {item.category}
+                        </div>
+                      )}
+                    </div>
+                    {item.done && <div className="text-emerald-400 ml-2">✓</div>}
+                  </div>
+                ))}
+                {parking.length > 5 && (
+                  <div className="text-center text-slate-400 text-sm">
+                    та ще {parking.length - 5} ідей...
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Progress Bar */}
           <div className="mb-8">
@@ -2572,6 +2605,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
         block={lastCompletedBlock}
         analytics={analytics}
         settings={settings}
+        parking={parking}
         onStartNew={() => {
           setShowSummary(false);
           setActiveTab('focus');
