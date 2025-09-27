@@ -96,6 +96,7 @@ type RunningBlock = {
   paused: boolean;
   elapsedSec: number;
   pausedTime: number;
+  pauseStartTs?: number; // Track when pause started
   interruptions: number;
   lastActivityTs: number;
 };
@@ -915,6 +916,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
     paused: false,
     elapsedSec: 0,
     pausedTime: 0,
+    pauseStartTs: undefined,
     interruptions: 0,
     lastActivityTs: 0
   }));
@@ -1023,21 +1025,33 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
   useEffect(() => ls.set('dw_settings', settings), [settings]);
   useEffect(() => ls.set('dw_starred', starredOOFs), [starredOOFs]);
   
-  // Enhanced timer with activity tracking
+  // Background-resistant timer using timestamps
   useEffect(() => {
     if (run.active && !run.paused) {
       intervalRef.current = window.setInterval(() => {
-        setRun(prev => ({
-          ...prev,
-          elapsedSec: prev.elapsedSec + 1
-        }));
+        setRun(prev => {
+          // Calculate elapsed time based on actual timestamps, not increment
+          const now = Date.now();
+          // Don't count time while currently paused
+          const currentPausedTime = prev.paused && prev.pauseStartTs ?
+            now - prev.pauseStartTs : 0;
+          const totalPausedMs = (prev.pausedTime * 1000) + currentPausedTime;
+          const realElapsedMs = now - prev.startTs - totalPausedMs;
+          const realElapsedSec = Math.max(0, Math.floor(realElapsedMs / 1000));
+
+          return {
+            ...prev,
+            elapsedSec: realElapsedSec,
+            lastActivityTs: now
+          };
+        });
       }, 1000);
-      
+
       // Activity timeout
       if (activityTimeoutRef.current) {
         clearTimeout(activityTimeoutRef.current);
       }
-      
+
       activityTimeoutRef.current = window.setTimeout(() => {
         if (settings.notifications) {
           // Show activity reminder
@@ -1054,13 +1068,44 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
         activityTimeoutRef.current = null;
       }
     }
-    
+
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (activityTimeoutRef.current) clearTimeout(activityTimeoutRef.current);
     };
   }, [run.active, run.paused, settings.notifications]);
-  
+
+  // Page Visibility API - force timer update when page becomes visible again
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && run.active) {
+        // Force immediate timer update when page becomes visible
+        setRun(prev => {
+          const now = Date.now();
+          const currentPausedTime = prev.paused && prev.pauseStartTs ?
+            now - prev.pauseStartTs : 0;
+          const totalPausedMs = (prev.pausedTime * 1000) + currentPausedTime;
+          const realElapsedMs = now - prev.startTs - totalPausedMs;
+          const realElapsedSec = Math.max(0, Math.floor(realElapsedMs / 1000));
+
+          return {
+            ...prev,
+            elapsedSec: realElapsedSec,
+            lastActivityTs: now
+          };
+        });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+    };
+  }, [run.active, run.startTs, run.pausedTime, run.paused, run.pauseStartTs]);
+
   // Smart notifications
   useEffect(() => {
     if (run.active && settings.notifications && 'Notification' in window) {
@@ -1193,6 +1238,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
       paused: false,
       elapsedSec: 0,
       pausedTime: 0,
+      pauseStartTs: undefined,
       interruptions: 0,
       lastActivityTs: Date.now()
     });
@@ -1213,15 +1259,37 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
   };
   
   const togglePause = () => {
-    setRun(prev => ({ 
-      ...prev, 
-      paused: !prev.paused,
-      pausedTime: prev.paused ? prev.pausedTime : prev.pausedTime + 1
-    }));
+    setRun(prev => {
+      const now = Date.now();
+      if (prev.paused) {
+        // Resuming - add the paused duration to total paused time
+        const pauseDuration = prev.pauseStartTs ? now - prev.pauseStartTs : 0;
+        return {
+          ...prev,
+          paused: false,
+          pausedTime: prev.pausedTime + Math.floor(pauseDuration / 1000),
+          pauseStartTs: undefined
+        };
+      } else {
+        // Pausing - record when pause started
+        return {
+          ...prev,
+          paused: true,
+          pauseStartTs: now
+        };
+      }
+    });
   };
   
   const resetTimer = () => {
-    setRun(prev => ({ ...prev, elapsedSec: 0, pausedTime: 0, interruptions: 0 }));
+    setRun(prev => ({
+      ...prev,
+      elapsedSec: 0,
+      pausedTime: 0,
+      pauseStartTs: undefined,
+      interruptions: 0,
+      startTs: Date.now() // Reset start time too
+    }));
   };
   
   const stopBlock = () => {
@@ -1273,6 +1341,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
       paused: false,
       elapsedSec: 0,
       pausedTime: 0,
+      pauseStartTs: undefined,
       interruptions: 0,
       lastActivityTs: 0
     });
