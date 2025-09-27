@@ -8,6 +8,30 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
    const [searchTerm, setSearchTerm] = useState('');
    const [hoveredProject, setHoveredProject] = useState(null);
    const [activeScrollZone, setActiveScrollZone] = useState('main');
+
+   // Device detection and adaptive settings
+   const [deviceSettings, setDeviceSettings] = useState(() => {
+     const isMobile = window.innerWidth <= 768;
+     const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
+     const isDesktop = window.innerWidth > 1024;
+
+     const settings = {
+       isMobile,
+       isTablet,
+       isDesktop,
+        quality: isMobile ? 'performance' : isTablet ? 'balanced' : 'beauty',
+       frameRate: isMobile ? 30 : 60
+     };
+
+     console.log('🌌 Quantum Device Detection:', {
+       windowWidth: window.innerWidth,
+       deviceType: isMobile ? 'Mobile' : isTablet ? 'Tablet' : 'Desktop',
+       particles: settings.particles,
+       quality: settings.quality
+     });
+
+     return settings;
+   });
   // language dropdown state (controlled by parent for selected language)
   const [langOpen, setLangOpen] = useState(false);
   const langRef = useRef(null);
@@ -20,6 +44,35 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
     };
     document.addEventListener('mousedown', onDocClick);
     return () => document.removeEventListener('mousedown', onDocClick);
+  }, []);
+
+  // Responsive device detection with resize listener
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth <= 768;
+      const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
+      const isDesktop = window.innerWidth > 1024;
+
+      const newSettings = {
+        isMobile,
+        isTablet,
+        isDesktop,
+            quality: isMobile ? 'performance' : isTablet ? 'balanced' : 'beauty',
+        frameRate: isMobile ? 30 : 60
+      };
+
+      console.log('🔄 Quantum Resize:', {
+        windowWidth: window.innerWidth,
+        deviceType: isMobile ? 'Mobile' : isTablet ? 'Tablet' : 'Desktop',
+        particles: newSettings.particles,
+        quality: newSettings.quality
+      });
+
+      setDeviceSettings(newSettings);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
   
   // simple translation map for catalog UI
@@ -125,186 +178,258 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
 
   // 3D Scene Setup
   useEffect(() => {
-    if (!mountRef.current) return;
+    console.log('🎬 Starting 3D scene creation...', deviceSettings);
+    if (!mountRef.current) {
+      console.error('❌ Mount ref not available');
+      return;
+    }
 
     // Scene setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ alpha: false, antialias: true });
     
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000, 0);
+    // Create beautiful dark cosmic background
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 512;
+    canvas.height = 512;
+
+    // Create gradient background
+    const gradient = context.createRadialGradient(256, 256, 0, 256, 256, 256);
+    gradient.addColorStop(0, '#020308');    // Very very dark blue center
+    gradient.addColorStop(0.5, '#010203');  // Almost black
+    gradient.addColorStop(1, '#000000');    // Pure black edge
+
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 512, 512);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    scene.background = texture;
+    renderer.setClearColor(0x000000, 1);
+    console.log('🖼️ Adding renderer to DOM...', renderer.domElement);
     mountRef.current.appendChild(renderer.domElement);
+    console.log('✅ Renderer added to DOM');
     sceneRef.current = { scene, camera, renderer };
 
-    // Camera position
-    camera.position.z = 50;
+    // Camera position - center the view
+    camera.position.set(0, 0, 80);
+    camera.lookAt(0, 0, 0);
 
-    // Quantum Foam Background
-    const foamBubbles = [];
-    for (let i = 0; i < 200; i++) {
-      const geometry = new THREE.SphereGeometry(Math.random() * 0.5 + 0.1, 8, 6);
-      const material = new THREE.MeshBasicMaterial({ 
-        color: new THREE.Color().setHSL(0.6 + Math.random() * 0.4, 0.7, 0.5),
-        transparent: true,
-        opacity: 0.3
-      });
-      const bubble = new THREE.Mesh(geometry, material);
-      
-      bubble.position.set(
-        (Math.random() - 0.5) * 200,
-        (Math.random() - 0.5) * 200,
-        (Math.random() - 0.5) * 200
-      );
-      
-      foamBubbles.push(bubble);
-      scene.add(bubble);
-    }
 
-    // Sacred Geometry - Particle System
-    const particleCount = 1000;
-    const positions = [];
-    const colors = [];
-    
-    for (let i = 0; i < particleCount; i++) {
-      // Golden ratio spiral
-      const phi = (1 + Math.sqrt(5)) / 2;
-      const theta = 2 * Math.PI * i / phi;
-      const r = Math.sqrt(i) * 2;
-      
-      positions.push(
-        r * Math.cos(theta),
-        r * Math.sin(theta),
-        (Math.random() - 0.5) * 50
-      );
-      
-      colors.push(0.3, 0.7, 1.0);
-    }
-    
-    const particleGeometry = new THREE.BufferGeometry();
-    particleGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    particleGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    
-    const particleMaterial = new THREE.PointsMaterial({
-      size: 2,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.6
-    });
-    
-    const particles = new THREE.Points(particleGeometry, particleMaterial);
-    scene.add(particles);
+    // Quantum Space Simulation - Heisenberg Uncertainty Principle
+    // Particles exist in superposition until user interaction
+    const quantumParticles = [];
+    const quantumCount = deviceSettings.quality === 'performance' ? 50 :
+                        deviceSettings.quality === 'balanced' ? 100 : 200;
 
-    // Tesseract (4D cube projection)
-    const tesseracts = [];
-    for (let i = 0; i < 3; i++) {
-      const tesseractGroup = new THREE.Group();
-      
-      // Create multiple cubes for 4D projection
-      for (let j = 0; j < 8; j++) {
-        const geometry = new THREE.BoxGeometry(2, 2, 2);
-        const material = new THREE.MeshBasicMaterial({
-          color: new THREE.Color().setHSL(0.1 + i * 0.3, 0.8, 0.6),
-          wireframe: true,
-          transparent: true,
-          opacity: 0.4
-        });
-        const cube = new THREE.Mesh(geometry, material);
-        
-        const angle = (j / 8) * Math.PI * 2;
-        cube.position.set(
-          Math.cos(angle) * 5,
-          Math.sin(angle) * 5,
-          Math.cos(angle * 0.5) * 3
-        );
-        
-        tesseractGroup.add(cube);
-      }
-      
-      tesseractGroup.position.set(
-        (Math.random() - 0.5) * 100,
-        (Math.random() - 0.5) * 100,
-        (Math.random() - 0.5) * 100
-      );
-      
-      tesseracts.push(tesseractGroup);
-      scene.add(tesseractGroup);
-    }
-
-    // Hyperbolic Space Curves
-    const curves = [];
-    for (let i = 0; i < 5; i++) {
-      const points = [];
-      for (let t = 0; t <= 1; t += 0.01) {
-        const x = Math.sinh(t * 4 - 2) * Math.cos(t * Math.PI * 4);
-        const y = Math.sinh(t * 4 - 2) * Math.sin(t * Math.PI * 4);
-        const z = Math.cosh(t * 4 - 2) * 0.5;
-        points.push(new THREE.Vector3(x * 5, y * 5, z * 2));
-      }
-      
-      const curve = new THREE.CatmullRomCurve3(points);
-      const tubeGeometry = new THREE.TubeGeometry(curve, 100, 0.1, 8, false);
-      const tubeMaterial = new THREE.MeshBasicMaterial({
-        color: new THREE.Color().setHSL(0.8, 0.9, 0.7),
-        transparent: true,
-        opacity: 0.5
-      });
-      const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
-      
-      tube.position.set(
-        (Math.random() - 0.5) * 80,
-        (Math.random() - 0.5) * 80,
-        (Math.random() - 0.5) * 80
-      );
-      tube.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-      
-      curves.push(tube);
-      scene.add(tube);
-    }
-
-    // Animation loop
-    const animate = () => {
-      requestAnimationFrame(animate);
-
-      // Rotate tesseracts
-      tesseracts.forEach((tesseract, index) => {
-        tesseract.rotation.x += 0.005 * (index + 1);
-        tesseract.rotation.y += 0.007 * (index + 1);
-        tesseract.rotation.z += 0.003 * (index + 1);
-        
-        tesseract.children.forEach((cube, cubeIndex) => {
-          cube.rotation.x += 0.01;
-          cube.rotation.y += 0.015;
-        });
-      });
-
-      // Animate foam bubbles
-      foamBubbles.forEach((bubble, index) => {
-        bubble.position.y += Math.sin(Date.now() * 0.001 + index) * 0.02;
-        bubble.rotation.x += 0.005;
-        bubble.rotation.y += 0.007;
-      });
-
-      // Rotate particle spiral
-      particles.rotation.z += 0.002;
-      particles.rotation.y += 0.001;
-
-      // Animate curves
-      curves.forEach((curve, index) => {
-        curve.rotation.x += 0.003 * (index + 1);
-        curve.rotation.y += 0.004 * (index + 1);
-      });
-
-      // Camera gentle movement
-      const time = Date.now() * 0.0005;
-      camera.position.x = Math.sin(time) * 5;
-      camera.position.y = Math.cos(time * 0.7) * 3;
-      camera.lookAt(scene.position);
-
-      renderer.render(scene, camera);
+    // Simple Perlin-like noise function for smooth randomness
+    const noise = (x, y, z, t) => {
+      return Math.sin(x * 0.01 + t) * Math.cos(y * 0.01 + t) * Math.sin(z * 0.01 + t * 0.5);
     };
 
-    animate();
+    for (let i = 0; i < quantumCount; i++) {
+      const particle = {
+        basePosition: new THREE.Vector3(
+          (Math.random() - 0.5) * 120,
+          (Math.random() - 0.5) * 120,
+          (Math.random() - 0.5) * 120
+        ),
+        uncertainty: Math.random() * 5 + 1, // Uncertainty magnitude
+        wavePhase: Math.random() * Math.PI * 2,
+        quantumNumber: Math.floor(Math.random() * 5) + 1 // Energy level
+      };
+
+      // Create visual representation
+      const geometry = new THREE.SphereGeometry(0.2, 8, 8);
+      const material = new THREE.MeshBasicMaterial({
+        color: new THREE.Color().setHSL(
+          0.1 + particle.quantumNumber * 0.15, // Color based on quantum number
+          0.8,
+          0.6
+        ),
+        transparent: true,
+        opacity: 0.7
+      });
+
+      particle.mesh = new THREE.Mesh(geometry, material);
+      particle.mesh.position.copy(particle.basePosition);
+
+      quantumParticles.push(particle);
+      scene.add(particle.mesh);
+    }
+
+    // 4D Tesseract Projection System
+    const tesseracts = [];
+    const tesseractCount = deviceSettings.quality === 'performance' ? 2 :
+                          deviceSettings.quality === 'balanced' ? 3 : 5;
+
+    // 4D Tesseract vertices (hypercube)
+    const generate4DVertices = () => {
+      const vertices = [];
+      for (let x = -1; x <= 1; x += 2) {
+        for (let y = -1; y <= 1; y += 2) {
+          for (let z = -1; z <= 1; z += 2) {
+            for (let w = -1; w <= 1; w += 2) {
+              vertices.push([x, y, z, w]);
+            }
+          }
+        }
+      }
+      return vertices;
+    };
+
+    // Project 4D point to 3D space
+    const project4Dto3D = (vertex4D, wOffset = 0) => {
+      const [x, y, z, w] = vertex4D;
+      const distance = 4; // Distance from 4D origin
+      const scale = distance / (distance + w + wOffset);
+      return new THREE.Vector3(x * scale * 10, y * scale * 10, z * scale * 10);
+    };
+
+    // Speed multipliers based on device
+    const speedMultiplier = deviceSettings.quality === 'performance' ? 1.0 :  // Mobile - normal speed
+                           deviceSettings.quality === 'balanced' ? 0.7 :    // Tablet - bit slower
+                           0.4;  // Desktop - much slower for better viewing
+
+    // Create grid layout for even distribution
+    const gridSize = Math.ceil(Math.sqrt(tesseractCount));
+    const spacing = deviceSettings.quality === 'performance' ? 60 :   // Mobile - closer
+                   deviceSettings.quality === 'balanced' ? 80 :      // Tablet - medium
+                   120;  // Desktop - far apart for better viewing
+
+    for (let i = 0; i < tesseractCount; i++) {
+      // Calculate grid position
+      const row = Math.floor(i / gridSize);
+      const col = i % gridSize;
+      const gridOffset = spacing * (gridSize - 1) / 2; // Center the grid
+
+      const tesseract = {
+        vertices4D: generate4DVertices(),
+        quantumNumber: i + 1, // Energy level affects frequency
+        wPhase: Math.random() * Math.PI * 2, // 4D rotation phase
+        breathPhase: Math.random() * Math.PI * 2, // Breathing phase
+        speedMultiplier: speedMultiplier, // Device-specific speed
+        position: new THREE.Vector3(
+          col * spacing - gridOffset + (Math.random() - 0.5) * 20, // Grid + small random offset
+          row * spacing - gridOffset + (Math.random() - 0.5) * 20,
+          (Math.random() - 0.5) * 40 // Some Z variation
+        ),
+        edges: []
+      };
+
+      // Create edges between vertices (hypercube connectivity)
+      const vertices3D = tesseract.vertices4D.map(v => project4Dto3D(v));
+
+      // Connect vertices that differ by exactly one coordinate
+      for (let a = 0; a < tesseract.vertices4D.length; a++) {
+        for (let b = a + 1; b < tesseract.vertices4D.length; b++) {
+          let differences = 0;
+          for (let coord = 0; coord < 4; coord++) {
+            if (tesseract.vertices4D[a][coord] !== tesseract.vertices4D[b][coord]) {
+              differences++;
+            }
+          }
+
+          if (differences === 1) { // Adjacent vertices in 4D
+            const geometry = new THREE.BufferGeometry().setFromPoints([
+              vertices3D[a], vertices3D[b]
+            ]);
+            const material = new THREE.LineBasicMaterial({
+              color: new THREE.Color().setHSL(
+                0.4 + tesseract.quantumNumber * 0.1,
+                0.9,
+                0.7
+              ),
+              transparent: true,
+              opacity: 0.6
+            });
+
+            const edge = new THREE.Line(geometry, material);
+            edge.position.copy(tesseract.position);
+            tesseract.edges.push(edge);
+            scene.add(edge);
+          }
+        }
+      }
+
+      tesseracts.push(tesseract);
+    }
+
+    // Adaptive animation loop with frame rate control
+    let lastTime = 0;
+    const targetInterval = 1000 / deviceSettings.frameRate; // Convert FPS to interval
+
+    const animate = (currentTime) => {
+      if (currentTime - lastTime >= targetInterval) {
+        lastTime = currentTime;
+
+        const time = Date.now() * 0.001;
+
+        // Animate Quantum Particles - Heisenberg Uncertainty Principle
+        quantumParticles.forEach((particle, index) => {
+          // Superposition - particles oscillate around base position
+          const uncertaintyX = noise(particle.basePosition.x, 0, 0, time + particle.wavePhase) * particle.uncertainty;
+          const uncertaintyY = noise(0, particle.basePosition.y, 0, time + particle.wavePhase) * particle.uncertainty;
+          const uncertaintyZ = noise(0, 0, particle.basePosition.z, time + particle.wavePhase) * particle.uncertainty;
+
+          particle.mesh.position.set(
+            particle.basePosition.x + uncertaintyX,
+            particle.basePosition.y + uncertaintyY,
+            particle.basePosition.z + uncertaintyZ
+          );
+
+          // Wave function collapse effect - opacity changes
+          const waveFunction = Math.sin(time * particle.quantumNumber + particle.wavePhase);
+          particle.mesh.material.opacity = 0.3 + Math.abs(waveFunction) * 0.5;
+
+          // Energy level color shifting
+          const hue = 0.1 + particle.quantumNumber * 0.15 + Math.sin(time * 0.5) * 0.1;
+          particle.mesh.material.color.setHSL(hue, 0.8, 0.6);
+        });
+
+        // Animate 4D Tesseracts - Breathing and Quantum Tunneling
+        tesseracts.forEach((tesseract, index) => {
+          const breathRate = 0.5 * tesseract.quantumNumber * tesseract.speedMultiplier;
+          const wRotationRate = 0.3 * tesseract.quantumNumber * tesseract.speedMultiplier;
+
+          // 4D rotation (w-axis)
+          tesseract.wPhase += wRotationRate * 0.01;
+          const wOffset = Math.sin(tesseract.wPhase) * 2;
+
+          // Breathing effect - scale changes
+          const breathScale = 1 + Math.sin(time * breathRate + tesseract.breathPhase) * 0.3;
+
+          // Update all edges with quantum effects
+          tesseract.edges.forEach((edge, edgeIndex) => {
+            // Quantum tunneling effect - opacity changes
+            const tunnelProbability = Math.sin(time * tesseract.quantumNumber * 2 * tesseract.speedMultiplier + edgeIndex) * 0.5 + 0.5;
+            edge.material.opacity = 0.2 + tunnelProbability * 0.6;
+
+            // Tesseract rotation
+            edge.rotation.x += 0.005 * tesseract.quantumNumber * tesseract.speedMultiplier;
+            edge.rotation.y += 0.007 * tesseract.quantumNumber * tesseract.speedMultiplier;
+            edge.rotation.z += 0.003 * tesseract.quantumNumber * tesseract.speedMultiplier;
+
+            // Breathing scale
+            edge.scale.setScalar(breathScale);
+          });
+        });
+
+      // Camera gentle movement
+      const cameraTime = Date.now() * 0.0005;
+      camera.position.x = Math.sin(cameraTime) * 5;
+      camera.position.y = Math.cos(cameraTime * 0.7) * 3;
+      camera.lookAt(scene.position);
+
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(animate);
+    };
+
+    console.log('🎭 Starting animation loop...');
+    animate(0);
 
     // Handle resize
     const handleResize = () => {
@@ -322,19 +447,55 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
       }
       renderer.dispose();
     };
-  }, []);
+  }, [deviceSettings]); // Recreate 3D scene when device settings change
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* 3D Background */}
-      <div ref={mountRef} className="fixed inset-0 -z-10" />
-      
-      {/* Gradient Overlay */}
-      <div className="fixed inset-0 bg-gradient-to-b from-transparent via-slate-950/40 to-slate-950/80 -z-5" />
+    <div className="relative min-h-screen" style={{ backgroundColor: '#000000' }}>
+      {/* Global styles for mobile optimizations */}
+      <style>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none !important;
+          scrollbar-width: none !important;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none !important;
+        }
+        .touch-manipulation {
+          touch-action: manipulation !important;
+        }
+        .transform-gpu {
+          transform: translateZ(0) !important;
+        }
+        .will-change-transform {
+          will-change: transform !important;
+        }
 
-      {/* Main Content */}
+        /* Mobile scroll hints */
+        @media (max-width: 768px) {
+          .mobile-scroll-container::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            background: linear-gradient(to left, rgba(15, 23, 42, 0.8), transparent);
+            pointer-events: none;
+          }
+        }
+      `}</style>
+        {/* 3D Background */}
+        <div
+          ref={mountRef}
+          className="fixed inset-0"
+          style={{ pointerEvents: 'none', zIndex: 0 }}
+        />
+
+
+      {/* Main Content with Glassmorphism */}
       <div className="relative z-10">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-8 py-12 relative overflow-hidden">
+          <div className="relative z-10">
           {/* Enhanced Header */}
           <header className="text-center mb-12">
             <div className="mb-6">
@@ -349,6 +510,7 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
               </p>
             </div>
 
+
             {/* Enhanced Search */}
             <div className="max-w-3xl mx-auto mb-8">
                <div className="flex items-center gap-4">
@@ -358,7 +520,7 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
                      placeholder={L.searchPlaceholder}
                      value={searchTerm}
                      onChange={(e) => setSearchTerm(e.target.value)}
-                     className="w-full px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400/50 transition-all"
+                     className="w-full px-6 py-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/30 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/70 focus:border-cyan-400/70 focus:bg-white/15 transition-all duration-300 shadow-lg"
                    />
                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,21 +564,42 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
           <main className="max-w-7xl mx-auto">
             {/* Enhanced Category Pills */}
             <div className="mb-8">
-              <div className="flex flex-wrap justify-center gap-3 mb-6">
+              {/* Debug: Show total categories on mobile */}
+              {deviceSettings.isMobile && (
+                <div className="text-center mb-2 text-xs text-gray-400">
+                  Swipe to see all {categories.length} categories →
+                </div>
+              )}
+              <div className={`mb-6 relative ${
+                deviceSettings.isMobile
+                  ? 'overflow-x-auto scrollbar-hide -mx-4 mobile-scroll-container'
+                  : 'flex flex-wrap justify-center gap-3'
+              }`}>
+                <div className={`${
+                  deviceSettings.isMobile
+                    ? 'flex gap-3 px-4 pb-2'
+                    : 'flex flex-wrap justify-center gap-3'
+                }`} style={deviceSettings.isMobile ? { minWidth: 'max-content' } : {}}>
                 {categories.map(category => (
                   <button
                     key={category.id}
                     onClick={() => setSelectedCategory(category.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 backdrop-blur-md border ${
-                      selectedCategory === category.id
-                        ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-cyan-400/50 shadow-lg shadow-cyan-500/25'
-                        : 'bg-white/10 text-gray-300 border-white/20 hover:bg-white/20 hover:text-white hover:border-white/40'
-                    }`}
+                    className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-500 backdrop-blur-xl border relative overflow-hidden whitespace-nowrap
+                      ${deviceSettings.isMobile ? 'touch-manipulation active:scale-95 min-h-[44px] flex items-center flex-shrink-0' : 'hover:scale-110'}
+                      ${selectedCategory === category.id
+                        ? 'bg-gradient-to-r from-cyan-500/80 to-blue-500/80 text-white border-cyan-400/60 shadow-xl shadow-cyan-500/30 backdrop-blur-xl'
+                        : `bg-white/10 text-gray-200 border-white/30 shadow-lg ${
+                            deviceSettings.isMobile
+                              ? 'active:bg-white/25 active:text-white active:border-white/50'
+                              : 'hover:bg-white/20 hover:text-white hover:border-white/50 hover:shadow-xl'
+                          }`
+                      }`}
                   >
                     <span className="mr-2">{category.icon}</span>
                     {category.name}
                   </button>
                 ))}
+                </div>
               </div>
               
               {/* Category Description with Stats */}
@@ -446,7 +629,13 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
             </div>
             
             {/* Projects Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className={`grid gap-6 ${
+              deviceSettings.isMobile
+                ? 'grid-cols-1 px-4'
+                : deviceSettings.isTablet
+                ? 'grid-cols-2 px-6'
+                : 'grid-cols-3'
+            }`}>
               {filteredProjects.map(project => (
                 <div
                   key={project.id}
@@ -460,7 +649,15 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
                     hoveredProject === project.id ? 'scale-105' : ''
                   }`}
                 >
-                  <div className="backdrop-blur-md bg-white/10 rounded-xl border border-white/20 p-6 shadow-xl hover:bg-white/15 transition-all duration-300 h-full">
+                  <div className={`backdrop-blur-xl bg-gradient-to-br from-white/15 via-white/10 to-white/5 rounded-2xl border border-white/30 p-8 shadow-2xl transition-all duration-500 h-full relative overflow-hidden
+                    ${deviceSettings.isMobile
+                      ? 'active:bg-white/25 active:shadow-3xl active:scale-[0.98] active:border-cyan-400/60 touch-manipulation'
+                      : 'hover:bg-white/20 hover:shadow-3xl hover:scale-[1.03] hover:border-cyan-400/50 hover:from-white/20 hover:via-white/15 hover:to-white/10'
+                    }
+                    ${hoveredProject === project.id ? 'transform-gpu will-change-transform' : ''}
+                    before:absolute before:inset-0 before:bg-gradient-to-br before:from-cyan-400/10 before:via-transparent before:to-purple-400/10 before:opacity-0 before:transition-opacity before:duration-500
+                    ${hoveredProject === project.id ? 'before:opacity-100' : ''}
+                  `}>
                     {/* Project Header */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
@@ -554,7 +751,7 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
             
             {/* Footer Info */}
             <div className="text-center mt-12 py-8">
-              <div className="inline-flex items-center gap-2 text-sm text-gray-500 bg-white/5 backdrop-blur-md rounded-full px-4 py-2 border border-white/10">
+              <div className="inline-flex items-center gap-2 text-sm text-gray-400 bg-white/10 backdrop-blur-xl rounded-full px-6 py-3 border border-white/20 shadow-xl">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                 <span>{L.footerStatus(1,2,73)}</span>
                 <div className="ml-4 flex items-center gap-3">
@@ -571,10 +768,9 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
               </div>
             </div>
           </main>
+          </div>
         </div>
       </div>
-
-
     </div>
   );
 };
