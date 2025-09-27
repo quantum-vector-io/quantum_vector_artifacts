@@ -26,7 +26,7 @@ import * as THREE from 'three';
 type OOF = {
   id: string;
   title: string;
-  domain: 'Backend' | 'Data' | 'CS' | 'SystemDesign' | 'AlgoDS' | 'Study' | 'Research' | 'Other';
+  domain: 'Backend' | 'Data' | 'CS' | 'SystemDesign' | 'AlgoDS' | 'Study' | 'Discovery' | 'Other';
   priority: 'Low' | 'Medium' | 'High' | 'Critical';
   estimatedMinutes: number;
   actualMinutes: number;
@@ -41,7 +41,7 @@ type OOF = {
   completedAt?: number;
 };
 
-type Domain = 'Backend' | 'Data' | 'CS' | 'SystemDesign' | 'AlgoDS' | 'Study' | 'Research' | 'Other';
+type Domain = 'Backend' | 'Data' | 'CS' | 'SystemDesign' | 'AlgoDS' | 'Study' | 'Discovery' | 'Other';
 type Priority = 'Low' | 'Medium' | 'High' | 'Critical';
 
 type ParkingItem = {
@@ -189,7 +189,7 @@ TRANSLATIONS.EN.tabTemplates = 'Templates';
 TRANSLATIONS.EN.tabSettings = 'Settings';
 TRANSLATIONS.EN.pomodoro25 = 'Pomodoro 25m';
 TRANSLATIONS.EN.standard60 = 'Standard 60m';
-TRANSLATIONS.EN.deep90 = 'Deep 90m';
+TRANSLATIONS.EN.deep90 = 'Deep focus 90m';
 TRANSLATIONS.EN.oofTitlePlaceholder = 'Task or project name';
 TRANSLATIONS.EN.oofDefinitionPlaceholder = 'Definition of Done - how will you know the task is done?';
 TRANSLATIONS.EN.constraintsPlaceholder = 'Constraints & context';
@@ -222,8 +222,169 @@ TRANSLATIONS.EN.quickAddPlaceholder = 'Quickly jot a thought or distraction...';
 TRANSLATIONS.EN.add = 'Add';
 TRANSLATIONS.EN.categoriesLabel = 'Categories:';
 TRANSLATIONS.EN.all = 'All';
+TRANSLATIONS.EN.starred = 'Starred';
+TRANSLATIONS.EN.highPriority = 'Important';
+TRANSLATIONS.EN.inProgress = 'In Progress';
+TRANSLATIONS.EN.completed = 'Completed';
 TRANSLATIONS.EN.entries = 'entries';
+TRANSLATIONS.EN.smartParkingList = 'Smart parking list';
+TRANSLATIONS.EN.todaysProductivity = 'Today\'s productivity';
+TRANSLATIONS.EN.achievements = 'Achievements';
+TRANSLATIONS.EN.productivityDynamics = 'Productivity dynamics (14 days)';
 TRANSLATIONS.EN.hintLong = 'Tip: use templates from the Templates tab — the "To notes" button inserts them here.';
+TRANSLATIONS.EN.readyToStart = 'Ready to start deep work?';
+TRANSLATIONS.EN.chooseTask = 'Choose a task from the "Focus" tab or start free mode';
+TRANSLATIONS.EN.useShiftEnter = 'Use Shift+Enter for newline, Enter to add';
+TRANSLATIONS.EN.copy = 'Copy';
+TRANSLATIONS.EN.copyStatus = 'Copied!';
+TRANSLATIONS.EN.copyFailed = 'Failed to copy';
+TRANSLATIONS.EN.templatesPlaybooks = 'Templates & Playbooks';
+TRANSLATIONS.EN.allTemplates = 'All templates';
+TRANSLATIONS.EN.popular = 'Popular';
+TRANSLATIONS.EN.custom = 'Custom';
+TRANSLATIONS.EN.createCustomTemplate = 'Create custom template';
+TRANSLATIONS.EN.uniqueIdPlaceholder = 'Unique ID';
+TRANSLATIONS.EN.templateNamePlaceholder = 'Template name';
+TRANSLATIONS.EN.categoryPlaceholder = 'Category';
+TRANSLATIONS.EN.templateBodyPlaceholder = 'Template body (steps, instructions, code, etc.)...';
+TRANSLATIONS.EN.addTemplate = 'Add template';
+TRANSLATIONS.EN.copyText = 'Copy';
+TRANSLATIONS.EN.useTemplate = 'Use';
+TRANSLATIONS.EN.systemSettings = 'System settings';
+TRANSLATIONS.EN.exportImportData = 'Export and import data';
+TRANSLATIONS.EN.exportData = 'Export data';
+TRANSLATIONS.EN.toNotes = 'To notes';
+
+// Settings translations
+TRANSLATIONS.EN.basicSettings = 'Basic settings';
+TRANSLATIONS.EN.notifications = 'Notifications';
+TRANSLATIONS.EN.showReminders = 'Show reminders and tips';
+TRANSLATIONS.EN.soundSignals = 'Sound signals';
+TRANSLATIONS.EN.soundOnComplete = 'Sound when blocks complete';
+TRANSLATIONS.EN.autoBreaks = 'Automatic breaks';
+TRANSLATIONS.EN.suggestBreaks = 'Suggest breaks between blocks';
+TRANSLATIONS.EN.defaultDuration = 'Default block duration';
+TRANSLATIONS.EN.goalsMetrics = 'Goals and metrics';
+TRANSLATIONS.EN.dailyGoal = 'Daily goal (minutes)';
+TRANSLATIONS.EN.currentGoalDaily = 'Current goal: {0} hours per day';
+TRANSLATIONS.EN.weeklyGoal = 'Weekly goal (minutes)';
+TRANSLATIONS.EN.currentGoalWeekly = 'Current goal: {0} hours per week';
+TRANSLATIONS.EN.energyTracking = 'Energy tracking';
+TRANSLATIONS.EN.trackEnergyAnalytics = 'Include energy level in analytics';
+TRANSLATIONS.EN.advancedAnalytics = 'Advanced analytics';
+TRANSLATIONS.EN.showDetailedMetrics = 'Show detailed productivity metrics';
+TRANSLATIONS.EN.dataImported = 'Data imported successfully!';
+TRANSLATIONS.EN.importError = 'Import error';
+
+// Template translations
+TRANSLATIONS.EN.templateRagTitle = 'RAG slice';
+TRANSLATIONS.EN.templateRagBody = `1. Define query and context\n2. Set up document search\n3. Filter relevant fragments\n4. Generate response with context\n5. Validate result accuracy`;
+TRANSLATIONS.EN.templateStudyTitle = 'Study session';
+TRANSLATIONS.EN.templateStudyBody = `1. Define topic and goals\n2. Prepare materials\n3. Active reading/practice\n4. Create summary\n5. Test understanding\n6. Plan review`;
+TRANSLATIONS.EN.templateCodingTitle = 'Problem solving';
+TRANSLATIONS.EN.templateCodingBody = `1. Read and understand the problem\n2. Analyze examples\n3. Determine approach and data structures\n4. Write pseudocode\n5. Implement solution\n6. Test and optimize`;
+// Priority translations
+TRANSLATIONS.EN.priorityLow = 'Low';
+TRANSLATIONS.EN.priorityMedium = 'Medium';
+TRANSLATIONS.EN.priorityHigh = 'High';
+TRANSLATIONS.EN.priorityCritical = 'Critical';
+// Domain translations
+TRANSLATIONS.EN.domainBackend = 'Backend';
+TRANSLATIONS.EN.domainData = 'Data';
+TRANSLATIONS.EN.domainCS = 'CS';
+TRANSLATIONS.EN.domainSystemDesign = 'System Design';
+TRANSLATIONS.EN.domainAlgoDS = 'Algo & DS';
+TRANSLATIONS.EN.domainStudy = 'Study';
+TRANSLATIONS.EN.domainDiscovery = 'Discovery';
+TRANSLATIONS.EN.domainOther = 'Other';
+// Analytics and metrics
+TRANSLATIONS.EN.qualityDepth = 'Quality Depth (DQ)';
+TRANSLATIONS.EN.energy = 'Energy';
+TRANSLATIONS.EN.mood = 'Mood';
+TRANSLATIONS.EN.avgDQ = 'Average DQ';
+TRANSLATIONS.EN.qualityFocus = 'Focus Quality';
+TRANSLATIONS.EN.flowSessions = 'Flow sessions';
+TRANSLATIONS.EN.flowState = 'Flow State';
+TRANSLATIONS.EN.completed = 'Completed';
+TRANSLATIONS.EN.qualityMood = 'Quality and Mood';
+TRANSLATIONS.EN.flowStateSigns = 'Signs of reaching flow state:';
+TRANSLATIONS.EN.flowDescription = 'loss of sense of time, complete concentration on the task';
+TRANSLATIONS.EN.deepWorkIndex = 'Deep Work Index';
+TRANSLATIONS.EN.flowDescriptionFull = 'ease of decision making, natural work rhythm. This state is most effective for complex tasks.';
+TRANSLATIONS.EN.minPlan = 'min plan';
+TRANSLATIONS.EN.complexityLabel = 'Complexity';
+TRANSLATIONS.EN.min = 'min';
+TRANSLATIONS.EN.intelligentProductivitySystem = 'Intelligent productivity system';
+TRANSLATIONS.EN.freeMode = 'Free mode';
+TRANSLATIONS.EN.remaining = 'Remaining';
+TRANSLATIONS.EN.finish = 'Finish';
+TRANSLATIONS.EN.overtime = 'Overtime!';
+
+// Analytics specific translations
+TRANSLATIONS.EN.deepHours = 'Deep Hours';
+TRANSLATIONS.EN.dailyGoalLabel = 'Daily Goal';
+TRANSLATIONS.EN.dailyGoalText = 'daily';
+TRANSLATIONS.EN.achieved = 'Achieved!';
+TRANSLATIONS.EN.bestTimeOfDay = 'Best Time of Day';
+TRANSLATIONS.EN.morning = 'Morning';
+TRANSLATIONS.EN.afternoon = 'Afternoon';
+TRANSLATIONS.EN.evening = 'Evening';
+TRANSLATIONS.EN.deepWorkIndex = 'Deep Work Index';
+TRANSLATIONS.EN.depthIndex = 'Depth Index';
+TRANSLATIONS.EN.deepBlocksLog = 'Deep Blocks Log';
+TRANSLATIONS.EN.dateTime = 'Date/Time';
+TRANSLATIONS.EN.oof = 'OOF';
+TRANSLATIONS.EN.minutes = 'Min';
+TRANSLATIONS.EN.dq = 'DQ';
+TRANSLATIONS.EN.dayLabel = 'Day';
+
+// Smart tips translations
+TRANSLATIONS.EN.microExperiment = 'Micro-experiment > 5min';
+TRANSLATIONS.EN.microExperimentDesc = 'If stuck for more than 5 minutes, try:';
+TRANSLATIONS.EN.microTip1 = 'Rephrase the problem';
+TRANSLATIONS.EN.microTip2 = 'Break into smaller steps';
+TRANSLATIONS.EN.microTip3 = 'Change approach or tool';
+TRANSLATIONS.EN.microTip4 = 'Start with the simplest option';
+
+TRANSLATIONS.EN.distractionManagement = 'Distraction Management';
+TRANSLATIONS.EN.distractionDesc = 'Write all side thoughts in the parking list:';
+TRANSLATIONS.EN.distractionTip1 = 'Ideas for other projects';
+TRANSLATIONS.EN.distractionTip2 = 'Personal reminders';
+TRANSLATIONS.EN.distractionTip3 = 'Technical questions to research';
+TRANSLATIONS.EN.distractionTip4 = 'Current process improvements';
+
+// Ukrainian smart tips translations
+TRANSLATIONS.UA.microExperiment = 'Мікроексперимент > 5хв';
+TRANSLATIONS.UA.microExperimentDesc = 'Якщо застрягли більше 5 хвилин, спробуйте:';
+TRANSLATIONS.UA.microTip1 = 'Перефразувати проблему';
+TRANSLATIONS.UA.microTip2 = 'Розбити на менші кроки';
+TRANSLATIONS.UA.microTip3 = 'Змінити підхід або інструмент';
+TRANSLATIONS.UA.microTip4 = 'Почати з найпростішого варіанту';
+
+TRANSLATIONS.UA.distractionManagement = 'Управління відволіканнями';
+TRANSLATIONS.UA.distractionDesc = 'Всі побічні думки записуйте в паркувальний список:';
+TRANSLATIONS.UA.distractionTip1 = 'Ідеї для інших проєктів';
+TRANSLATIONS.UA.distractionTip2 = 'Особисті нагадування';
+TRANSLATIONS.UA.distractionTip3 = 'Технічні питання для дослідження';
+TRANSLATIONS.UA.distractionTip4 = 'Покращення поточного процесу';
+
+// Flow state translations
+TRANSLATIONS.EN.flowStateAchieved = 'Flow state achieved';
+TRANSLATIONS.UA.flowStateAchieved = 'Стан потоку досягнуто';
+
+// Smart hints header translations
+TRANSLATIONS.EN.smartHintsTitle = 'Smart tips and micro-experiments';
+TRANSLATIONS.UA.smartHintsTitle = 'Розумні підказки та мікроексперименти';
+
+// Time unit translations
+TRANSLATIONS.EN.hoursShort = 'h';
+TRANSLATIONS.UA.hoursShort = 'г';
+TRANSLATIONS.EN.today = 'Today';
+TRANSLATIONS.EN.week = 'Week';
+TRANSLATIONS.EN.streak = 'Streak';
+TRANSLATIONS.UA.today = 'Сьогодні';
+TRANSLATIONS.UA.week = 'Тиждень';
+TRANSLATIONS.UA.streak = 'Стрік';
 
 TRANSLATIONS.UA.tabFocus = 'Фокус';
 TRANSLATIONS.UA.tabTimer = 'Таймер';
@@ -233,14 +394,14 @@ TRANSLATIONS.UA.tabTemplates = 'Шаблони';
 TRANSLATIONS.UA.tabSettings = 'Налаштування';
 TRANSLATIONS.UA.pomodoro25 = 'Pomodoro 25хв';
 TRANSLATIONS.UA.standard60 = 'Стандарт 60хв';
-TRANSLATIONS.UA.deep90 = 'Глибокий 90хв';
+TRANSLATIONS.UA.deep90 = 'Глибокий фокус 90хв';
 TRANSLATIONS.UA.domain = 'Домен';
 TRANSLATIONS.UA.priority = 'Пріоритет';
 TRANSLATIONS.UA.time = 'Час (хв)';
 TRANSLATIONS.UA.difficulty = 'Складність';
 TRANSLATIONS.UA.energy = 'Енергія';
 TRANSLATIONS.UA.oofTitlePlaceholder = 'Назва завдання або проєкту';
-TRANSLATIONS.UA.oofDefinitionPlaceholder = 'Definition of Done - як ви зрозумієте, що завдання виконане?';
+TRANSLATIONS.UA.oofDefinitionPlaceholder = 'Критерії готовності - як ви зрозумієте, що завдання виконане?';
 TRANSLATIONS.UA.constraintsPlaceholder = 'Обмеження та контекст';
 TRANSLATIONS.UA.firstStepPlaceholder = 'Конкретний перший крок';
 TRANSLATIONS.UA.readyPrompt = 'Оберіть завдання з вкладки "Фокус" або запустіть вільний режим';
@@ -265,8 +426,121 @@ TRANSLATIONS.UA.quickAddPlaceholder = 'Швидко запишіть думку 
 TRANSLATIONS.UA.add = 'Додати';
 TRANSLATIONS.UA.categoriesLabel = 'Категорії:';
 TRANSLATIONS.UA.all = 'Всі';
+TRANSLATIONS.UA.starred = 'Обрані';
+TRANSLATIONS.UA.highPriority = 'Важливі';
+TRANSLATIONS.UA.inProgress = 'В роботі';
+TRANSLATIONS.UA.completed = 'Завершені';
 TRANSLATIONS.UA.entries = 'записів';
+TRANSLATIONS.UA.smartParkingList = 'Розумний паркувальний список';
+TRANSLATIONS.UA.todaysProductivity = 'Сьогоднішня продуктивність';
+TRANSLATIONS.UA.achievements = 'Досягнення';
+TRANSLATIONS.UA.productivityDynamics = 'Динаміка продуктивності (14 днів)';
 TRANSLATIONS.UA.hintLong = 'Підказка: використовуйте шаблони з вкладки "Шаблони" — кнопка "В нотатки" додає їх сюди.';
+TRANSLATIONS.UA.readyToStart = 'Готові розпочати глибоку роботу?';
+TRANSLATIONS.UA.chooseTask = 'Оберіть завдання з вкладки "Фокус" або запустіть вільний режим';
+TRANSLATIONS.UA.useShiftEnter = 'Використовуйте Shift+Enter для нового рядка, Enter для додавання';
+TRANSLATIONS.UA.copy = 'Копіювати';
+TRANSLATIONS.UA.copyStatus = 'Скопійовано!';
+TRANSLATIONS.UA.copyFailed = 'Не вдалося скопіювати';
+TRANSLATIONS.UA.templatesPlaybooks = 'Шаблони та плейбуки';
+TRANSLATIONS.UA.allTemplates = 'Всі шаблони';
+TRANSLATIONS.UA.popular = 'Популярні';
+TRANSLATIONS.UA.custom = 'Кастомні';
+TRANSLATIONS.UA.createCustomTemplate = 'Створити власний шаблон';
+TRANSLATIONS.UA.uniqueIdPlaceholder = 'Унікальний ID';
+TRANSLATIONS.UA.templateNamePlaceholder = 'Назва шаблону';
+TRANSLATIONS.UA.categoryPlaceholder = 'Категорія';
+TRANSLATIONS.UA.templateBodyPlaceholder = 'Тіло шаблону (кроки, інструкції, код тощо)...';
+TRANSLATIONS.UA.addTemplate = 'Додати шаблон';
+TRANSLATIONS.UA.copyText = 'Копіювати';
+TRANSLATIONS.UA.useTemplate = 'Використати';
+TRANSLATIONS.UA.systemSettings = 'Налаштування системи';
+TRANSLATIONS.UA.exportImportData = 'Експорт та імпорт даних';
+TRANSLATIONS.UA.exportData = 'Експортувати дані';
+TRANSLATIONS.UA.toNotes = 'В нотатки';
+
+// Settings translations
+TRANSLATIONS.UA.basicSettings = 'Основні налаштування';
+TRANSLATIONS.UA.notifications = 'Сповіщення';
+TRANSLATIONS.UA.showReminders = 'Показувати нагадування та підказки';
+TRANSLATIONS.UA.soundSignals = 'Звукові сигнали';
+TRANSLATIONS.UA.soundOnComplete = 'Звук при завершенні блоків';
+TRANSLATIONS.UA.autoBreaks = 'Автоматичні перерви';
+TRANSLATIONS.UA.suggestBreaks = 'Пропонувати перерви між блоками';
+TRANSLATIONS.UA.defaultDuration = 'Стандартна тривалість блоку';
+TRANSLATIONS.UA.goalsMetrics = 'Цілі та метрики';
+TRANSLATIONS.UA.dailyGoal = 'Щоденна ціль (хвилини)';
+TRANSLATIONS.UA.currentGoalDaily = 'Поточна ціль: {0} годин на день';
+TRANSLATIONS.UA.weeklyGoal = 'Тижнева ціль (хвилини)';
+TRANSLATIONS.UA.currentGoalWeekly = 'Поточна ціль: {0} годин на тиждень';
+TRANSLATIONS.UA.energyTracking = 'Відстеження енергії';
+TRANSLATIONS.UA.trackEnergyAnalytics = 'Враховувати рівень енергії в аналітиці';
+TRANSLATIONS.UA.advancedAnalytics = 'Розширена аналітика';
+TRANSLATIONS.UA.showDetailedMetrics = 'Показувати детальні метрики продуктивності';
+TRANSLATIONS.UA.dataImported = 'Дані успішно імпортовано!';
+TRANSLATIONS.UA.importError = 'Помилка імпорту даних';
+
+// Template translations
+TRANSLATIONS.UA.templateRagTitle = 'RAG слайс';
+TRANSLATIONS.UA.templateRagBody = `1. Визначити запит та контекст\n2. Налаштувати пошук документів\n3. Відфільтрувати релевантні фрагменти\n4. Згенерувати відповідь з контекстом\n5. Валідувати точність результату`;
+TRANSLATIONS.UA.templateStudyTitle = 'Навчальна сесія';
+TRANSLATIONS.UA.templateStudyBody = `1. Визначити тему та цілі\n2. Підготувати матеріали\n3. Активне читання/практика\n4. Створити резюме\n5. Тестування розуміння\n6. Планування повторення`;
+TRANSLATIONS.UA.templateCodingTitle = 'Вирішення задачі';
+TRANSLATIONS.UA.templateCodingBody = `1. Прочитати і зрозуміти умову\n2. Розібрати приклади\n3. Визначити підхід та структури даних\n4. Написати псевдокод\n5. Імплементувати рішення\n6. Тестувати та оптимізувати`;
+// Priority translations
+TRANSLATIONS.UA.priorityLow = 'Низький';
+TRANSLATIONS.UA.priorityMedium = 'Середній';
+TRANSLATIONS.UA.priorityHigh = 'Високий';
+TRANSLATIONS.UA.priorityCritical = 'Критичний';
+// Domain translations
+TRANSLATIONS.UA.domainBackend = 'Backend';
+TRANSLATIONS.UA.domainData = 'Дані';
+TRANSLATIONS.UA.domainCS = 'CS';
+TRANSLATIONS.UA.domainSystemDesign = 'Дизайн Систем';
+TRANSLATIONS.UA.domainAlgoDS = 'Алгоритми & СД';
+TRANSLATIONS.UA.domainStudy = 'Навчання';
+TRANSLATIONS.UA.domainDiscovery = 'Дослідження';
+TRANSLATIONS.UA.domainOther = 'Інше';
+// Analytics and metrics
+TRANSLATIONS.UA.qualityDepth = 'Якість глибини (DQ)';
+TRANSLATIONS.UA.energy = 'Енергія';
+TRANSLATIONS.UA.mood = 'Настрій';
+TRANSLATIONS.UA.avgDQ = 'Середнє DQ';
+TRANSLATIONS.UA.qualityFocus = 'Якість фокусу';
+TRANSLATIONS.UA.flowSessions = 'Flow сесії';
+TRANSLATIONS.UA.flowState = 'Стан потоку';
+TRANSLATIONS.UA.completed = 'Завершено';
+TRANSLATIONS.UA.qualityMood = 'Якість та настрій';
+TRANSLATIONS.UA.flowStateSigns = 'Ознаки досягнення стану потоку:';
+TRANSLATIONS.UA.flowDescription = 'втрата відчуття часу, повна концентрація на завданні';
+TRANSLATIONS.UA.deepWorkIndex = 'Індекс Глибокої Роботи';
+TRANSLATIONS.UA.flowDescriptionFull = 'легкість прийняття рішень, природний ритм роботи. Цей стан найефективніший для складних завдань.';
+TRANSLATIONS.UA.minPlan = 'хв план';
+TRANSLATIONS.UA.complexityLabel = 'Складність';
+TRANSLATIONS.UA.min = 'хв';
+TRANSLATIONS.UA.intelligentProductivitySystem = 'Інтелектуальна система продуктивності';
+TRANSLATIONS.UA.freeMode = 'Вільний режим';
+TRANSLATIONS.UA.remaining = 'Залишилось';
+TRANSLATIONS.UA.finish = 'Завершити';
+TRANSLATIONS.UA.overtime = 'Овертайм!';
+
+// Analytics specific translations
+TRANSLATIONS.UA.deepHours = 'Години глибини';
+TRANSLATIONS.UA.dailyGoalLabel = 'Щоденна ціль';
+TRANSLATIONS.UA.dailyGoalText = 'щодня';
+TRANSLATIONS.UA.achieved = 'Досягнуто!';
+TRANSLATIONS.UA.bestTimeOfDay = 'Краща пора дня';
+TRANSLATIONS.UA.morning = 'Ранок';
+TRANSLATIONS.UA.afternoon = 'День';
+TRANSLATIONS.UA.evening = 'Вечір';
+TRANSLATIONS.UA.deepWorkIndex = 'Індекс Глибокої Роботи';
+TRANSLATIONS.UA.depthIndex = 'Індекс глибини';
+TRANSLATIONS.UA.deepBlocksLog = 'Журнал глибоких блоків';
+TRANSLATIONS.UA.dateTime = 'Дата/Час';
+TRANSLATIONS.UA.oof = 'OOF';
+TRANSLATIONS.UA.minutes = 'Хв';
+TRANSLATIONS.UA.dq = 'DQ';
+TRANSLATIONS.UA.dayLabel = 'День';
 
 
 const translate = (language: string, key: string, ...args: any[]) => {
@@ -274,6 +548,58 @@ const translate = (language: string, key: string, ...args: any[]) => {
   if (typeof val === 'function') return val(...args);
   return val ?? key;
 }
+
+// Helper functions for translating priorities and domains
+const translatePriority = (language: string, priority: Priority) => {
+  const priorityMap: Record<Priority, string> = {
+    'Low': 'priorityLow',
+    'Medium': 'priorityMedium',
+    'High': 'priorityHigh',
+    'Critical': 'priorityCritical'
+  };
+  return translate(language, priorityMap[priority]);
+};
+
+const translateDomain = (language: string, domain: Domain) => {
+  const domainMap: Record<Domain, string> = {
+    'Backend': 'domainBackend',
+    'Data': 'domainData',
+    'CS': 'domainCS',
+    'SystemDesign': 'domainSystemDesign',
+    'AlgoDS': 'domainAlgoDS',
+    'Study': 'domainStudy',
+    'Discovery': 'domainDiscovery',
+    'Other': 'domainOther'
+  };
+  return translate(language, domainMap[domain]);
+};
+
+const getDefaultTemplates = (language: string): Template[] => [
+  {
+    id: 'rag-slice',
+    title: translate(language, 'templateRagTitle'),
+    body: translate(language, 'templateRagBody'),
+    category: 'AI/ML',
+    useCount: 0,
+    lastUsed: 0
+  },
+  {
+    id: 'study-session',
+    title: translate(language, 'templateStudyTitle'),
+    body: translate(language, 'templateStudyBody'),
+    category: 'Study',
+    useCount: 0,
+    lastUsed: 0
+  },
+  {
+    id: 'coding-problem',
+    title: translate(language, 'templateCodingTitle'),
+    body: translate(language, 'templateCodingBody'),
+    category: 'Coding',
+    useCount: 0,
+    lastUsed: 0
+  }
+];
 
 // Enhanced Helper Components
 const QuickStats = ({ logs, className = "", onResetData, language = 'EN' }: { logs:any[]; className?:string; onResetData?:()=>void; language?: string }) => {
@@ -294,7 +620,7 @@ const QuickStats = ({ logs, className = "", onResetData, language = 'EN' }: { lo
       <Card className="bg-slate-800/5 backdrop-blur-md border-emerald-500/60 shadow-2xl shadow-emerald-500/20">
         <CardContent className="pt-4">
           <div className="text-center">
-            <div className="text-3xl font-bold text-emerald-300">{Math.round(todayTime/60 * 10)/10}h</div>
+            <div className="text-3xl font-bold text-emerald-300">{Math.round(todayTime/60 * 10)/10}{translate(language,'hoursShort')}</div>
             <div className="text-slate-200 text-sm font-medium">{translate(language,'today')}</div>
           </div>
         </CardContent>
@@ -302,7 +628,7 @@ const QuickStats = ({ logs, className = "", onResetData, language = 'EN' }: { lo
       <Card className="bg-slate-800/5 backdrop-blur-md border-blue-500/60 shadow-2xl shadow-blue-500/20">
         <CardContent className="pt-4">
           <div className="text-center">
-            <div className="text-3xl font-bold text-blue-300">{Math.round(weekTime/60 * 10)/10}h</div>
+            <div className="text-3xl font-bold text-blue-300">{Math.round(weekTime/60 * 10)/10}{translate(language,'hoursShort')}</div>
             <div className="text-slate-200 text-sm font-medium">{translate(language,'week')}</div>
           </div>
         </CardContent>
@@ -345,7 +671,7 @@ const calculateStreak = (logs: BlockLog[]): number => {
   return streak;
 };
 
-const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec }: { run: RunningBlock; onTogglePause: ()=>void; onReset: ()=>void; onStop: ()=>void; elapsedSec: number }) => {
+const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec, language }: { run: RunningBlock; onTogglePause: ()=>void; onReset: ()=>void; onStop: ()=>void; elapsedSec: number; language: string }) => {
   const targetSec = run.targetMinutes * 60;
   const progress = Math.min(100, Math.round((elapsedSec / targetSec) * 100));
   const remainingMin = Math.ceil((targetSec - elapsedSec) / 60);
@@ -365,8 +691,8 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec }: { run: 
             </div>
             <div className="text-sm text-slate-400">
               {isOvertime ? 
-                <span className="text-amber-400 font-semibold">Овертайм! +{remainingMin-run.targetMinutes} хв</span> :
-                <span>Залишилось: {remainingMin} хв ({progress}%)</span>
+                <span className="text-amber-400 font-semibold">{translate(language, 'overtime')} +{remainingMin-run.targetMinutes} {translate(language, 'min')}</span> :
+                <span>{translate(language, 'remaining')}: {remainingMin} {translate(language, 'min')} ({progress}%)</span>
               }
             </div>
           </div>
@@ -425,7 +751,7 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec }: { run: 
               className="bg-cyan-600 hover:bg-cyan-700 flex-1 sm:flex-none"
             >
               <Square className="w-5 h-5 mr-2" />
-              Завершити
+              {translate(language, 'finish')}
             </Button>
           </div>
         </div>
@@ -442,16 +768,18 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
     Critical: { bg: 'bg-red-900/60', text: 'text-red-400', border: 'border-red-700' }
   };
   
-  const domainConfig = {
-    Backend: { label: 'Backend', color: 'text-blue-400', bgColor: 'bg-blue-900/40' },
-    Data: { label: 'Data', color: 'text-emerald-400', bgColor: 'bg-emerald-900/40' },
-    CS: { label: 'CS', color: 'text-purple-400', bgColor: 'bg-purple-900/40' },
-    Other: { label: 'Other', color: 'text-amber-400', bgColor: 'bg-amber-900/40' },
-    SystemDesign: { label: 'System Design', color: 'text-cyan-400', bgColor: 'bg-cyan-900/40' },
-    AlgoDS: { label: 'Algo & DS', color: 'text-rose-400', bgColor: 'bg-rose-900/40' },
-    Study: { label: 'Study', color: 'text-green-400', bgColor: 'bg-green-900/40' },
-    Research: { label: 'Research', color: 'text-indigo-400', bgColor: 'bg-indigo-900/40' }
-  };
+  const getDomainConfig = (language: string) => ({
+    Backend: { label: translateDomain(language, 'Backend'), color: 'text-blue-400', bgColor: 'bg-blue-900/40' },
+    Data: { label: translateDomain(language, 'Data'), color: 'text-emerald-400', bgColor: 'bg-emerald-900/40' },
+    CS: { label: translateDomain(language, 'CS'), color: 'text-purple-400', bgColor: 'bg-purple-900/40' },
+    Other: { label: translateDomain(language, 'Other'), color: 'text-amber-400', bgColor: 'bg-amber-900/40' },
+    SystemDesign: { label: translateDomain(language, 'SystemDesign'), color: 'text-cyan-400', bgColor: 'bg-cyan-900/40' },
+    AlgoDS: { label: translateDomain(language, 'AlgoDS'), color: 'text-rose-400', bgColor: 'bg-rose-900/40' },
+    Study: { label: translateDomain(language, 'Study'), color: 'text-green-400', bgColor: 'bg-green-900/40' },
+    Discovery: { label: translateDomain(language, 'Discovery'), color: 'text-indigo-400', bgColor: 'bg-indigo-900/40' }
+  });
+
+  const domainConfig = getDomainConfig(language);
   
   const completionRate = oof.actualMinutes > 0 ? Math.round((oof.actualMinutes / oof.estimatedMinutes) * 100) : 0;
   
@@ -465,7 +793,7 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
                 {domainConfig[oof.domain].label}
               </Badge>
               <Badge className={`${priorityColors[oof.priority].bg} ${priorityColors[oof.priority].text} border-0 text-xs font-semibold px-2 py-1`}>
-                {oof.priority}
+                {translatePriority(language, oof.priority)}
               </Badge>
               {oof.tags.map(tag => (
                 <Badge key={tag} className="text-xs border border-slate-500/50 text-slate-300 bg-slate-800/10 px-2 py-1">
@@ -476,9 +804,9 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
             <h4 className="font-semibold text-slate-100 mb-2 leading-tight">{oof.title}</h4>
             <div className="text-sm text-slate-300 space-y-1">
               <div className="flex items-center space-x-4">
-                <span className="text-slate-300">📊 {oof.estimatedMinutes}хв план</span>
-                <span className="text-slate-300">⚡ Складність: {oof.difficulty}/5</span>
-                <span className="text-slate-300">🔋 Енергія: {oof.energy}/5</span>
+                <span className="text-slate-300">📊 {oof.estimatedMinutes}{translate(language, 'minPlan')}</span>
+                <span className="text-slate-300">⚡ {translate(language, 'complexityLabel')}: {oof.difficulty}/5</span>
+                <span className="text-slate-300">🔋 {translate(language, 'energy')}: {oof.energy}/5</span>
               </div>
               {completionRate > 0 && (
                 <div className="flex items-center">
@@ -524,7 +852,7 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
             </Button>
             {oof.estimatedMinutes && ![60,90].includes(oof.estimatedMinutes) && (
               <Button size="sm" onClick={() => onStart(oof, oof.estimatedMinutes)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md flex-1 sm:flex-none">
-                {oof.estimatedMinutes}хв
+                {oof.estimatedMinutes}{translate(language, 'min')}
               </Button>
             )}
           </div>
@@ -588,7 +916,7 @@ const SmartParkingList = ({ parking, onAdd, onToggle, onDelete, onCategorize, cu
                   : 'bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-slate-200 border-2 border-slate-600/50 hover:border-slate-500/50'
               }`}
             >
-              📋 Всі
+              📋 {translate(language, 'all')}
             </Button>
             {categories.map(cat => (
               <Button
@@ -608,7 +936,7 @@ const SmartParkingList = ({ parking, onAdd, onToggle, onDelete, onCategorize, cu
         </div>
         
         <div className="text-slate-200 text-sm font-semibold bg-slate-800/10 px-4 py-2 rounded-lg border border-slate-700/50 shadow-md">
-          {filteredParking.length} записів
+          {filteredParking.length} {translate(language, 'entries')}
         </div>
       </div>
       
@@ -730,7 +1058,7 @@ const AddInline = ({ placeholder, onAdd, buttonText = "Додати", language =
       </div>
       <div className="text-xs text-slate-400 bg-slate-800/30 px-3 py-2 rounded-lg border border-slate-700/30">
         <Lightbulb className="w-3 h-3 mr-1 inline text-indigo-400" />
-        <strong>{translate(language,'tipLabel')}</strong> {language === 'EN' ? 'Use Shift+Enter for newline, Enter to add' : 'Використовуйте Shift+Enter для нового рядка, Enter для додавання'}
+        <strong>{translate(language,'tipLabel')}</strong> {translate(language, 'useShiftEnter')}
       </div>
     </div>
   );
@@ -778,6 +1106,8 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
   const [isCopied, setIsCopied] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
+  const t = (key: string) => (TRANSLATIONS[language] && TRANSLATIONS[language][key]) || TRANSLATIONS['EN'][key] || key;
+
   const handleCopy = async () => {
     if (notes.trim()) {
       try {
@@ -815,19 +1145,19 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
         <CardTitle className="text-slate-100 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <NotebookPen className="w-5 h-5 text-purple-400" />
-            <span>{translate(language,'notesTitle')}</span>
+            <span>{t('notesTitle')}</span>
           </div>
             <div className="flex items-center space-x-2 text-xs text-slate-400">
-            <span>{wordCount} {translate(language,'words')}</span>
+            <span>{wordCount} {t('words')}</span>
             <span>•</span>
-            <span>{charCount} {translate(language,'chars')}</span>
+            <span>{charCount} {t('chars')}</span>
           </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6 pb-4">
         <div className="space-y-4">
             <Textarea
-            placeholder={translate(language,'notesPlaceholder')}
+            placeholder={t('notesPlaceholder')}
             value={notes}
             onChange={(e) => onNotesChange(e.target.value)}
             className="bg-slate-900/5 border-slate-600/50 text-slate-100 placeholder-slate-400 min-h-[100px] md:min-h-[175px] rounded-xl resize-y focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors duration-200"
@@ -843,11 +1173,11 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
                 onClick={() => setShowHint((v) => !v)}
               >
                 <Lightbulb className="w-4 h-4 mr-1 text-purple-400" />
-                ℹ️ {translate(language,'hint')}
+                ℹ️ {t('hint')}
               </button>
               {showHint && (
                 <div className="mt-2 text-xs text-slate-300 bg-slate-800/10 p-2 rounded-md border border-slate-700/50 max-w-xs shadow-lg">
-                  <strong>{translate(language,'tipLabel')}</strong> {translate(language,'hintLongShort')}
+                  <strong>{t('tipLabel')}</strong> {t('hintLongShort')}
                 </div>
               )}
             </div>
@@ -863,12 +1193,12 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
                     {isCopied ? (
                   <>
                     <span className="w-4 h-4 mr-1">✓</span>
-                    {translate(language,'copied')}
+                    {t('copied')}
                   </>
                 ) : (
                   <>
                     <Copy className="w-4 h-4 mr-1" />
-                    {language === 'EN' ? 'Copy' : 'Копіювати'}
+                    {t('copy')}
                   </>
                 )}
               </Button>
@@ -880,7 +1210,7 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
                 className="border-slate-500 text-slate-300 hover:text-slate-100 hover:bg-slate-700/10 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
               >
                 <Download className="w-4 h-4 mr-1" />
-                {translate(language,'export')}
+                {t('export')}
               </Button>
               <Button
                 size="sm"
@@ -890,7 +1220,7 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
                 className="border-slate-500 text-red-400 hover:text-red-200 hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
               >
                 <Trash2 className="w-4 h-4 mr-1" />
-                {translate(language,'clear')}
+                {t('clear')}
               </Button>
             </div>
           </div>
@@ -900,7 +1230,7 @@ const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }:
   );
 };
 
-const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
+const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string; onBackToCatalog?: () => void }) => {
    const t = (key: string) => (TRANSLATIONS[language] && TRANSLATIONS[language][key]) || TRANSLATIONS['EN'][key] || key;
 
   // Enhanced state management with localStorage persistence
@@ -926,11 +1256,10 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
     lastActivityTs: 0
   }));
   const [logs, setLogs] = useState<BlockLog[]>(() => ls.get('dw_logs', []));
-  const [templates, setTemplates] = useState<Template[]>(() => ls.get('dw_templates', [
-    { id: 'rag-slice', title: 'RAG слайс', body: `1. Визначити запит та контекст\n2. Налаштувати пошук документів\n3. Відфільтрувати релевантні фрагменти\n4. Згенерувати відповідь з контекстом\n5. Валідувати точність результату`, category: 'AI/ML', useCount: 0, lastUsed: 0 },
-    { id: 'study-session', title: 'Навчальна сесія', body: `1. Визначити тему та цілі\n2. Підготувати матеріали\n3. Активне читання/практика\n4. Створити резюме\n5. Тестування розуміння\n6. Планування повторення`, category: 'Study', useCount: 0, lastUsed: 0 },
-    { id: 'coding-problem', title: 'Вирішення задачі', body: `1. Прочитати і зрозуміти умову\n2. Розібрати приклади\n3. Визначити підхід та структури даних\n4. Написати псевдокод\n5. Імплементувати рішення\n6. Тестувати та оптимізувати`, category: 'Coding', useCount: 0, lastUsed: 0 }
-  ]));
+  const [templates, setTemplates] = useState<Template[]>(() => {
+    const stored = ls.get('dw_templates', []);
+    return stored.length > 0 ? stored : getDefaultTemplates(language);
+  });
   const [settings, setSettings] = useState<Settings>(() => ls.get('dw_settings', {
     notifications: true,
     soundEnabled: true,
@@ -951,18 +1280,47 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
   const [oofFilter, setOofFilter] = useState('all');
   const [editingOOF, setEditingOOF] = useState<OOF | null>(null);
   
+  // Helper function to get preferred default domain from localStorage
+  const getPreferredDomain = (): Domain => {
+    try {
+      const stored = localStorage.getItem('deepwork-preferred-domain');
+      if (stored && ['Backend', 'Data', 'CS', 'SystemDesign', 'AlgoDS', 'Study', 'Discovery', 'Other'].includes(stored)) {
+        console.log('🔥 Using stored preferred domain:', stored);
+        return stored as Domain;
+      }
+    } catch (error) {
+      console.warn('Error reading preferred domain from localStorage:', error);
+    }
+    console.log('🔥 Using default domain: Discovery');
+    return 'Discovery';
+  };
+
+  // Helper function to save preferred domain to localStorage
+  const savePreferredDomain = (domain: Domain) => {
+    try {
+      localStorage.setItem('deepwork-preferred-domain', domain);
+      console.log('🔥 Saved preferred domain to localStorage:', domain);
+    } catch (error) {
+      console.warn('Error saving preferred domain to localStorage:', error);
+    }
+  };
+
   // Form states
-  const [newOOF, setNewOOF] = useState({
-    title: '',
-    domain: 'Backend' as Domain,
-    priority: 'Medium' as Priority,
-    estimatedMinutes: '90',
-    definitionOfDone: '',
-    constraints: '',
-    firstStep: '',
-    tags: [] as string[],
-    difficulty: 3,
-    energy: 3
+  const [newOOF, setNewOOF] = useState(() => {
+    const preferredDomain = getPreferredDomain();
+    console.log('🔥 Initializing newOOF with preferred domain:', preferredDomain);
+    return {
+      title: '',
+      domain: preferredDomain,
+      priority: 'Medium' as Priority,
+      estimatedMinutes: '90',
+      definitionOfDone: '',
+      constraints: '',
+      firstStep: '',
+      tags: [] as string[],
+      difficulty: 3,
+      energy: 3
+    };
   });
 
   // When editingOOF is set, populate the form with its values
@@ -981,10 +1339,12 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
         energy: editingOOF.energy || 3
       });
     } else {
-      // reset to defaults when not editing
+      // reset to defaults when not editing, using preferred domain
+      const preferredDomain = getPreferredDomain();
+      console.log('🔥 Resetting form to defaults with preferred domain:', preferredDomain);
       setNewOOF({
         title: '',
-        domain: 'Backend',
+        domain: preferredDomain,
         priority: 'Medium',
         estimatedMinutes: '90',
         definitionOfDone: '',
@@ -1033,6 +1393,39 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
   useEffect(() => ls.set('dw_templates', templates), [templates]);
   useEffect(() => ls.set('dw_settings', settings), [settings]);
   useEffect(() => ls.set('dw_starred', starredOOFs), [starredOOFs]);
+
+  // Update templates when language changes
+  useEffect(() => {
+    const stored = ls.get('dw_templates', []);
+    if (stored.length === 0) {
+      setTemplates(getDefaultTemplates(language));
+    } else {
+      // Update existing default templates with new language
+      const updatedTemplates = stored.map((template: Template) => {
+        if (template.id === 'rag-slice') {
+          return {
+            ...template,
+            title: translate(language, 'templateRagTitle'),
+            body: translate(language, 'templateRagBody')
+          };
+        } else if (template.id === 'study-session') {
+          return {
+            ...template,
+            title: translate(language, 'templateStudyTitle'),
+            body: translate(language, 'templateStudyBody')
+          };
+        } else if (template.id === 'coding-problem') {
+          return {
+            ...template,
+            title: translate(language, 'templateCodingTitle'),
+            body: translate(language, 'templateCodingBody')
+          };
+        }
+        return template;
+      });
+      setTemplates(updatedTemplates);
+    }
+  }, [language]);
 
   // Quantum Background 3D Scene Setup
   useEffect(() => {
@@ -1270,7 +1663,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      setCopyStatus('Скопійовано!');
+      setCopyStatus(translate(language, 'copyStatus'));
     } catch (err) {
       // Fallback for non-secure contexts
       const textArea = document.createElement('textarea');
@@ -1283,7 +1676,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
       textArea.select();
       const successful = document.execCommand('copy');
       textArea.remove();
-      setCopyStatus(successful ? 'Скопійовано!' : 'Не вдалося скопіювати');
+      setCopyStatus(successful ? translate(language, 'copyStatus') : translate(language, 'copyFailed'));
     }
     
     setTimeout(() => setCopyStatus(''), 2000);
@@ -1311,13 +1704,18 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
     };
     
     setOofs(prev => [oof, ...prev]);
-    setNewOOF({ 
-      title: '', 
-      domain: 'Backend', 
-      priority: 'Medium', 
+
+    // Save the selected domain as the new preferred default
+    savePreferredDomain(oof.domain);
+
+    console.log('🔥 After adding OOF, resetting form with preferred domain:', oof.domain);
+    setNewOOF({
+      title: '',
+      domain: oof.domain,
+      priority: 'Medium',
       estimatedMinutes: '90',
-      definitionOfDone: '', 
-      constraints: '', 
+      definitionOfDone: '',
+      constraints: '',
       firstStep: '',
       tags: [],
       difficulty: 3,
@@ -1371,7 +1769,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
       active: true,
       blockId,
       oofId: oof?.id,
-      oofTitle: oof?.title || 'Вільний режим',
+      oofTitle: oof?.title || translate(language, 'freeMode'),
       targetMinutes: minutes,
       startTs: Date.now(),
       paused: false,
@@ -1698,13 +2096,13 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                 <Brain className="w-8 h-8 text-indigo-400" />
                 <span>Deep Work OS</span>
               </h1>
-              <p className="text-slate-300 mt-1">Інтелектуальна система продуктивності</p>
+              <p className="text-slate-300 mt-1">{translate(language, 'intelligentProductivitySystem')}</p>
             </div>
 
             <div className="flex flex-col items-end w-full lg:w-auto">
               <div className="flex flex-col sm:flex-row items-center gap-3 mb-3">
                 <Button
-                  onClick={() => window.location.href = '/'}
+                  onClick={() => onBackToCatalog ? onBackToCatalog() : window.location.href = '/'}
                   className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 hover:from-indigo-500/30 hover:to-purple-500/30 border border-indigo-400/30 text-indigo-300 hover:text-indigo-200 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-indigo-500/25 font-semibold"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
@@ -1751,6 +2149,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                 onReset={resetTimer}
                 onStop={stopBlock}
                 elapsedSec={run.elapsedSec}
+                language={language}
               />
             </div>
           )}
@@ -1814,14 +2213,14 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                 onChange={(e) => setNewOOF(prev => ({ ...prev, domain: e.target.value as Domain }))}
                                 className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-slate-100 focus:border-indigo-500"
                               >
-                                <option value="Backend">Backend</option>
-                                <option value="Data">Data Science</option>
-                                <option value="CS">Computer Science</option>
-                                <option value="SystemDesign">System Design</option>
-                                <option value="AlgoDS">Algorithms & DS</option>
-                                <option value="Study">Навчання</option>
-                                <option value="Research">Дослідження</option>
-                                <option value="Other">Інше</option>
+                                <option value="Backend">{translateDomain(language, 'Backend')}</option>
+                                <option value="Data">{translateDomain(language, 'Data')}</option>
+                                <option value="CS">{translateDomain(language, 'CS')}</option>
+                                <option value="SystemDesign">{translateDomain(language, 'SystemDesign')}</option>
+                                <option value="AlgoDS">{translateDomain(language, 'AlgoDS')}</option>
+                                <option value="Study">{translateDomain(language, 'Study')}</option>
+                                <option value="Discovery">{translateDomain(language, 'Discovery')}</option>
+                                <option value="Other">{translateDomain(language, 'Other')}</option>
                               </select>
                             </div>
                             
@@ -1832,10 +2231,10 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                 onChange={(e) => setNewOOF(prev => ({ ...prev, priority: e.target.value as Priority }))}
                                 className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-slate-100 focus:border-indigo-500"
                               >
-                                <option value="Low">Низький</option>
-                                <option value="Medium">Середній</option>
-                                <option value="High">Високий</option>
-                                <option value="Critical">Критичний</option>
+                                <option value="Low">{translatePriority(language, 'Low')}</option>
+                                <option value="Medium">{translatePriority(language, 'Medium')}</option>
+                                <option value="High">{translatePriority(language, 'High')}</option>
+                                <option value="Critical">{translatePriority(language, 'Critical')}</option>
                               </select>
                             </div>
                           </div>
@@ -1885,7 +2284,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                         
                         <div className="space-y-4">
                           <Textarea
-                            placeholder="Definition of Done - як ви зрозуміте, що завдання виконане?"
+                            placeholder={translate(language, 'oofDefinitionPlaceholder')}
                             value={newOOF.definitionOfDone}
                             onChange={(e) => setNewOOF(prev => ({ ...prev, definitionOfDone: e.target.value }))}
                             className="bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400"
@@ -1893,7 +2292,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           />
                           
                           <Textarea
-                            placeholder="Обмеження та контекст"
+                            placeholder={translate(language, 'constraintsPlaceholder')}
                             value={newOOF.constraints}
                             onChange={(e) => setNewOOF(prev => ({ ...prev, constraints: e.target.value }))}
                             className="bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400"
@@ -1901,7 +2300,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           />
                           
                           <Input
-                            placeholder="Конкретний перший крок"
+                            placeholder={translate(language, 'firstStepPlaceholder')}
                             value={newOOF.firstStep}
                             onChange={(e) => setNewOOF(prev => ({ ...prev, firstStep: e.target.value }))}
                             className="bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400"
@@ -1949,11 +2348,11 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                 : 'bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600 text-slate-200 border-2 border-slate-700/50 hover:border-slate-600/50'
                             }`}
                           >
-                            {filter === 'all' && '📋 Всі'}
-                            {filter === 'starred' && '⭐ Обрані'}
-                            {filter === 'high-priority' && '🔥 Важливі'}
-                            {filter === 'in-progress' && '⚡ В роботі'}
-                            {filter === 'completed' && '✅ Завершені'}
+                            {filter === 'all' && `📋 ${translate(language, 'all')}`}
+                            {filter === 'starred' && `⭐ ${translate(language, 'starred')}`}
+                            {filter === 'high-priority' && `🔥 ${translate(language, 'highPriority')}`}
+                            {filter === 'in-progress' && `⚡ ${translate(language, 'inProgress')}`}
+                            {filter === 'completed' && `✅ ${translate(language, 'completed')}`}
                           </Button>
                         ))}
                       </div>
@@ -1989,8 +2388,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                         <div className="text-center space-y-6">
                           <div className="space-y-2">
                             <Clock className="w-16 h-16 text-slate-300 mx-auto" />
-                            <h3 className="text-xl font-semibold text-slate-100 mb-2">{language === 'EN' ? 'Ready to start deep work?' : 'Готові розпочати глибоку роботу?'}</h3>
-                            <p className="text-slate-300">{language === 'EN' ? 'Choose a task from the "Focus" tab or start free mode' : 'Оберіть завдання з вкладки "Фокус" або запустіть вільний режим'}</p>
+                            <h3 className="text-xl font-semibold text-slate-100 mb-2">{translate(language, 'readyToStart')}</h3>
+                            <p className="text-slate-300">{translate(language, 'chooseTask')}</p>
                           </div>
                           
                           <div className="flex flex-col sm:flex-row justify-center gap-3 px-4">
@@ -2025,9 +2424,10 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                   ) : (
                     <div className="space-y-6">
                       {/* Секція нотаток завжди видима коли блок активний */}
-                      <NotesSection 
+                      <NotesSection
                         notes={postBlockData.notes}
                         onNotesChange={(notes) => setPostBlockData(prev => ({ ...prev, notes }))}
+                        language={language}
                       />
                       
                       {/* Enhanced Hints */}
@@ -2040,7 +2440,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           >
                             <span className="flex items-center font-semibold">
                               <Lightbulb className="w-5 h-5 mr-2 text-yellow-400" />
-                              Розумні підказки та мікроекспериментами
+                              {t('smartHintsTitle')}
                             </span>
                             {showHints ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                           </Button>
@@ -2052,16 +2452,16 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                   <CardContent className="pt-5">
                                     <h4 className="text-emerald-300 font-bold mb-3 flex items-center text-lg">
                                       <Zap className="w-5 h-5 mr-2" />
-                                      Мікроексперимент {'>'} 5хв
+                                      {t('microExperiment')}
                                     </h4>
                                     <p className="text-slate-200 text-sm mb-4 leading-relaxed">
-                                      Якщо застрягли більше 5 хвилин, спробуйте:
+                                      {t('microExperimentDesc')}
                                     </p>
                                     <ul className="text-slate-300 text-sm space-y-2">
-                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>Перефразувати проблему</li>
-                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>Розбити на менші кроки</li>
-                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>Змінити підхід або інструмент</li>
-                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>Почати з найпростішого варіанту</li>
+                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip1')}</li>
+                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip2')}</li>
+                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip3')}</li>
+                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip4')}</li>
                                     </ul>
                                   </CardContent>
                                 </Card>
@@ -2070,16 +2470,16 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                   <CardContent className="pt-5">
                                     <h4 className="text-amber-300 font-bold mb-3 flex items-center text-lg">
                                       <NotebookPen className="w-5 h-5 mr-2" />
-                                      Управління відволіканнями
+                                      {t('distractionManagement')}
                                     </h4>
                                     <p className="text-slate-200 text-sm mb-4 leading-relaxed">
-                                      Всі побічні думки записуйте в паркувальний список:
+                                      {t('distractionDesc')}
                                     </p>
                                     <ul className="text-slate-300 text-sm space-y-2">
-                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>Ідеї для інших проєктів</li>
-                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>Особисті нагадування</li>
-                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>Технічні питання для дослідження</li>
-                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>Покращення поточного процесу</li>
+                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip1')}</li>
+                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip2')}</li>
+                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip3')}</li>
+                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip4')}</li>
                                     </ul>
                                   </CardContent>
                                 </Card>
@@ -2089,11 +2489,11 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                 <CardContent className="pt-5">
                                   <h4 className="text-blue-300 font-bold mb-3 flex items-center text-lg">
                                     <Brain className="w-5 h-5 mr-2" />
-                                    Стан потоку (Flow State)
+                                    {translate(language, 'flowState')} (Flow State)
                                   </h4>
                                   <p className="text-slate-200 text-sm leading-relaxed">
-                                    <strong>Ознаки досягнення стану потоку:</strong> втрата відчуття часу, повна концентрація на завданні, 
-                                    легкість прийняття рішень, природний ритм роботи. Цей стан найефективніший для складних завдань.
+                                    <strong>{translate(language, 'flowStateSigns')}</strong> {translate(language, 'flowDescription')},
+                                    {translate(language, 'flowDescriptionFull')}
                                   </p>
                                 </CardContent>
                               </Card>
@@ -2105,51 +2505,55 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                       {/* Enhanced During Checklists */}
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <ChecklistTile
-                          title="Одна справа"
+                          title={translate(language, 'check_single_title')}
                           checked={checklists.during.singleTask}
-                          onChange={(checked) => setChecklists(prev => ({ 
-                            ...prev, 
-                            during: { ...prev.during, singleTask: checked } 
+                          onChange={(checked) => setChecklists(prev => ({
+                            ...prev,
+                            during: { ...prev.during, singleTask: checked }
                           }))}
-                          infoContent="Зосередьтесь виключно на поточному завданні. Закрийте все зайве."
-                          example="Одна вкладка браузера, один редактор, вимкнені сповіщення"
+                          infoContent={translate(language, 'check_single_info')}
+                          example={translate(language, 'check_single_example')}
                           icon="🎯"
+                          language={language}
                         />
                         
                         <ChecklistTile
-                          title="Чернетка готова"
+                          title={translate(language, 'check_scratch_title')}
                           checked={checklists.during.scratchpad}
-                          onChange={(checked) => setChecklists(prev => ({ 
-                            ...prev, 
-                            during: { ...prev.during, scratchpad: checked } 
+                          onChange={(checked) => setChecklists(prev => ({
+                            ...prev,
+                            during: { ...prev.during, scratchpad: checked }
                           }))}
-                          infoContent="Використовуйте чернетку для швидких записів та ідей."
-                          example="Текстовий файл, блокнот, або спеціальний додаток"
+                          infoContent={translate(language, 'check_scratch_info')}
+                          example={translate(language, 'check_scratch_example')}
                           icon="📝"
+                          language={language}
                         />
                         
                         <ChecklistTile
-                          title="Правило 5 хвилин"
+                          title={translate(language, 'check_5min_title')}
                           checked={checklists.during.stuckRule}
-                          onChange={(checked) => setChecklists(prev => ({ 
-                            ...prev, 
-                            during: { ...prev.during, stuckRule: checked } 
+                          onChange={(checked) => setChecklists(prev => ({
+                            ...prev,
+                            during: { ...prev.during, stuckRule: checked }
                           }))}
-                          infoContent="При застою понад 5хв роблю мікроексперимент або змінюю підхід."
-                          example="Нова перспектива, інший алгоритм, спрощення задачі"
+                          infoContent={translate(language, 'check_5min_info')}
+                          example={translate(language, 'check_5min_example')}
                           icon="⚡"
+                          language={language}
                         />
                         
                         <ChecklistTile
-                          title="Гідратація"
+                          title={translate(language, 'check_hydration_title')}
                           checked={checklists.during.hydration}
-                          onChange={(checked) => setChecklists(prev => ({ 
-                            ...prev, 
-                            during: { ...prev.during, hydration: checked } 
+                          onChange={(checked) => setChecklists(prev => ({
+                            ...prev,
+                            during: { ...prev.during, hydration: checked }
                           }))}
-                          infoContent="Пийте воду регулярно для підтримки концентрації."
-                          example="Скляночка води кожні 30 хвилин"
+                          infoContent={translate(language, 'check_hydration_info')}
+                          example={translate(language, 'check_hydration_example')}
                           icon="💧"
+                          language={language}
                         />
                       </div>
                       
@@ -2166,7 +2570,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                               <div className="space-y-5">
                                 <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
-                                  <label className="text-slate-100 text-sm font-bold mb-3 block">Якість глибини (DQ): {postBlockData.dq}/5</label>
+                                  <label className="text-slate-100 text-sm font-bold mb-3 block">{translate(language, 'qualityDepth')}: {postBlockData.dq}/5</label>
                                   <Slider
                                     value={[postBlockData.dq]}
                                     onValueChange={(vals) => setPostBlockData(prev => ({ ...prev, dq: vals[0] }))}
@@ -2228,7 +2632,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                 <div className="grid grid-cols-2 gap-4">
                                   <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
                                     <label className="text-slate-100 text-sm font-bold mb-3 block">
-                                      Настрій: {postBlockData.mood}/5
+                                      {translate(language, 'mood')}: {postBlockData.mood}/5
                                     </label>
                                     <Slider
                                       value={[postBlockData.mood]}
@@ -2270,7 +2674,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                       checked={postBlockData.flowState}
                                       onCheckedChange={(checked) => setPostBlockData(prev => ({ ...prev, flowState: checked }))}
                                     />
-                                    <span className="text-slate-100 text-sm font-semibold">Стан потоку досягнуто</span>
+                                    <span className="text-slate-100 text-sm font-semibold">{t('flowStateAchieved')}</span>
                                   </div>
                                   
                                   <div className="flex items-center space-x-3">
@@ -2296,7 +2700,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                     <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                       <CardTitle className="text-slate-50 flex items-center space-x-2">
                         <NotebookPen className="w-5 h-5 text-amber-400" />
-                        <span>Розумний паркувальний список</span>
+                        <span>{translate(language, 'smartParkingList')}</span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
@@ -2321,14 +2725,14 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                       <CardHeader className="bg-slate-700/10">
                         <CardTitle className="text-slate-100 flex items-center space-x-2">
                           <Activity className="w-5 h-5 text-emerald-400" />
-                          <span>Сьогоднішня продуктивність</span>
+                          <span>{translate(language, 'todaysProductivity')}</span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="pt-6">
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                           <div className="text-center p-4 bg-emerald-900/20 border border-emerald-700/50 rounded-lg">
-                            <div className="text-4xl font-bold text-emerald-300 mb-1">{Math.round(analytics.today.dh * 10) / 10}h</div>
-                            <div className="text-slate-200 text-sm font-medium mb-1">Години глибини</div>
+                            <div className="text-4xl font-bold text-emerald-300 mb-1">{Math.round(analytics.today.dh * 10) / 10}{t('hoursShort')}</div>
+                            <div className="text-slate-200 text-sm font-medium mb-1">{translate(language, 'deepHours')}</div>
                             <div className="w-full bg-slate-700 rounded-full h-2 mt-2">
                               <div 
                                 className="bg-emerald-400 h-2 rounded-full transition-all duration-300"
@@ -2339,13 +2743,13 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           
                           <div className="text-center p-4 bg-blue-900/20 border border-blue-700/50 rounded-lg">
                             <div className="text-4xl font-bold text-blue-300 mb-1">{analytics.today.avgDQ}</div>
-                            <div className="text-slate-200 text-sm font-medium mb-1">Середнє DQ</div>
-                            <div className="text-xs text-slate-300">Якість фокусу</div>
+                            <div className="text-slate-200 text-sm font-medium mb-1">{translate(language, 'avgDQ')}</div>
+                            <div className="text-xs text-slate-300">{translate(language, 'qualityFocus')}</div>
                           </div>
                           
                           <div className="text-center p-4 bg-cyan-900/20 border border-cyan-700/50 rounded-lg">
                             <div className="text-4xl font-bold text-cyan-300 mb-1">{analytics.dwi}</div>
-                            <div className="text-slate-200 text-sm font-medium mb-1">Індекс глибини</div>
+                            <div className="text-slate-200 text-sm font-medium mb-1">{translate(language, 'depthIndex')}</div>
                             <div className="text-xs text-slate-300">DH×DQ+OU+0.5×LR</div>
                           </div>
                           
@@ -2354,8 +2758,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                               {analytics.today.flowSessions > 0 && <Zap className="w-8 h-8 mr-1" />}
                               {analytics.today.flowSessions}
                             </div>
-                            <div className="text-slate-200 text-sm font-medium mb-1">Flow сесії</div>
-                            <div className="text-xs text-slate-300">Стан потоку</div>
+                            <div className="text-slate-200 text-sm font-medium mb-1">{translate(language, 'flowSessions')}</div>
+                            <div className="text-xs text-slate-300">{translate(language, 'flowState')}</div>
                           </div>
                         </div>
                       </CardContent>
@@ -2365,38 +2769,38 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                       <CardHeader className="bg-amber-900/20 border-b border-amber-700/50">
                         <CardTitle className="text-slate-100 flex items-center space-x-2">
                           <Award className="w-5 h-5 text-amber-400" />
-                          <span>Досягнення</span>
+                          <span>{translate(language, 'achievements')}</span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4 pt-6">
                         <div className="flex items-center justify-between p-4 bg-slate-700 border border-slate-600 rounded-lg">
                           <div>
-                            <div className="text-slate-100 font-bold">Щоденна ціль</div>
-                            <div className="text-slate-300 text-sm">{settings.dailyGoal / 60}h щодня</div>
+                            <div className="text-slate-100 font-bold">{translate(language, 'dailyGoalLabel')}</div>
+                            <div className="text-slate-300 text-sm">{settings.dailyGoal / 60}{t('hoursShort')} {translate(language, 'dailyGoalText')}</div>
                           </div>
                           <div className="text-right">
                             <div className="text-2xl font-bold text-emerald-300">{Math.round(analytics.dailyGoalProgress)}%</div>
-                            {analytics.dailyGoalProgress >= 100 && <div className="text-sm text-emerald-300">🎉 Досягнуто!</div>}
+                            {analytics.dailyGoalProgress >= 100 && <div className="text-sm text-emerald-300">🎉 {translate(language, 'achieved')}</div>}
                           </div>
                         </div>
                         
                         <div className="flex items-center justify-between p-4 bg-slate-700 border border-slate-600 rounded-lg">
                           <div>
                             <div className="text-slate-100 font-bold">Тижнева ціль</div>
-                            <div className="text-slate-300 text-sm">{settings.weeklyGoal / 60}h на тиждень</div>
+                            <div className="text-slate-300 text-sm">{settings.weeklyGoal / 60}{t('hoursShort')} на тиждень</div>
                           </div>
                           <div className="text-right">
                             <div className="text-2xl font-bold text-blue-300">{Math.round(analytics.weeklyGoalProgress)}%</div>
-                            {analytics.weeklyGoalProgress >= 100 && <div className="text-sm text-blue-300">🎉 Досягнуто!</div>}
+                            {analytics.weeklyGoalProgress >= 100 && <div className="text-sm text-blue-300">🎉 {translate(language, 'achieved')}</div>}
                           </div>
                         </div>
                         
                         <div className="p-4 bg-slate-700 border border-slate-600 rounded-lg">
-                          <div className="text-slate-100 font-semibold mb-2">Краща пора дня</div>
+                          <div className="text-slate-100 font-semibold mb-2">{translate(language, 'bestTimeOfDay')}</div>
                           <div className="text-slate-200 text-lg capitalize bg-slate-800/5 backdrop-blur-md px-3 py-1 rounded inline-block">
-                            {analytics.bestTimeOfDay === 'morning' && '🌅 Ранок'}
-                            {analytics.bestTimeOfDay === 'afternoon' && '☀️ День'}  
-                            {analytics.bestTimeOfDay === 'evening' && '🌙 Вечір'}
+                            {analytics.bestTimeOfDay === 'morning' && `🌅 ${translate(language, 'morning')}`}
+                            {analytics.bestTimeOfDay === 'afternoon' && `☀️ ${translate(language, 'afternoon')}`}
+                            {analytics.bestTimeOfDay === 'evening' && `🌙 ${translate(language, 'evening')}`}
                           </div>
                         </div>
                       </CardContent>
@@ -2409,7 +2813,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                       <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                         <CardTitle className="text-slate-50 flex items-center space-x-2">
                           <BarChart3 className="w-5 h-5 text-indigo-400" />
-                          <span>Динаміка продуктивності (14 днів)</span>
+                          <span>{translate(language, 'productivityDynamics')}</span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="pt-6">
@@ -2446,9 +2850,9 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                 stroke="#10B981" 
                                 strokeWidth={3}
                                 fill="url(#dhGradient)" 
-                                name="Години глибини"
+                                name={translate(language, 'deepHours')}
                               />
-                              <Bar yAxisId="right" dataKey="DWI" fill="url(#dwiGradient)" name="Індекс глибини" opacity={0.8} radius={[4, 4, 0, 0]} />
+                              <Bar yAxisId="right" dataKey="DWI" fill="url(#dwiGradient)" name={translate(language, 'depthIndex')} opacity={0.8} radius={[4, 4, 0, 0]} />
                             </ComposedChart>
                           </ResponsiveContainer>
                         </div>
@@ -2459,7 +2863,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                       <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                         <CardTitle className="text-slate-50 flex items-center space-x-2">
                           <TrendingUp className="w-5 h-5 text-emerald-400" />
-                          <span>Якість та настрій</span>
+                          <span>{translate(language, 'qualityMood')}</span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="pt-6">
@@ -2497,7 +2901,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                 strokeWidth={4}
                                 dot={{ fill: '#F59E0B', strokeWidth: 2, r: 6, stroke: '#1E293B' }}
                                 activeDot={{ r: 8, stroke: '#F59E0B', strokeWidth: 2, fill: '#FEF3C7' }}
-                                name="Середнє DQ"
+                                name={translate(language, 'avgDQ')}
                               />
                               <Line 
                                 yAxisId="right" 
@@ -2521,7 +2925,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                     <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                       <CardTitle className="text-slate-50 flex items-center space-x-2">
                         <NotebookPen className="w-5 h-5 text-slate-400" />
-                        <span>Журнал глибоких блоків</span>
+                        <span>{translate(language, 'deepBlocksLog')}</span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
@@ -2530,10 +2934,10 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           <table className="min-w-[900px] w-full text-sm">
                             <thead className="sticky top-0 bg-slate-800/5 backdrop-blur-xl border-b-2 border-slate-600/50">
                               <tr>
-                                <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">Дата/Час</th>
-                                <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">OOF</th>
-                                <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">Хв</th>
-                                <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">DQ</th>
+                                <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">{translate(language, 'dateTime')}</th>
+                                <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">{translate(language, 'oof')}</th>
+                                <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">{translate(language, 'minutes')}</th>
+                                <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">{translate(language, 'dq')}</th>
                                 <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">ОВ</th>
                                 <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">ПН</th>
                                 <th className="text-left text-slate-100 pb-4 pt-4 px-4 font-bold">💫</th>
@@ -2546,14 +2950,14 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                   <td className="py-4 px-4">
                                     <div className="text-slate-200 font-medium">{log.dateISO.slice(5)}</div>
                                     <div className="text-xs text-slate-400 capitalize bg-slate-800/10 px-2 py-1 rounded-md mt-1 inline-block">
-                                      {log.timeOfDay === 'morning' && '🌅 Ранок'}
-                                      {log.timeOfDay === 'afternoon' && '☀️ День'}  
-                                      {log.timeOfDay === 'evening' && '🌙 Вечір'}
+                                      {log.timeOfDay === 'morning' && `🌅 ${translate(language, 'morning')}`}
+                                      {log.timeOfDay === 'afternoon' && `☀️ ${translate(language, 'afternoon')}`}
+                                      {log.timeOfDay === 'evening' && `🌙 ${translate(language, 'evening')}`}
                                     </div>
                                   </td>
                                   <td className="py-4 px-4">
                                     <div className="text-slate-200 break-words max-w-[200px] font-medium">{log.oofTitle}</div>
-                                    {log.completedOOF && <span className="text-emerald-400 text-xs font-semibold bg-emerald-900/30 px-2 py-1 rounded-md mt-1 inline-block">✅ Завершено</span>}
+                                    {log.completedOOF && <span className="text-emerald-400 text-xs font-semibold bg-emerald-900/30 px-2 py-1 rounded-md mt-1 inline-block">✅ {translate(language, 'completed')}</span>}
                                   </td>
                                   <td className="py-4 px-4">
                                     <span className="text-slate-200 font-semibold bg-slate-800/10 px-2 py-1 rounded-md">{log.minutes}</span>
@@ -2597,20 +3001,20 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                     <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                       <CardTitle className="text-slate-50 flex items-center space-x-2">
                         <Copy className="w-5 h-5 text-purple-400" />
-                        <span>Шаблони та плейбуки</span>
+                        <span>{translate(language, 'templatesPlaybooks')}</span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
                       <Tabs defaultValue="all" className="w-full">
                         <TabsList className="grid w-full grid-cols-3 bg-slate-700/10 border border-slate-600/50 shadow-lg">
                           <TabsTrigger value="all" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 font-semibold">
-                            Всі шаблони
+                            {translate(language, 'allTemplates')}
                           </TabsTrigger>
                           <TabsTrigger value="popular" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 font-semibold">
-                            Популярні
+                            {translate(language, 'popular')}
                           </TabsTrigger>
                           <TabsTrigger value="custom" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 font-semibold">
-                            Кастомні
+                            {translate(language, 'custom')}
                           </TabsTrigger>
                         </TabsList>
                         
@@ -2640,7 +3044,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                         className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-semibold shadow-lg flex-1 sm:flex-none"
                                       >
                                         <Copy className="w-4 h-4 mr-1" />
-                                        Копіювати
+                                        {translate(language, 'copyText')}
                                       </Button>
                                       <Button
                                         size="sm"
@@ -2654,7 +3058,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                         }}
                                         className="border-slate-500 text-slate-200 hover:bg-slate-700/10 backdrop-blur-sm flex-1 sm:flex-none"
                                       >
-                                        В нотатки
+                                        {translate(language, 'toNotes')}
                                       </Button>
                                       {!['rag-slice', 'study-session', 'coding-problem'].includes(template.id) && (
                                         <Button
@@ -2714,7 +3118,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                         className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-semibold shadow-lg"
                                       >
                                         <Copy className="w-4 h-4 mr-1" />
-                                        Використати
+                                        {translate(language, 'useTemplate')}
                                       </Button>
                                     </div>
                                     <div 
@@ -2740,37 +3144,37 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                             <CardContent className="pt-6">
                               <h4 className="text-slate-100 font-bold mb-4 text-lg flex items-center">
                                 <Plus className="w-5 h-5 mr-2 text-indigo-400" />
-                                Створити власний шаблон
+                                {translate(language, 'createCustomTemplate')}
                               </h4>
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <Input
-                                  placeholder="Унікальний ID"
+                                  placeholder={translate(language, 'uniqueIdPlaceholder')}
                                   value={newTemplate.id}
                                   onChange={(e) => setNewTemplate(prev => ({ ...prev, id: e.target.value }))}
                                   className="bg-slate-700/10 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                 />
                                 <Input
-                                  placeholder="Назва шаблону"
+                                  placeholder={translate(language, 'templateNamePlaceholder')}
                                   value={newTemplate.title}
                                   onChange={(e) => setNewTemplate(prev => ({ ...prev, title: e.target.value }))}
                                   className="bg-slate-700/10 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                 />
                                 <Input
-                                  placeholder="Категорія"
+                                  placeholder={translate(language, 'categoryPlaceholder')}
                                   value={newTemplate.category}
                                   onChange={(e) => setNewTemplate(prev => ({ ...prev, category: e.target.value }))}
                                   className="bg-slate-700/10 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                 />
                               </div>
                               <Textarea
-                                placeholder="Тіло шаблону (кроки, інструкції, код тощо)..."
+                                placeholder={translate(language, 'templateBodyPlaceholder')}
                                 value={newTemplate.body}
                                 onChange={(e) => setNewTemplate(prev => ({ ...prev, body: e.target.value }))}
                                 className="bg-slate-700/10 border-slate-600/50 text-slate-100 placeholder-slate-400 h-32 mb-6 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl"
                               />
                               <Button onClick={addTemplate} className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold shadow-lg">
                                 <Plus className="w-4 h-4 mr-2" />
-                                Додати шаблон
+                                {translate(language, 'addTemplate')}
                               </Button>
                             </CardContent>
                           </Card>
@@ -2799,7 +3203,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                           className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-semibold shadow-lg"
                                         >
                                           <Copy className="w-4 h-4 mr-1" />
-                                          Копіювати
+                                          {translate(language, 'copyText')}
                                         </Button>
                                         <Button
                                           size="sm"
@@ -2847,7 +3251,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                     <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                       <CardTitle className="text-slate-50 flex items-center space-x-2">
                         <Settings className="w-5 h-5 text-slate-400" />
-                        <span>Налаштування системи</span>
+                        <span>{translate(language, 'systemSettings')}</span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6 pt-6">
@@ -2855,13 +3259,13 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                         <div className="space-y-4">
                           <h4 className="text-slate-100 font-bold text-lg mb-4 flex items-center">
                             <Settings className="w-5 h-5 mr-2 text-indigo-400" />
-                            Основні налаштування
+                            {translate(language, 'basicSettings')}
                           </h4>
                           
                           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <div>
-                              <div className="text-slate-100 font-bold">Сповіщення</div>
-                              <div className="text-slate-300 text-sm">Показувати нагадування та підказки</div>
+                              <div className="text-slate-100 font-bold">{translate(language, 'notifications')}</div>
+                              <div className="text-slate-300 text-sm">{translate(language, 'showReminders')}</div>
                             </div>
                             <Switch
                               checked={settings.notifications}
@@ -2872,8 +3276,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           
                           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <div>
-                              <div className="text-slate-100 font-bold">Звукові сигнали</div>
-                              <div className="text-slate-300 text-sm">Звук при завершенні блоків</div>
+                              <div className="text-slate-100 font-bold">{translate(language, 'soundSignals')}</div>
+                              <div className="text-slate-300 text-sm">{translate(language, 'soundOnComplete')}</div>
                             </div>
                             <Switch
                               checked={settings.soundEnabled}
@@ -2884,8 +3288,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           
                           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <div>
-                              <div className="text-slate-100 font-bold">Автоматичні перерви</div>
-                              <div className="text-slate-300 text-sm">Пропонувати перерви між блоками</div>
+                              <div className="text-slate-100 font-bold">{translate(language, 'autoBreaks')}</div>
+                              <div className="text-slate-300 text-sm">{translate(language, 'suggestBreaks')}</div>
                             </div>
                             <Switch
                               checked={settings.autoBreaks}
@@ -2895,7 +3299,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           </div>
                           
                           <div className="space-y-3 p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
-                            <label className="text-slate-100 text-sm font-bold mb-3 block">Стандартна тривалість блоку</label>
+                            <label className="text-slate-100 text-sm font-bold mb-3 block">{translate(language, 'defaultDuration')}</label>
                             <select
                               value={settings.preferredBlockSize}
                               onChange={(e) => setSettings(prev => ({ ...prev, preferredBlockSize: parseInt(e.target.value) }))}
@@ -2912,11 +3316,11 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                         <div className="space-y-4">
                           <h4 className="text-slate-100 font-bold text-lg mb-4 flex items-center">
                             <Target className="w-5 h-5 mr-2 text-emerald-400" />
-                            Цілі та метрики
+                            {translate(language, 'goalsMetrics')}
                           </h4>
                           
                           <div className="space-y-3 p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
-                            <label className="text-slate-100 text-sm font-bold">Щоденна ціль (хвилини)</label>
+                            <label className="text-slate-100 text-sm font-bold">{translate(language, 'dailyGoal')}</label>
                             <Input
                               type="number"
                               value={settings.dailyGoal}
@@ -2924,12 +3328,12 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                               className="bg-slate-800/10 border-slate-600/50 text-slate-100 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             />
                             <div className="text-slate-300 text-xs bg-slate-800/50 px-2 py-1 rounded-md">
-                              Поточна ціль: {settings.dailyGoal / 60} годин на день
+                              {translate(language, 'currentGoalDaily', settings.dailyGoal / 60)}
                             </div>
                           </div>
                           
                           <div className="space-y-3 p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
-                            <label className="text-slate-100 text-sm font-bold">Тижнева ціль (хвилини)</label>
+                            <label className="text-slate-100 text-sm font-bold">{translate(language, 'weeklyGoal')}</label>
                             <Input
                               type="number"
                               value={settings.weeklyGoal}
@@ -2937,14 +3341,14 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                               className="bg-slate-800/10 border-slate-600/50 text-slate-100 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             />
                             <div className="text-slate-300 text-xs bg-slate-800/50 px-2 py-1 rounded-md">
-                              Поточна ціль: {settings.weeklyGoal / 60} годин на тиждень
+                              {translate(language, 'currentGoalWeekly', settings.weeklyGoal / 60)}
                             </div>
                           </div>
                           
                           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <div>
-                              <div className="text-slate-100 font-bold">Відстеження енергії</div>
-                              <div className="text-slate-300 text-sm">Враховувати рівень енергії в аналітиці</div>
+                              <div className="text-slate-100 font-bold">{translate(language, 'energyTracking')}</div>
+                              <div className="text-slate-300 text-sm">{translate(language, 'trackEnergyAnalytics')}</div>
                             </div>
                             <Switch
                               checked={settings.energyTracking}
@@ -2954,8 +3358,8 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                           
                           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <div>
-                              <div className="text-slate-100 font-bold">Розширена аналітика</div>
-                              <div className="text-slate-300 text-sm">Показувати детальні метрики продуктивності</div>
+                              <div className="text-slate-100 font-bold">{translate(language, 'advancedAnalytics')}</div>
+                              <div className="text-slate-300 text-sm">{translate(language, 'showDetailedMetrics')}</div>
                             </div>
                             <Switch
                               checked={settings.advancedMetrics}
@@ -2968,7 +3372,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                       <div className="border-t border-slate-600 pt-6">
                         <h4 className="text-slate-100 font-bold mb-6 text-lg flex items-center">
                           <Download className="w-5 h-5 mr-2 text-cyan-400" />
-                          Експорт та імпорт даних
+                          {translate(language, 'exportImportData')}
                         </h4>
                         <div className="flex items-center space-x-4 flex-wrap gap-4">
                           <Button
@@ -2994,7 +3398,7 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                             size="lg"
                           >
                             <Download className="w-4 h-4 mr-2" />
-                            Експортувати дані
+                            {translate(language, 'exportData')}
                           </Button>
                           
                           <input
@@ -3013,9 +3417,9 @@ const DeepWorkOS_UA = ({ language = 'EN' }: { language?: string }) => {
                                     if (data.parking) setParking(data.parking);
                                     if (data.settings) setSettings(data.settings);
                                     if (data.starredOOFs) setStarredOOFs(data.starredOOFs);
-                                    setCopyStatus('Дані успішно імпортовано!');
+                                    setCopyStatus(translate(language, 'dataImported'));
                                   } catch (error) {
-                                    setCopyStatus('Помилка імпорту даних');
+                                    setCopyStatus(translate(language, 'importError'));
                                   }
                                 };
                                 reader.readAsText(file);
