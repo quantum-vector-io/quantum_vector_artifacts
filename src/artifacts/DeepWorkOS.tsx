@@ -23,6 +23,13 @@ import { ResponsiveContainer, ComposedChart, Area, Bar, CartesianGrid, XAxis, YA
 // Three.js for quantum background
 import * as THREE from 'three';
 
+
+type DoD = {
+  id: string;
+  text: string;
+  completed: boolean;
+};
+
 type OOF = {
   id: string;
   title: string;
@@ -30,7 +37,8 @@ type OOF = {
   priority: 'Low' | 'Medium' | 'High' | 'Critical';
   estimatedMinutes: number;
   actualMinutes: number;
-  definitionOfDone?: string;
+  definitionOfDone?: string; // Keep for backward compatibility
+  definitionOfDoneList?: DoD[]; // New checklist format
   constraints?: string;
   firstStep?: string;
   planned: boolean;
@@ -41,7 +49,7 @@ type OOF = {
   completedAt?: number;
 };
 
-type Domain = 'Backend' | 'Data' | 'CS' | 'SystemDesign' | 'AlgoDS' | 'Study' | 'Discovery' | 'Other';
+type Domain = string; // Now allows custom domains in addition to the defaults
 type Priority = 'Low' | 'Medium' | 'High' | 'Critical';
 
 type ParkingItem = {
@@ -104,14 +112,6 @@ type RunningBlock = {
   lastActivityTs: number;
 };
 
-type Template = { 
-  id: string; 
-  title: string; 
-  body: string; 
-  category: string;
-  useCount: number;
-  lastUsed: number;
-};
 
 type Settings = {
   notifications: boolean;
@@ -142,12 +142,12 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
     backToHome: 'Back to Catalog',
     resetData: 'Reset data',
     resetConfirm: 'Are you sure you want to reset all focus data? This will clear session logs and progress.',
-    notesTitle: 'Current session notes',
-    notesPlaceholder: 'Capture ideas, insights, questions and conclusions while working...',
     hint: 'Hint',
     copied: 'Copied',
     export: 'Export',
     clear: 'Clear',
+    save: 'Save',
+    saved: 'Saved!',
     today: 'Today',
     week: 'Week',
     streak: 'Streak',
@@ -156,18 +156,32 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
     createOOF: 'Create OOF',
     launch: 'Launch',
     show: 'Show',
-    hide: 'Hide'
+    hide: 'Hide',
+    pause: 'Pause',
+    resume: 'Resume',
+    reset: 'Reset',
+    finish: 'Finish',
+    remaining: 'Remaining',
+    completed: 'Completed',
+    overtime: 'Overtime'
   },
   UA: {
     backToHome: 'На головну',
     resetData: 'Скинути дані',
     resetConfirm: 'Ви впевнені, що хочете скинути всі дані фокусу? Це очистить журнал сесій і статистику.',
-    notesTitle: 'Нотатки поточної сесії',
-    notesPlaceholder: 'Записуйте ідеї, інсайти, питання та висновки під час роботи...',
     hint: 'Підказка',
     copied: 'Скопійовано',
     export: 'Експорт',
     clear: 'Очистити',
+    save: 'Зберегти',
+    saved: 'Збережено!',
+    freeSession: 'Вільна сесія',
+    noOofNotesYet: 'Поки немає нотаток OOF сесій. Запустіть таймер з OOF і збережіть нотатки!',
+    noFreeNotesYet: 'Поки немає нотаток вільних сесій. Запустіть вільний таймер і збережіть нотатки!',
+    confirmDeleteNote: 'Ви впевнені, що хочете видалити цю нотатку?',
+    confirmDeleteAllNotes: 'Ви впевнені, що хочете видалити ВСІ збережені нотатки? Це назавжди видалить всі нотатки OOF та вільних сесій і не може бути скасовано.',
+    confirmDeleteOofNotes: 'Ви впевнені, що хочете видалити всі нотатки OOF сесій? Це не може бути скасовано.',
+    confirmDeleteFreeNotes: 'Ви впевнені, що хочете видалити всі нотатки вільних сесій? Це не може бути скасовано.',
     today: 'Сьогодні',
     week: 'Тиждень',
     streak: 'Стрік',
@@ -176,16 +190,22 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
     createOOF: 'Створити OOF',
     launch: 'Запустити',
     show: 'Показати',
-    hide: 'Сховати'
+    hide: 'Сховати',
+    pause: 'Пауза',
+    resume: 'Продовжити',
+    reset: 'Скинути',
+    finish: 'Завершити',
+    remaining: 'Залишилось',
+    completed: 'Завершено',
+    overtime: 'Додатково'
   }
 };
 
 // additional keys used across the artifact UI
-TRANSLATIONS.EN.tabFocus = 'Focus';
+TRANSLATIONS.EN.tabFocus = 'Tasks';
 TRANSLATIONS.EN.tabTimer = 'Timer';
 TRANSLATIONS.EN.tabParking = 'Parking';
 TRANSLATIONS.EN.tabAnalytics = 'Analytics';
-TRANSLATIONS.EN.tabTemplates = 'Templates';
 TRANSLATIONS.EN.tabSettings = 'Settings';
 TRANSLATIONS.EN.pomodoro25 = 'Pomodoro 25m';
 TRANSLATIONS.EN.standard60 = 'Standard 60m';
@@ -194,9 +214,9 @@ TRANSLATIONS.EN.oofTitlePlaceholder = 'Task or project name';
 TRANSLATIONS.EN.oofDefinitionPlaceholder = 'Definition of Done - how will you know the task is done?';
 TRANSLATIONS.EN.constraintsPlaceholder = 'Constraints & context';
 TRANSLATIONS.EN.firstStepPlaceholder = 'Specific first step';
-TRANSLATIONS.EN.readyPrompt = 'Choose a task from the "Focus" tab or start free mode';
+TRANSLATIONS.EN.readyPrompt = 'Choose a task from the "Tasks" tab or start free mode';
 TRANSLATIONS.EN.tipLabel = 'Tip:';
-TRANSLATIONS.EN.hintLongShort = 'Use templates from the Templates tab — the "To notes" button inserts them here.';
+TRANSLATIONS.EN.hintLongShort = 'Take notes about your progress, blockers, and insights.';
 TRANSLATIONS.EN.check_single_title = 'Single task';
 TRANSLATIONS.EN.check_single_info = 'Focus only on the current task. Close everything else.';
 TRANSLATIONS.EN.check_single_example = 'One browser tab, one editor, notifications off';
@@ -227,29 +247,28 @@ TRANSLATIONS.EN.highPriority = 'Important';
 TRANSLATIONS.EN.inProgress = 'In Progress';
 TRANSLATIONS.EN.completed = 'Completed';
 TRANSLATIONS.EN.entries = 'entries';
-TRANSLATIONS.EN.smartParkingList = 'Smart parking list';
+TRANSLATIONS.EN.definitionOfDoneChecklist = 'Definition of Done Checklist';
+TRANSLATIONS.EN.definitionOfDone = 'Definition of Done';
+TRANSLATIONS.EN.progress = 'Progress';
+TRANSLATIONS.EN.addNewCriterion = 'Add new criterion...';
+TRANSLATIONS.EN.noCriteriaAdded = 'No criteria added yet. Add specific criteria to track completion.';
+TRANSLATIONS.EN.complete = 'complete';
+TRANSLATIONS.EN.smartParkingList = 'Parking list';
 TRANSLATIONS.EN.todaysProductivity = 'Today\'s productivity';
 TRANSLATIONS.EN.achievements = 'Achievements';
 TRANSLATIONS.EN.productivityDynamics = 'Productivity dynamics (14 days)';
-TRANSLATIONS.EN.hintLong = 'Tip: use templates from the Templates tab — the "To notes" button inserts them here.';
+TRANSLATIONS.EN.hintLong = 'Tip: take notes about your progress, blockers, and insights.';
 TRANSLATIONS.EN.readyToStart = 'Ready to start deep work?';
-TRANSLATIONS.EN.chooseTask = 'Choose a task from the "Focus" tab or start free mode';
+TRANSLATIONS.EN.chooseTask = 'Choose a task from the "Tasks" tab or start free mode';
 TRANSLATIONS.EN.useShiftEnter = 'Use Shift+Enter for newline, Enter to add';
 TRANSLATIONS.EN.copy = 'Copy';
 TRANSLATIONS.EN.copyStatus = 'Copied!';
 TRANSLATIONS.EN.copyFailed = 'Failed to copy';
-TRANSLATIONS.EN.templatesPlaybooks = 'Templates & Playbooks';
-TRANSLATIONS.EN.allTemplates = 'All templates';
 TRANSLATIONS.EN.popular = 'Popular';
 TRANSLATIONS.EN.custom = 'Custom';
-TRANSLATIONS.EN.createCustomTemplate = 'Create custom template';
 TRANSLATIONS.EN.uniqueIdPlaceholder = 'Unique ID';
-TRANSLATIONS.EN.templateNamePlaceholder = 'Template name';
 TRANSLATIONS.EN.categoryPlaceholder = 'Category';
-TRANSLATIONS.EN.templateBodyPlaceholder = 'Template body (steps, instructions, code, etc.)...';
-TRANSLATIONS.EN.addTemplate = 'Add template';
 TRANSLATIONS.EN.copyText = 'Copy';
-TRANSLATIONS.EN.useTemplate = 'Use';
 TRANSLATIONS.EN.systemSettings = 'System settings';
 TRANSLATIONS.EN.exportImportData = 'Export and import data';
 TRANSLATIONS.EN.exportData = 'Export data';
@@ -276,13 +295,6 @@ TRANSLATIONS.EN.showDetailedMetrics = 'Show detailed productivity metrics';
 TRANSLATIONS.EN.dataImported = 'Data imported successfully!';
 TRANSLATIONS.EN.importError = 'Import error';
 
-// Template translations
-TRANSLATIONS.EN.templateRagTitle = 'RAG slice';
-TRANSLATIONS.EN.templateRagBody = `1. Define query and context\n2. Set up document search\n3. Filter relevant fragments\n4. Generate response with context\n5. Validate result accuracy`;
-TRANSLATIONS.EN.templateStudyTitle = 'Study session';
-TRANSLATIONS.EN.templateStudyBody = `1. Define topic and goals\n2. Prepare materials\n3. Active reading/practice\n4. Create summary\n5. Test understanding\n6. Plan review`;
-TRANSLATIONS.EN.templateCodingTitle = 'Problem solving';
-TRANSLATIONS.EN.templateCodingBody = `1. Read and understand the problem\n2. Analyze examples\n3. Determine approach and data structures\n4. Write pseudocode\n5. Implement solution\n6. Test and optimize`;
 // Priority translations
 TRANSLATIONS.EN.priorityLow = 'Low';
 TRANSLATIONS.EN.priorityMedium = 'Medium';
@@ -394,12 +406,18 @@ TRANSLATIONS.EN.flowStateAchieved = 'Flow state achieved';
 TRANSLATIONS.UA.flowStateAchieved = 'Стан потоку досягнуто';
 
 // Smart hints header translations
-TRANSLATIONS.EN.smartHintsTitle = 'Smart tips and micro-experiments';
-TRANSLATIONS.UA.smartHintsTitle = 'Розумні підказки та мікроексперименти';
+TRANSLATIONS.EN.smartHintsTitle = 'Tips';
+TRANSLATIONS.UA.smartHintsTitle = 'Підказки';
 
 // Time unit translations
 TRANSLATIONS.EN.hoursShort = 'h';
 TRANSLATIONS.UA.hoursShort = 'г';
+TRANSLATIONS.EN.hours = 'HOURS';
+TRANSLATIONS.EN.minutes = 'MINUTES';
+TRANSLATIONS.EN.seconds = 'SECONDS';
+TRANSLATIONS.UA.hours = 'ГОДИНИ';
+TRANSLATIONS.UA.minutes = 'ХВИЛИНИ';
+TRANSLATIONS.UA.seconds = 'СЕКУНДИ';
 TRANSLATIONS.EN.today = 'Today';
 TRANSLATIONS.EN.week = 'Week';
 TRANSLATIONS.EN.streak = 'Streak';
@@ -407,11 +425,10 @@ TRANSLATIONS.UA.today = 'Сьогодні';
 TRANSLATIONS.UA.week = 'Тиждень';
 TRANSLATIONS.UA.streak = 'Стрік';
 
-TRANSLATIONS.UA.tabFocus = 'Фокус';
+TRANSLATIONS.UA.tabFocus = 'Задачі';
 TRANSLATIONS.UA.tabTimer = 'Таймер';
 TRANSLATIONS.UA.tabParking = 'Паркінг';
 TRANSLATIONS.UA.tabAnalytics = 'Аналітика';
-TRANSLATIONS.UA.tabTemplates = 'Шаблони';
 TRANSLATIONS.UA.tabSettings = 'Налаштування';
 TRANSLATIONS.UA.pomodoro25 = 'Pomodoro 25хв';
 TRANSLATIONS.UA.standard60 = 'Стандарт 60хв';
@@ -452,7 +469,13 @@ TRANSLATIONS.UA.highPriority = 'Важливі';
 TRANSLATIONS.UA.inProgress = 'В роботі';
 TRANSLATIONS.UA.completed = 'Завершені';
 TRANSLATIONS.UA.entries = 'записів';
-TRANSLATIONS.UA.smartParkingList = 'Розумний паркувальний список';
+TRANSLATIONS.UA.definitionOfDoneChecklist = 'Чекліст критеріїв завершення';
+TRANSLATIONS.UA.definitionOfDone = 'Критерії завершення';
+TRANSLATIONS.UA.progress = 'Прогрес';
+TRANSLATIONS.UA.addNewCriterion = 'Додати новий критерій...';
+TRANSLATIONS.UA.noCriteriaAdded = 'Критерії ще не додано. Додайте конкретні критерії для відстеження завершення.';
+TRANSLATIONS.UA.complete = 'завершено';
+TRANSLATIONS.UA.smartParkingList = 'Паркувальний список';
 TRANSLATIONS.UA.todaysProductivity = 'Сьогоднішня продуктивність';
 TRANSLATIONS.UA.achievements = 'Досягнення';
 TRANSLATIONS.UA.productivityDynamics = 'Динаміка продуктивності (14 днів)';
@@ -463,18 +486,11 @@ TRANSLATIONS.UA.useShiftEnter = 'Використовуйте Shift+Enter для
 TRANSLATIONS.UA.copy = 'Копіювати';
 TRANSLATIONS.UA.copyStatus = 'Скопійовано!';
 TRANSLATIONS.UA.copyFailed = 'Не вдалося скопіювати';
-TRANSLATIONS.UA.templatesPlaybooks = 'Шаблони та плейбуки';
-TRANSLATIONS.UA.allTemplates = 'Всі шаблони';
 TRANSLATIONS.UA.popular = 'Популярні';
 TRANSLATIONS.UA.custom = 'Кастомні';
-TRANSLATIONS.UA.createCustomTemplate = 'Створити власний шаблон';
 TRANSLATIONS.UA.uniqueIdPlaceholder = 'Унікальний ID';
-TRANSLATIONS.UA.templateNamePlaceholder = 'Назва шаблону';
 TRANSLATIONS.UA.categoryPlaceholder = 'Категорія';
-TRANSLATIONS.UA.templateBodyPlaceholder = 'Тіло шаблону (кроки, інструкції, код тощо)...';
-TRANSLATIONS.UA.addTemplate = 'Додати шаблон';
 TRANSLATIONS.UA.copyText = 'Копіювати';
-TRANSLATIONS.UA.useTemplate = 'Використати';
 TRANSLATIONS.UA.systemSettings = 'Налаштування системи';
 TRANSLATIONS.UA.exportImportData = 'Експорт та імпорт даних';
 TRANSLATIONS.UA.exportData = 'Експортувати дані';
@@ -501,13 +517,6 @@ TRANSLATIONS.UA.showDetailedMetrics = 'Показувати детальні м�
 TRANSLATIONS.UA.dataImported = 'Дані успішно імпортовано!';
 TRANSLATIONS.UA.importError = 'Помилка імпорту даних';
 
-// Template translations
-TRANSLATIONS.UA.templateRagTitle = 'RAG слайс';
-TRANSLATIONS.UA.templateRagBody = `1. Визначити запит та контекст\n2. Налаштувати пошук документів\n3. Відфільтрувати релевантні фрагменти\n4. Згенерувати відповідь з контекстом\n5. Валідувати точність результату`;
-TRANSLATIONS.UA.templateStudyTitle = 'Навчальна сесія';
-TRANSLATIONS.UA.templateStudyBody = `1. Визначити тему та цілі\n2. Підготувати матеріали\n3. Активне читання/практика\n4. Створити резюме\n5. Тестування розуміння\n6. Планування повторення`;
-TRANSLATIONS.UA.templateCodingTitle = 'Вирішення задачі';
-TRANSLATIONS.UA.templateCodingBody = `1. Прочитати і зрозуміти умову\n2. Розібрати приклади\n3. Визначити підхід та структури даних\n4. Написати псевдокод\n5. Імплементувати рішення\n6. Тестувати та оптимізувати`;
 // Priority translations
 TRANSLATIONS.UA.priorityLow = 'Низький';
 TRANSLATIONS.UA.priorityMedium = 'Середній';
@@ -603,7 +612,7 @@ const translatePriority = (language: string, priority: Priority) => {
 };
 
 const translateDomain = (language: string, domain: Domain) => {
-  const domainMap: Record<Domain, string> = {
+  const domainMap: Record<string, string> = {
     'Backend': 'domainBackend',
     'Data': 'domainData',
     'CS': 'domainCS',
@@ -613,35 +622,10 @@ const translateDomain = (language: string, domain: Domain) => {
     'Discovery': 'domainDiscovery',
     'Other': 'domainOther'
   };
-  return translate(language, domainMap[domain]);
+  // For custom domains, return the domain name as-is if no translation exists
+  return translate(language, domainMap[domain]) || domain;
 };
 
-const getDefaultTemplates = (language: string): Template[] => [
-  {
-    id: 'rag-slice',
-    title: translate(language, 'templateRagTitle'),
-    body: translate(language, 'templateRagBody'),
-    category: 'AI/ML',
-    useCount: 0,
-    lastUsed: 0
-  },
-  {
-    id: 'study-session',
-    title: translate(language, 'templateStudyTitle'),
-    body: translate(language, 'templateStudyBody'),
-    category: 'Study',
-    useCount: 0,
-    lastUsed: 0
-  },
-  {
-    id: 'coding-problem',
-    title: translate(language, 'templateCodingTitle'),
-    body: translate(language, 'templateCodingBody'),
-    category: 'Coding',
-    useCount: 0,
-    lastUsed: 0
-  }
-];
 
 // Enhanced Helper Components
 const QuickStats = ({ logs, className = "", onResetData, language = 'EN' }: { logs:any[]; className?:string; onResetData?:()=>void; language?: string }) => {
@@ -713,92 +697,108 @@ const calculateStreak = (logs: BlockLog[]): number => {
   return streak;
 };
 
+
 const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec, language }: { run: RunningBlock; onTogglePause: ()=>void; onReset: ()=>void; onStop: ()=>void; elapsedSec: number; language: string }) => {
   const targetSec = run.targetMinutes * 60;
   const progress = Math.min(100, Math.round((elapsedSec / targetSec) * 100));
   const remainingMin = Math.ceil((targetSec - elapsedSec) / 60);
-  
+
   // Activity detection
   const isNearComplete = progress > 85;
   const isOvertime = progress > 100;
-  
+
+  // Get time units for countdown display (remaining time)
+  const remainingSec = Math.max(0, targetSec - elapsedSec);
+  const timeUnits = formatTimeUnits(remainingSec);
+
   return (
-    <Card className={`bg-transparent border-2 ${isOvertime ? 'border-amber-500/70' : isNearComplete ? 'border-emerald-500/70' : 'border-slate-600/50'} shadow-2xl`}>
-      <CardContent className="pt-6">
-        <div className="text-center space-y-6">
-          <div>
-            <h3 className="text-xl font-semibold text-slate-200 mb-2">{run.oofTitle}</h3>
-            <div className="text-5xl font-mono font-bold text-emerald-400 mb-2">
-              {formatTime(elapsedSec)}
-            </div>
-            <div className="text-sm text-slate-400">
-              {isOvertime ? 
-                <span className="text-amber-400 font-semibold">{translate(language, 'overtime')} +{remainingMin-run.targetMinutes} {translate(language, 'min')}</span> :
-                <span>{translate(language, 'remaining')}: {remainingMin} {translate(language, 'min')} ({progress}%)</span>
-              }
-            </div>
-          </div>
-          
-          {/* Enhanced Progress Ring */}
-          <div className="relative w-40 h-40 mx-auto">
-            <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 36 36">
-              <path
-                className="text-slate-700"
-                stroke="currentColor"
-                strokeWidth="3"
-                fill="none"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-              <path
-                className={isOvertime ? "text-amber-400" : "text-emerald-400"}
-                stroke="currentColor"
-                strokeWidth="3"
-                fill="none"
-                strokeDasharray={`${Math.min(progress, 100)}, 100`}
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <div className={`text-2xl font-bold ${isOvertime ? 'text-amber-400' : 'text-emerald-400'}`}>
-                  {progress}%
+    <>
+
+      <Card className={`bg-slate-800/5 backdrop-blur-md border-2 ${isOvertime ? 'border-amber-500/70' : isNearComplete ? 'border-emerald-500/70' : 'border-slate-600/30'} shadow-2xl`}>
+        <CardContent className="pt-6">
+          <div className="text-center space-y-6">
+            <div>
+              {/* Linear Progress Bar */}
+              <div className="mb-6 px-2">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-slate-400">
+                    {translate(language, 'remaining')}: {remainingMin} {translate(language, 'min')}
+                  </span>
+                  <span className={`text-sm font-semibold ${isOvertime ? 'text-amber-400' : 'text-emerald-400'}`}>
+                    {progress}%
+                  </span>
                 </div>
-                <div className="text-xs text-slate-400">готово</div>
+                <div className="w-full bg-slate-700/30 rounded-full h-3 overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-500 ease-out rounded-full ${
+                      isOvertime ? 'bg-gradient-to-r from-amber-500 to-red-500' : 'bg-gradient-to-r from-emerald-500 to-emerald-400'
+                    }`}
+                    style={{ width: `${Math.min(progress, 100)}%` }}
+                  />
+                </div>
               </div>
+
+              {/* Three-Tile Timer Display */}
+              <div className="bg-slate-900/20 backdrop-blur-sm border border-slate-600/20 rounded-2xl p-4 sm:p-6 mb-6">
+                <div className="flex gap-2 sm:gap-3 md:gap-4">
+                  <AnimatedDigit value={timeUnits.hours} label="HOURS" language={language} />
+                  <AnimatedDigit value={timeUnits.minutes} label="MINUTES" language={language} />
+                  <AnimatedDigit value={timeUnits.seconds} label="SECONDS" language={language} />
+                </div>
+              </div>
+
+              {isOvertime && (
+                <div className="text-center mt-2">
+                  <span className="text-amber-400 font-semibold text-sm">
+                    {translate(language, 'overtime')} +{remainingMin-run.targetMinutes} {translate(language, 'min')}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
-          
-          <div className="flex flex-col sm:flex-row justify-center gap-3 px-4">
-            <Button
-              onClick={onTogglePause}
-              variant="outline"
-              size="lg"
-              className="border-slate-600 text-slate-300 hover:text-slate-100 flex-1 sm:flex-none"
-            >
-              {run.paused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
-            </Button>
-            <Button
-              onClick={onReset}
-              variant="outline"
-              size="lg"
-              className="border-slate-600 text-slate-300 hover:text-slate-100 flex-1 sm:flex-none"
-            >
-              <RotateCcw className="w-5 h-5" />
-            </Button>
-            <Button
-              onClick={onStop}
-              variant="default"
-              size="lg"
-              className="bg-cyan-600 hover:bg-cyan-700 flex-1 sm:flex-none"
-            >
-              <Square className="w-5 h-5 mr-2" />
-              {translate(language, 'finish')}
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+
+          {/* Control Buttons */}
+            <div className="flex flex-row justify-center gap-3 sm:gap-4 px-4 sm:px-0">
+              <Button
+                onClick={onTogglePause}
+                variant="outline"
+                size="lg"
+                className="border-slate-600 text-slate-300 hover:text-slate-100 hover:border-slate-500 flex-1 sm:flex-none min-h-[44px] sm:min-h-[48px] px-3 sm:px-4"
+              >
+                {run.paused ? (
+                  <>
+                    <Play className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
+                    <span className="hidden sm:inline">{translate(language, 'resume')}</span>
+                  </>
+                ) : (
+                  <>
+                    <Pause className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
+                    <span className="hidden sm:inline">{translate(language, 'pause')}</span>
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={onReset}
+                variant="outline"
+                size="lg"
+                className="border-slate-600 text-slate-300 hover:text-slate-100 hover:border-slate-500 flex-1 sm:flex-none min-h-[44px] sm:min-h-[48px] px-3 sm:px-4"
+              >
+                <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
+                <span className="hidden sm:inline">{translate(language, 'reset')}</span>
+              </Button>
+              <Button
+                onClick={onStop}
+                variant="default"
+                size="lg"
+                className="bg-cyan-600 hover:bg-cyan-700 flex-1 sm:flex-none min-h-[44px] sm:min-h-[48px] px-3 sm:px-4"
+              >
+                <Square className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+                <span className="text-xs sm:text-sm">{translate(language, 'finish')}</span>
+              </Button>
+            </div>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 
@@ -813,12 +813,29 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
   language?: string;
 }) => {
   const t = (key: string) => translate(language, key);
-  const summaryQuantumRef = useRef<HTMLDivElement>(null);
+  const [animationPhase, setAnimationPhase] = React.useState(0);
 
   // Calculate achievements and progress
   const dailyProgress = Math.round((analytics.today.dh / (settings.dailyGoal / 60)) * 100);
   const isGoalReached = dailyProgress >= 100;
   const streakDays = analytics.streakDays || 0;
+
+  // Start entrance animation
+  React.useEffect(() => {
+    const phases = [0, 1, 2, 3];
+    let currentPhase = 0;
+
+    const animationInterval = setInterval(() => {
+      if (currentPhase < phases.length - 1) {
+        currentPhase++;
+        setAnimationPhase(currentPhase);
+      } else {
+        clearInterval(animationInterval);
+      }
+    }, 800);
+
+    return () => clearInterval(animationInterval);
+  }, []);
 
   // Motivational messages
   const getMotivationalMessage = () => {
@@ -830,441 +847,318 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
 
   // Energy indicators
   const getEnergyColor = (energy: number) => {
-    if (energy >= 4) return 'text-green-400';
-    if (energy >= 3) return 'text-yellow-400';
+    if (energy >= 7) return 'text-green-400';
+    if (energy >= 4) return 'text-yellow-400';
     return 'text-red-400';
   };
 
-  // Quantum Background for Summary
-  useEffect(() => {
-    if (!summaryQuantumRef.current) return;
-
-    // Scene setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: false, antialias: true });
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    // Create beautiful dark cosmic background
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.width = 512;
-    canvas.height = 512;
-
-    // Create gradient background
-    const gradient = context.createRadialGradient(256, 256, 0, 256, 256, 256);
-    gradient.addColorStop(0, '#020308');
-    gradient.addColorStop(0.5, '#010203');
-    gradient.addColorStop(1, '#000000');
-
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, 512, 512);
-
-    const texture = new THREE.CanvasTexture(canvas);
-    scene.background = texture;
-    renderer.setClearColor(0x000000, 1);
-
-    summaryQuantumRef.current.appendChild(renderer.domElement);
-
-    camera.position.set(0, 0, 80);
-    camera.lookAt(0, 0, 0);
-
-    // WOW EFFECT: Explosion-Convergence Cycle
-    const particles = [];
-    const particleCount = 400; // Even more particles for spectacular effect!
-    const centerPoint = new THREE.Vector3(0, 0, 0); // Screen center explosion
-
-    // Golden ratio for natural distribution
-    const phi = (1 + Math.sqrt(5)) / 2;
-    const goldenAngle = Math.PI * 2 / phi;
-
-    for (let i = 0; i < particleCount; i++) {
-      // Explosive radial pattern - random directions for WOW effect
-      const angle = i * goldenAngle + Math.random() * 0.5; // Slight randomness
-      const elevation = Math.asin((2 * i / particleCount) - 1) + Math.random() * 0.3;
-      const explosionRadius = 150 + Math.random() * 100; // Varied explosion distance
-
-      // Convert to cartesian - explosion targets
-      const explosionX = explosionRadius * Math.cos(elevation) * Math.cos(angle);
-      const explosionY = explosionRadius * Math.cos(elevation) * Math.sin(angle);
-      const explosionZ = explosionRadius * Math.sin(elevation);
-
-      const particle = {
-        centerPosition: centerPoint.clone(), // Always return here
-        explosionPosition: new THREE.Vector3(explosionX, explosionY, explosionZ),
-        currentPosition: centerPoint.clone(),
-
-        // Animation timing for visible expansion
-        explosionDelay: (i / particleCount) * 1.2, // Staggered for visible wave
-        convergenceDelay: 6 + (i / particleCount) * 2, // Delayed convergence
-
-        // Animation states
-        phase: 'expansion', // 'expansion' -> 'floating' -> 'convergence' -> 'repeat'
-        cycleProgress: 0,
-
-        // Movement properties for visible expansion
-        expansionDuration: 2.0, // 2 seconds to fully expand (faster after 1s)
-        convergenceSpeed: 1.0 + Math.random() * 0.5, // Convergence speed
-        floatRadius: 3 + Math.random() * 4,
-        floatPhase: Math.random() * Math.PI * 2,
-
-        // Visual properties
-        layer: Math.floor(i / (particleCount / 6)), // 6 layers for depth
-        trailIntensity: Math.random() * 0.5 + 0.5
-      };
-
-      // Create WOW particle - much bigger center point, varied sizes for dramatic effect
-      const size = 2.5 + (particle.layer * 0.5) + Math.random() * 1.0; // 15x bigger base size!
-      const geometry = new THREE.SphereGeometry(size, 8, 8);
-
-      // Dramatic color progression through explosion-convergence cycle
-      const hue = (i / particleCount * 0.8) + (particle.layer * 0.12) + 0.1;
-      const saturation = 0.9 + Math.random() * 0.1; // High saturation for WOW
-      const lightness = 0.7 + (particle.layer * 0.05);
-
-      const material = new THREE.MeshBasicMaterial({
-        color: new THREE.Color().setHSL(hue, saturation, lightness),
-        transparent: true,
-        opacity: 0.9 + Math.random() * 0.1 // Higher visibility
-      });
-
-      particle.mesh = new THREE.Mesh(geometry, material);
-      particle.mesh.position.copy(centerPoint); // All start at center for WOW explosion
-
-      particles.push(particle);
-      scene.add(particle.mesh);
-    }
-
-
-    // Celebration animation loop
-    const animate = () => {
-      const time = Date.now() * 0.001;
-
-      // WOW EFFECT: Explosion-Convergence Cycle Animation
-      particles.forEach((particle, index) => {
-        const cycleTime = time % 13; // 13-second cycle with big center and fast expansion
-        const adjustedTime = cycleTime - particle.explosionDelay;
-
-        if (adjustedTime > 0) {
-          // PHASE 1: VISIBLE EXPANSION (0-2s) - Big center point then fast spread
-          if (particle.phase === 'expansion' && adjustedTime <= particle.expansionDuration) {
-            let expansionProgress;
-
-            if (adjustedTime <= 1.0) {
-              // First second: slow start, big visible center
-              expansionProgress = Math.min(0.2, adjustedTime * 0.2); // Only 20% in first second
-            } else {
-              // After 1 second: fast expansion
-              const fastTime = adjustedTime - 1.0;
-              expansionProgress = 0.2 + (fastTime / 1.0) * 0.8; // Remaining 80% in 1 second
-            }
-
-            const easeOut = 1 - Math.pow(1 - expansionProgress, 1.5); // Sharper expansion after delay
-
-            // Visible expansion from center to target
-            particle.currentPosition.lerpVectors(
-              particle.centerPosition,
-              particle.explosionPosition,
-              easeOut
-            );
-
-            particle.mesh.position.copy(particle.currentPosition);
-
-            // Growing intensity as particles spread
-            const intensity = 0.3 + expansionProgress * 0.7; // Grow brighter as they expand
-            particle.mesh.material.opacity = intensity * particle.trailIntensity;
-
-            // Scale - start bigger, then grow even more
-            particle.mesh.scale.setScalar(1.0 + expansionProgress * 1.5); // Much bigger scale!
-
-            // Add slight sparkle during expansion
-            const sparkle = Math.sin(adjustedTime * 4 + index * 0.1) * 0.2 + 0.8;
-            particle.mesh.material.opacity *= sparkle;
-
-            if (expansionProgress >= 1) {
-              particle.phase = 'floating';
-            }
-          }
-
-          // PHASE 2: FLOATING DANCE (2-7s)
-          else if (particle.phase === 'floating' && adjustedTime > 2 && adjustedTime <= 7) {
-            const floatTime = (adjustedTime - 2) * 1.0;
-
-            // Beautiful floating patterns - MORE ACTIVE
-            const floatX = Math.cos(floatTime * 1.5 + particle.floatPhase) * particle.floatRadius;
-            const floatY = Math.sin(floatTime * 1.2 + particle.floatPhase) * particle.floatRadius;
-            const floatZ = Math.sin(floatTime * 0.8 + particle.floatPhase) * particle.floatRadius * 0.8;
-
-            particle.mesh.position.set(
-              particle.currentPosition.x + floatX,
-              particle.currentPosition.y + floatY,
-              particle.currentPosition.z + floatZ
-            );
-
-            // Gentle sparkle during float
-            const sparkle = Math.sin(floatTime * 3 + particle.layer);
-            particle.mesh.material.opacity = 0.4 + Math.abs(sparkle) * 0.6;
-            particle.mesh.scale.setScalar(1 + Math.sin(floatTime * 2) * 0.2);
-
-            // Prepare for convergence
-            if (adjustedTime >= 7) {
-              particle.phase = 'convergence';
-            }
-          }
-
-          // PHASE 3: CONVERGENCE MAGIC (7-11s)
-          else if (particle.phase === 'convergence' && adjustedTime > 7 && adjustedTime <= 11) {
-            const convergenceProgress = Math.min(1, (adjustedTime - 7) / 4 * particle.convergenceSpeed);
-            const easeIn = Math.pow(convergenceProgress, 2); // Smooth convergence
-
-            // Get current position and lerp back to center
-            const currentPos = particle.mesh.position.clone();
-            particle.mesh.position.lerpVectors(
-              currentPos,
-              particle.centerPosition,
-              easeIn * 0.02 // Slow convergence
-            );
-
-            // Convergence glow effect
-            const convergenceGlow = 1 - convergenceProgress;
-            particle.mesh.material.opacity = convergenceGlow * 0.8 + 0.2;
-            particle.mesh.scale.setScalar(1 + convergenceGlow * 0.5);
-
-            if (convergenceProgress >= 0.95) {
-              particle.phase = 'reset';
-            }
-          }
-
-          // PHASE 4: RESET FOR NEXT CYCLE (11-13s)
-          else if (particle.phase === 'reset' && adjustedTime > 11) {
-            // Quick fade and reset to center
-            particle.mesh.position.copy(particle.centerPosition);
-            particle.currentPosition.copy(particle.centerPosition);
-
-            const fadeOut = Math.max(0, 1 - (adjustedTime - 11) / 2);
-            particle.mesh.material.opacity = fadeOut * 0.3;
-            particle.mesh.scale.setScalar(fadeOut * 2.0 + 1.0); // Bigger during reset
-
-            // Reset for next cycle
-            if (adjustedTime >= 13) {
-              particle.phase = 'expansion';
-            }
-          }
-
-          // Continuous rotation for all phases
-          particle.mesh.rotation.x += 0.01 * (particle.layer + 1);
-          particle.mesh.rotation.y += 0.015 * (particle.layer + 1);
-          particle.mesh.rotation.z += 0.008 * (particle.layer + 1);
-        }
-      });
-
-
-      // Fractal camera movement
-      camera.position.x = Math.sin(time * 0.2) * 12;
-      camera.position.y = Math.cos(time * 0.15) * 8 + 3;
-      camera.position.z = 80 + Math.sin(time * 0.1) * 8; // More dynamic zoom
-      camera.lookAt(new THREE.Vector3(
-        Math.sin(time * 0.18) * 3,
-        Math.cos(time * 0.12) * 2,
-        0
-      )); // More active fractal focus
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    // Handle resize
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      if (summaryQuantumRef.current && renderer.domElement) {
-        summaryQuantumRef.current.removeChild(renderer.domElement);
-      }
-      renderer.dispose();
-    };
-  }, []);
+  // Background stars animation
+  const generateStars = () => {
+    return Array.from({ length: 50 }, (_, i) => (
+      <div
+        key={i}
+        className="absolute w-1 h-1 bg-white rounded-full opacity-20 animate-pulse"
+        style={{
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          animationDelay: `${Math.random() * 3}s`,
+          animationDuration: `${2 + Math.random() * 4}s`
+        }}
+      />
+    ));
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'transparent' }}>
-      {/* Quantum Background for Celebration */}
-      <div
-        ref={summaryQuantumRef}
-        className="fixed inset-0"
-        style={{ pointerEvents: 'none', zIndex: 0 }}
-      />
-      <Card className="relative z-10 w-full max-w-2xl mx-auto bg-transparent border-slate-700/20 shadow-2xl">
-        <CardHeader className="text-center bg-transparent border-b border-slate-700/20">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ backgroundColor: 'transparent' }}>
+      {/* Animated background stars */}
+      <div className="absolute inset-0 pointer-events-none">
+        {generateStars()}
+      </div>
+
+      {/* Cosmic gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-slate-900/40 to-black/60 pointer-events-none" />
+
+      <Card className={`relative z-10 w-full max-w-3xl mx-auto bg-slate-900/80 backdrop-blur-xl border-slate-700/40 shadow-2xl transition-all duration-1000 ${
+        animationPhase >= 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+      }`}>
+        <CardHeader className={`text-center bg-slate-800/50 backdrop-blur border-b border-slate-700/30 transition-all duration-800 delay-200 ${
+          animationPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}>
           <div className="mb-4">
-            <div className="text-6xl mb-2">🎉</div>
-            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            <div className="text-7xl mb-3 animate-bounce">🎉</div>
+            <CardTitle className="text-4xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">
               {t('blockCompleted')}
             </CardTitle>
-            <p className="text-slate-300 text-lg mt-2">{t('wellDone')}</p>
+            <p className="text-slate-300 text-xl">{t('wellDone')}</p>
+            <div className="mt-4 flex justify-center space-x-2">
+              {[0, 1, 2, 3].map((dot) => (
+                <div
+                  key={dot}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    animationPhase >= dot ? 'bg-emerald-400 scale-100' : 'bg-slate-600 scale-75'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </CardHeader>
 
         <CardContent className="p-8">
-          {/* Main Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-            <div className="text-center p-4 bg-transparent rounded-xl border border-slate-600/20">
-              <div className="text-3xl font-bold text-emerald-400 mb-1">{block.minutes}</div>
-              <div className="text-slate-300 text-sm">{t('minutes')}</div>
+          {/* Enhanced Stats Grid with animations */}
+          <div className={`grid grid-cols-2 md:grid-cols-4 gap-6 mb-8 transition-all duration-800 delay-400 ${
+            animationPhase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+          }`}>
+            <div className="text-center p-6 bg-gradient-to-br from-emerald-900/40 to-emerald-800/20 rounded-2xl border border-emerald-700/30 hover:border-emerald-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/20">
+              <div className="text-4xl font-bold text-emerald-400 mb-2 animate-pulse">{block.minutes}</div>
+              <div className="text-slate-300 text-sm font-medium">{t('minutes')}</div>
               <div className="text-xs text-slate-400 mt-1">{t('timeSpent')}</div>
+              {/* Visual indicator */}
+              <div className="w-full bg-slate-700/30 rounded-full h-1 mt-3">
+                <div
+                  className="bg-gradient-to-r from-emerald-400 to-emerald-500 h-1 rounded-full transition-all duration-1000"
+                  style={{ width: `${Math.min((block.minutes / 60) * 100, 100)}%` }}
+                />
+              </div>
             </div>
 
-            <div className="text-center p-4 bg-transparent rounded-xl border border-slate-600/20">
-              <div className="text-3xl font-bold text-blue-400 mb-1">{block.dq}</div>
-              <div className="text-slate-300 text-sm">DQ</div>
+            <div className="text-center p-6 bg-gradient-to-br from-blue-900/40 to-blue-800/20 rounded-2xl border border-blue-700/30 hover:border-blue-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20">
+              <div className="text-4xl font-bold text-blue-400 mb-2">{block.dq}</div>
+              <div className="text-slate-300 text-sm font-medium">DQ</div>
               <div className="text-xs text-slate-400 mt-1">{t('qualityRating')}</div>
+              {/* Quality stars */}
+              <div className="flex justify-center mt-2 space-x-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <div
+                    key={star}
+                    className={`text-sm ${star <= block.dq ? 'text-blue-400' : 'text-slate-600'}`}
+                  >
+                    ⭐
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="text-center p-4 bg-transparent rounded-xl border border-slate-600/20">
-              <div className={`text-3xl font-bold mb-1 ${getEnergyColor(block.energy)}`}>{block.energy}</div>
-              <div className="text-slate-300 text-sm">{t('energy')}</div>
+            <div className="text-center p-6 bg-gradient-to-br from-yellow-900/40 to-orange-800/20 rounded-2xl border border-yellow-700/30 hover:border-yellow-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/20">
+              <div className={`text-4xl font-bold mb-2 ${getEnergyColor(block.energy)}`}>{block.energy}</div>
+              <div className="text-slate-300 text-sm font-medium">{t('energy')}</div>
               <div className="text-xs text-slate-400 mt-1">{t('energyLevel')}</div>
+              {/* Energy bar */}
+              <div className="w-full bg-slate-700/30 rounded-full h-1 mt-3">
+                <div
+                  className={`h-1 rounded-full transition-all duration-1000 ${
+                    block.energy >= 7 ? 'bg-gradient-to-r from-green-400 to-green-500' :
+                    block.energy >= 4 ? 'bg-gradient-to-r from-yellow-400 to-orange-500' :
+                    'bg-gradient-to-r from-red-400 to-red-500'
+                  }`}
+                  style={{ width: `${(block.energy / 10) * 100}%` }}
+                />
+              </div>
             </div>
 
-            <div className="text-center p-4 bg-transparent rounded-xl border border-slate-600/20">
-              <div className="text-3xl font-bold text-purple-400 mb-1">{dailyProgress}%</div>
-              <div className="text-slate-300 text-sm">{t('dailyProgress')}</div>
+            <div className="text-center p-6 bg-gradient-to-br from-purple-900/40 to-indigo-800/20 rounded-2xl border border-purple-700/30 hover:border-purple-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20">
+              <div className="text-4xl font-bold text-purple-400 mb-2">{dailyProgress}%</div>
+              <div className="text-slate-300 text-sm font-medium">{t('dailyProgress')}</div>
               <div className="text-xs text-slate-400 mt-1">{Math.round(analytics.today.dh * 10) / 10}h / {settings.dailyGoal / 60}h</div>
+              {/* Circular progress */}
+              <div className="relative w-8 h-8 mx-auto mt-2">
+                <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 32 32">
+                  <circle
+                    cx="16"
+                    cy="16"
+                    r="14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className="text-slate-700"
+                  />
+                  <circle
+                    cx="16"
+                    cy="16"
+                    r="14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeDasharray={`${2 * Math.PI * 14}`}
+                    strokeDashoffset={`${2 * Math.PI * 14 * (1 - dailyProgress / 100)}`}
+                    className="text-purple-400 transition-all duration-1000"
+                  />
+                </svg>
+              </div>
             </div>
           </div>
 
-          {/* Parking Lot Ideas */}
+          {/* Enhanced Parking Lot Ideas */}
           {parking && parking.length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center mb-4">
-                <NotebookPen className="w-5 h-5 text-amber-400 mr-2" />
-                <span className="text-slate-300 font-semibold">{translate(language, 'smartParkingList')}</span>
+            <div className={`mb-8 transition-all duration-800 delay-600 ${
+              animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}>
+              <div className="flex items-center justify-between mb-4 p-4 bg-gradient-to-r from-amber-900/30 to-orange-900/30 rounded-xl border border-amber-700/30">
+                <div className="flex items-center">
+                  <NotebookPen className="w-6 h-6 text-amber-400 mr-3 animate-pulse" />
+                  <span className="text-slate-100 font-bold text-lg">{translate(language, 'smartParkingList')}</span>
+                </div>
+                <div className="bg-amber-500/20 px-3 py-1 rounded-full border border-amber-500/30">
+                  <span className="text-amber-300 text-sm font-semibold">{parking.length} ідей</span>
+                </div>
               </div>
-              <div className="space-y-2 max-h-32 overflow-y-auto">
-                {parking.slice(0, 5).map((item) => (
-                  <div key={item.id} className="flex items-center p-2 bg-transparent border border-slate-600/20 rounded-lg">
+              <div className="grid gap-3 max-h-40 overflow-y-auto">
+                {parking.slice(0, 6).map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/30 rounded-xl border border-slate-600/20 hover:border-amber-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
                     <div className="flex-1">
-                      <div className={`text-sm ${item.done ? 'text-slate-400 line-through' : 'text-slate-300'}`}>
+                      <div className={`text-sm font-medium ${item.done ? 'text-slate-400 line-through' : 'text-slate-200'}`}>
                         {item.text}
                       </div>
                       {item.category && (
-                        <div className="text-xs text-slate-500 mt-1">
+                        <div className="text-xs text-amber-400/70 mt-1 bg-amber-900/20 px-2 py-1 rounded-md inline-block">
                           {item.category}
                         </div>
                       )}
                     </div>
-                    {item.done && <div className="text-emerald-400 ml-2">✓</div>}
+                    {item.done && <div className="text-emerald-400 ml-3 text-lg animate-pulse">✓</div>}
+                    {!item.done && <div className="w-3 h-3 bg-amber-500/30 rounded-full ml-3 animate-pulse" />}
                   </div>
                 ))}
-                {parking.length > 5 && (
-                  <div className="text-center text-slate-400 text-sm">
-                    та ще {parking.length - 5} ідей...
+                {parking.length > 6 && (
+                  <div className="text-center text-slate-400 text-sm p-2 bg-slate-800/30 rounded-lg border border-slate-700/20">
+                    та ще {parking.length - 6} ідей у паркінгу...
                   </div>
                 )}
               </div>
             </div>
           )}
 
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-slate-300 font-semibold">{t('dailyProgress')}</span>
-              <span className="text-slate-400 text-sm">{getMotivationalMessage()}</span>
+          {/* Enhanced Progress Bar */}
+          <div className={`mb-8 transition-all duration-800 delay-700 ${
+            animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}>
+            <div className="flex justify-between items-center mb-4 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/30 rounded-xl border border-slate-600/20">
+              <div className="flex items-center">
+                <span className="text-slate-100 font-bold text-lg mr-3">{t('dailyProgress')}</span>
+                <div className="bg-purple-500/20 px-3 py-1 rounded-full border border-purple-500/30">
+                  <span className="text-purple-300 text-sm font-semibold">{dailyProgress}%</span>
+                </div>
+              </div>
+              <span className="text-slate-300 text-sm bg-slate-700/50 px-3 py-1 rounded-full">{getMotivationalMessage()}</span>
             </div>
-            <div className="w-full bg-slate-700/10 rounded-full h-3">
-              <div
-                className={`h-3 rounded-full transition-all duration-500 ${
-                  isGoalReached ? 'bg-gradient-to-r from-emerald-400 to-green-500' :
-                  dailyProgress >= 50 ? 'bg-gradient-to-r from-cyan-400 to-blue-500' :
-                  'bg-gradient-to-r from-yellow-400 to-orange-500'
-                }`}
-                style={{ width: `${Math.min(dailyProgress, 100)}%` }}
-              />
+            <div className="relative">
+              <div className="w-full bg-slate-700/30 rounded-full h-4 shadow-inner">
+                <div
+                  className={`h-4 rounded-full transition-all duration-2000 shadow-lg relative overflow-hidden ${
+                    isGoalReached ? 'bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-600' :
+                    dailyProgress >= 50 ? 'bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500' :
+                    'bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500'
+                  }`}
+                  style={{ width: `${Math.min(dailyProgress, 100)}%` }}
+                >
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                </div>
+              </div>
+              {/* Progress milestones */}
+              <div className="flex justify-between mt-2 text-xs text-slate-400">
+                <span className={dailyProgress >= 25 ? 'text-emerald-400' : ''}>25%</span>
+                <span className={dailyProgress >= 50 ? 'text-emerald-400' : ''}>50%</span>
+                <span className={dailyProgress >= 75 ? 'text-emerald-400' : ''}>75%</span>
+                <span className={dailyProgress >= 100 ? 'text-emerald-400' : ''}>🎯</span>
+              </div>
             </div>
           </div>
 
-          {/* Special Achievements */}
-          <div className="space-y-3 mb-8">
+          {/* Enhanced Special Achievements */}
+          <div className={`space-y-4 mb-8 transition-all duration-800 delay-800 ${
+            animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}>
             {block.completedOOF && (
-              <div className="flex items-center p-3 bg-transparent border border-emerald-700/20 rounded-lg">
-                <div className="text-2xl mr-3">✅</div>
-                <div>
-                  <div className="text-emerald-400 font-semibold">{t('oofCompleted')}</div>
-                  <div className="text-slate-300 text-sm">{block.oofTitle}</div>
+              <div className="flex items-center p-4 bg-gradient-to-r from-emerald-900/40 to-green-900/30 rounded-xl border border-emerald-700/30 hover:border-emerald-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-500/20">
+                <div className="text-3xl mr-4 animate-bounce">✅</div>
+                <div className="flex-1">
+                  <div className="text-emerald-300 font-bold text-lg">{t('oofCompleted')}</div>
+                  <div className="text-slate-200 text-sm bg-emerald-900/20 px-3 py-1 rounded-md mt-1 inline-block">{block.oofTitle}</div>
                 </div>
+                <div className="text-emerald-400 text-2xl">🎉</div>
               </div>
             )}
 
             {block.flowState && (
-              <div className="flex items-center p-3 bg-transparent border border-purple-700/20 rounded-lg">
-                <div className="text-2xl mr-3">⚡</div>
-                <div>
-                  <div className="text-purple-400 font-semibold">{t('flowState')}</div>
-                  <div className="text-slate-300 text-sm">{t('greatWork')}</div>
+              <div className="flex items-center p-4 bg-gradient-to-r from-purple-900/40 to-indigo-900/30 rounded-xl border border-purple-700/30 hover:border-purple-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/20">
+                <div className="text-3xl mr-4 animate-pulse">⚡</div>
+                <div className="flex-1">
+                  <div className="text-purple-300 font-bold text-lg">{t('flowState')}</div>
+                  <div className="text-slate-200 text-sm">{t('greatWork')}</div>
                 </div>
+                <div className="text-purple-400 text-2xl">🌊</div>
               </div>
             )}
 
             {streakDays > 1 && (
-              <div className="flex items-center p-3 bg-transparent border border-orange-700/20 rounded-lg">
-                <div className="text-2xl mr-3">🔥</div>
-                <div>
-                  <div className="text-orange-400 font-semibold">{streakDays} {t('dayLabel')} {t('streak')}</div>
-                  <div className="text-slate-300 text-sm">{t('keepGoing')}</div>
+              <div className="flex items-center p-4 bg-gradient-to-r from-orange-900/40 to-red-900/30 rounded-xl border border-orange-700/30 hover:border-orange-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-orange-500/20">
+                <div className="text-3xl mr-4 animate-pulse">🔥</div>
+                <div className="flex-1">
+                  <div className="text-orange-300 font-bold text-lg">{streakDays} {t('dayLabel')} {t('streak')}</div>
+                  <div className="text-slate-200 text-sm">{t('keepGoing')}</div>
                 </div>
+                <div className="text-orange-400 text-2xl">⭐</div>
               </div>
             )}
 
             {isGoalReached && (
-              <div className="flex items-center p-3 bg-transparent border border-yellow-700/20 rounded-lg">
-                <div className="text-2xl mr-3">🏆</div>
-                <div>
-                  <div className="text-yellow-400 font-semibold">{t('achievement')}</div>
-                  <div className="text-slate-300 text-sm">{t('goalReached')}</div>
+              <div className="flex items-center p-4 bg-gradient-to-r from-yellow-900/40 to-amber-900/30 rounded-xl border border-yellow-700/30 hover:border-yellow-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-yellow-500/20">
+                <div className="text-3xl mr-4 animate-bounce">🏆</div>
+                <div className="flex-1">
+                  <div className="text-yellow-300 font-bold text-lg">{t('achievement')}</div>
+                  <div className="text-slate-200 text-sm">{t('goalReached')}</div>
                 </div>
+                <div className="text-yellow-400 text-2xl">👑</div>
               </div>
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          {/* Enhanced Action Buttons */}
+          <div className={`flex flex-col sm:flex-row gap-4 transition-all duration-800 delay-900 ${
+            animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}>
             <Button
               onClick={onStartNew}
-              className="flex-1 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-semibold py-3"
+              className="group flex-1 bg-gradient-to-r from-emerald-600 via-cyan-600 to-blue-600 hover:from-emerald-500 hover:via-cyan-500 hover:to-blue-500 text-white font-bold py-4 px-6 rounded-xl border-2 border-emerald-500/30 hover:border-emerald-400/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-emerald-500/25 relative overflow-hidden"
               size="lg"
             >
-              <Play className="w-5 h-5 mr-2" />
-              {t('startNewBlock')}
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+              <Play className="w-6 h-6 mr-3 group-hover:animate-pulse" />
+              <span className="text-lg">{t('startNewBlock')}</span>
+              <div className="ml-auto text-xl group-hover:scale-110 transition-transform duration-300">🚀</div>
             </Button>
 
             <Button
               onClick={onViewAnalytics}
               variant="outline"
-              className="flex-1 border-slate-600 text-slate-300 hover:text-slate-100 hover:bg-slate-700 py-3"
+              className="group flex-1 bg-gradient-to-r from-slate-800/80 to-slate-700/80 border-2 border-slate-600/50 hover:border-purple-500/50 text-slate-200 hover:text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/25 relative overflow-hidden"
               size="lg"
             >
-              <BarChart3 className="w-5 h-5 mr-2" />
-              {t('viewAnalytics')}
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/0 via-purple-600/10 to-purple-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+              <BarChart3 className="w-6 h-6 mr-3 group-hover:animate-pulse" />
+              <span className="text-lg">{t('viewAnalytics')}</span>
+              <div className="ml-auto text-xl group-hover:scale-110 transition-transform duration-300">📊</div>
             </Button>
           </div>
 
-          {/* Close Button */}
-          <div className="text-center mt-6">
+          {/* Enhanced Close Button */}
+          <div className={`text-center mt-8 transition-all duration-800 delay-1000 ${
+            animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+          }`}>
             <Button
               onClick={onClose}
               variant="ghost"
-              className="text-slate-400 hover:text-slate-200"
+              className="group text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
               size="sm"
             >
-              {translate(language, 'close')}
+              <span className="group-hover:scale-110 transition-transform duration-300">
+                {translate(language, 'close')}
+              </span>
+              <div className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">✨</div>
             </Button>
           </div>
         </CardContent>
@@ -1273,7 +1167,7 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
   );
 };
 
-const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarred, language = 'EN' }: { oof: OOF; onStart: (oof:OOF, minutes:number)=>void; onEdit: (oof:OOF)=>void; onDelete: (id:string)=>void; onToggleStar: (id:string)=>void; isStarred:boolean; language?:string }) => {
+const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, onUpdateDoD, isStarred, language = 'EN' }: { oof: OOF; onStart: (oof:OOF, minutes:number)=>void; onEdit: (oof:OOF)=>void; onDelete: (id:string)=>void; onToggleStar: (id:string)=>void; onUpdateDoD?: (oofId: string, dodList: DoD[])=>void; isStarred:boolean; language?:string }) => {
   const priorityColors = {
     Low: { bg: 'bg-slate-800/10', text: 'text-slate-300', border: 'border-slate-600' },
     Medium: { bg: 'bg-blue-900/60', text: 'text-blue-400', border: 'border-blue-700' },
@@ -1281,18 +1175,36 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
     Critical: { bg: 'bg-red-900/60', text: 'text-red-400', border: 'border-red-700' }
   };
   
-  const getDomainConfig = (language: string) => ({
-    Backend: { label: translateDomain(language, 'Backend'), color: 'text-blue-400', bgColor: 'bg-blue-900/40' },
-    Data: { label: translateDomain(language, 'Data'), color: 'text-emerald-400', bgColor: 'bg-emerald-900/40' },
-    CS: { label: translateDomain(language, 'CS'), color: 'text-purple-400', bgColor: 'bg-purple-900/40' },
-    Other: { label: translateDomain(language, 'Other'), color: 'text-amber-400', bgColor: 'bg-amber-900/40' },
-    SystemDesign: { label: translateDomain(language, 'SystemDesign'), color: 'text-cyan-400', bgColor: 'bg-cyan-900/40' },
-    AlgoDS: { label: translateDomain(language, 'AlgoDS'), color: 'text-rose-400', bgColor: 'bg-rose-900/40' },
-    Study: { label: translateDomain(language, 'Study'), color: 'text-green-400', bgColor: 'bg-green-900/40' },
-    Discovery: { label: translateDomain(language, 'Discovery'), color: 'text-indigo-400', bgColor: 'bg-indigo-900/40' }
-  });
+  const toggleDoD = (dodId: string) => {
+    if (oof.definitionOfDoneList && onUpdateDoD) {
+      const updatedList = oof.definitionOfDoneList.map(item =>
+        item.id === dodId ? { ...item, completed: !item.completed } : item
+      );
+      onUpdateDoD(oof.id, updatedList);
+    }
+  };
 
-  const domainConfig = getDomainConfig(language);
+  const getDomainConfig = (language: string, domain: string) => {
+    const defaultConfigs: Record<string, { label: string, color: string, bgColor: string }> = {
+      Backend: { label: translateDomain(language, 'Backend'), color: 'text-blue-400', bgColor: 'bg-blue-900/40' },
+      Data: { label: translateDomain(language, 'Data'), color: 'text-emerald-400', bgColor: 'bg-emerald-900/40' },
+      CS: { label: translateDomain(language, 'CS'), color: 'text-purple-400', bgColor: 'bg-purple-900/40' },
+      Other: { label: translateDomain(language, 'Other'), color: 'text-amber-400', bgColor: 'bg-amber-900/40' },
+      SystemDesign: { label: translateDomain(language, 'SystemDesign'), color: 'text-cyan-400', bgColor: 'bg-cyan-900/40' },
+      AlgoDS: { label: translateDomain(language, 'AlgoDS'), color: 'text-rose-400', bgColor: 'bg-rose-900/40' },
+      Study: { label: translateDomain(language, 'Study'), color: 'text-green-400', bgColor: 'bg-green-900/40' },
+      Discovery: { label: translateDomain(language, 'Discovery'), color: 'text-indigo-400', bgColor: 'bg-indigo-900/40' }
+    };
+
+    // Return specific config or fallback for custom domains
+    return defaultConfigs[domain] || {
+      label: translateDomain(language, domain),
+      color: 'text-slate-400',
+      bgColor: 'bg-slate-900/40'
+    };
+  };
+
+  const domainConfig = getDomainConfig(language, oof.domain);
   
   const completionRate = oof.actualMinutes > 0 ? Math.round((oof.actualMinutes / oof.estimatedMinutes) * 100) : 0;
   
@@ -1302,8 +1214,8 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <div className="flex items-center space-x-2 mb-2">
-              <Badge className={`${domainConfig[oof.domain].bgColor} ${domainConfig[oof.domain].color} border-0 text-xs font-semibold px-2 py-1`}>
-                {domainConfig[oof.domain].label}
+              <Badge className={`${domainConfig.bgColor} ${domainConfig.color} border-0 text-xs font-semibold px-2 py-1`}>
+                {domainConfig.label}
               </Badge>
               <Badge className={`${priorityColors[oof.priority].bg} ${priorityColors[oof.priority].text} border-0 text-xs font-semibold px-2 py-1`}>
                 {translatePriority(language, oof.priority)}
@@ -1318,8 +1230,8 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
             <div className="text-sm text-slate-300 space-y-1">
               <div className="flex items-center space-x-4">
                 <span className="text-slate-300">📊 {oof.estimatedMinutes}{translate(language, 'minPlan')}</span>
-                <span className="text-slate-300">⚡ {translate(language, 'complexityLabel')}: {oof.difficulty}/5</span>
-                <span className="text-slate-300">🔋 {translate(language, 'energy')}: {oof.energy}/5</span>
+                <span className="text-slate-300">⚡ {translate(language, 'complexityLabel')}: {oof.difficulty}/10</span>
+                <span className="text-slate-300">🔋 {translate(language, 'energy')}: {oof.energy}/10</span>
               </div>
               {completionRate > 0 && (
                 <div className="flex items-center">
@@ -1348,6 +1260,50 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
           <p className="text-slate-300 text-sm mb-2 bg-slate-800/5 p-2 rounded-lg border border-slate-700/50">
             ✅ DoD: {oof.definitionOfDone}
           </p>
+        )}
+        {oof.definitionOfDoneList && oof.definitionOfDoneList.length > 0 && (
+          <div className="bg-slate-800/5 p-3 rounded-lg border border-slate-700/50 mb-2">
+            <h5 className="text-slate-200 font-semibold text-sm mb-2 flex items-center">
+              <span className="mr-2">✅</span>
+              {translate(language, 'definitionOfDone')} ({oof.definitionOfDoneList.filter(item => item.completed).length}/{oof.definitionOfDoneList.length})
+            </h5>
+
+            {/* Progress bar */}
+            <div className="mb-3">
+              <div className="w-full bg-slate-700 rounded-full h-1.5 mb-1">
+                <div
+                  className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-1.5 rounded-full transition-all duration-300 ease-out"
+                  style={{
+                    width: `${(oof.definitionOfDoneList.filter(item => item.completed).length / oof.definitionOfDoneList.length) * 100}%`
+                  }}
+                ></div>
+              </div>
+              <div className="text-xs text-slate-400">
+                {Math.round((oof.definitionOfDoneList.filter(item => item.completed).length / oof.definitionOfDoneList.length) * 100)}% {translate(language, 'complete')}
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              {oof.definitionOfDoneList.map((item) => (
+                <div key={item.id} className="flex items-center gap-2 text-sm group">
+                  <button
+                    onClick={() => toggleDoD(item.id)}
+                    className={`w-4 h-4 flex items-center justify-center rounded cursor-pointer transition-colors hover:scale-110 ${
+                      item.completed
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-slate-600 border border-slate-500 hover:bg-slate-500'
+                    }`}
+                  >
+                    {item.completed && '✓'}
+                  </button>
+                  <span className={`text-slate-300 ${item.completed ? 'line-through opacity-60' : ''} cursor-pointer`}
+                        onClick={() => toggleDoD(item.id)}>
+                    {item.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
         {oof.firstStep && (
           <p className="text-slate-300 text-sm mb-3 bg-slate-800/5 p-2 rounded-lg border border-slate-700/50">
@@ -1543,6 +1499,53 @@ const formatTime = (seconds: number) => {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 };
 
+const formatTimeUnits = (seconds: number) => {
+  const totalMinutes = Math.floor(seconds / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  const secs = seconds % 60;
+
+  return {
+    hours: hours.toString().padStart(2, '0'),
+    minutes: minutes.toString().padStart(2, '0'),
+    seconds: secs.toString().padStart(2, '0')
+  };
+};
+
+const AnimatedDigit = ({ value, label, language = 'EN' }: { value: string; label: string; language?: string }) => {
+  const [displayValue, setDisplayValue] = useState(value);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (value !== displayValue) {
+      setIsAnimating(true);
+
+      // Start animation after a short delay to allow for cascade effect
+      const timeout = setTimeout(() => {
+        setDisplayValue(value);
+        setTimeout(() => setIsAnimating(false), 300);
+      }, 100);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [value, displayValue]);
+
+  return (
+    <div className="flex-1 bg-slate-800/20 backdrop-blur-sm border border-slate-600/30 rounded-xl p-3 sm:p-4 text-center group hover:border-slate-500/50 transition-all duration-300 hover:bg-slate-800/30">
+      <div className={`text-2xl sm:text-3xl md:text-4xl font-mono font-bold mb-1 sm:mb-2 tabular-nums transition-all duration-300 ${
+        isAnimating
+          ? 'text-emerald-300 scale-110 transform'
+          : 'text-emerald-400 group-hover:text-emerald-300'
+        }`}>
+        {displayValue}
+      </div>
+      <div className="text-xs sm:text-sm uppercase tracking-wider text-slate-400 font-semibold">
+        {translate(language, label.toLowerCase())}
+      </div>
+    </div>
+  );
+};
+
 const AddInline = ({ placeholder, onAdd, buttonText = "Додати", language = 'EN' }: { placeholder?: string; onAdd: (text:string)=>void; buttonText?: string; language?: string }) => {
   const [text, setText] = useState("");
   
@@ -1615,131 +1618,142 @@ const ChecklistTile = ({ title, checked, onChange, infoContent, example, icon, l
   );
 };
 
-const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }: { notes:string; onNotesChange:(v:string)=>void; className?:string; language?:string }) => {
-  const [isCopied, setIsCopied] = useState(false);
-  const [showHint, setShowHint] = useState(false);
 
-  const t = (key: string) => (TRANSLATIONS[language] && TRANSLATIONS[language][key]) || TRANSLATIONS['EN'][key] || key;
+// Definition of Done Editor Component
+const DefinitionOfDoneEditor = ({
+  definitionOfDone,
+  definitionOfDoneList,
+  onDefinitionChange,
+  onListChange,
+  language = 'EN'
+}: {
+  definitionOfDone: string;
+  definitionOfDoneList: DoD[];
+  onDefinitionChange: (value: string) => void;
+  onListChange: (list: DoD[]) => void;
+  language?: string;
+}) => {
+  const [newItem, setNewItem] = useState('');
 
-  const handleCopy = async () => {
-    if (notes.trim()) {
-      try {
-        await navigator.clipboard.writeText(notes);
-        setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 2000);
-      } catch (err) {
-        console.error('Failed to copy text: ', err);
-      }
+  const addItem = () => {
+    if (newItem.trim()) {
+      const newDoD: DoD = {
+        id: Date.now().toString(),
+        text: newItem.trim(),
+        completed: false
+      };
+      onListChange([...definitionOfDoneList, newDoD]);
+      setNewItem('');
     }
   };
 
-  const handleClear = () => {
-    onNotesChange('');
+  const removeItem = (id: string) => {
+    onListChange(definitionOfDoneList.filter(item => item.id !== id));
   };
 
-  const handleExport = () => {
-    if (notes.trim()) {
-      const blob = new Blob([notes], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `session-notes-${new Date().toISOString().split('T')[0]}.txt`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
+  const toggleItem = (id: string) => {
+    onListChange(definitionOfDoneList.map(item =>
+      item.id === id ? { ...item, completed: !item.completed } : item
+    ));
   };
 
-  const wordCount = notes.trim().length ? notes.trim().split(/\s+/).filter(word => word.length > 0).length : 0;
-  const charCount = notes.length;
+  const updateItem = (id: string, newText: string) => {
+    onListChange(definitionOfDoneList.map(item =>
+      item.id === id ? { ...item, text: newText } : item
+    ));
+  };
 
   return (
-    <Card className={`bg-slate-800/10 border-slate-600/70 shadow-xl ${className}`}>
-      <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
-        <CardTitle className="text-slate-100 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <NotebookPen className="w-5 h-5 text-purple-400" />
-            <span>{t('notesTitle')}</span>
-          </div>
-            <div className="flex items-center space-x-2 text-xs text-slate-400">
-            <span>{wordCount} {t('words')}</span>
-            <span>•</span>
-            <span>{charCount} {t('chars')}</span>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-6 pb-4">
-        <div className="space-y-4">
-            <Textarea
-            placeholder={t('notesPlaceholder')}
-            value={notes}
-            onChange={(e) => onNotesChange(e.target.value)}
-            className="bg-slate-900/5 border-slate-600/50 text-slate-100 placeholder-slate-400 min-h-[100px] md:min-h-[175px] rounded-xl resize-y focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors duration-200"
-            style={{ minHeight: '100px', maxHeight: '400px' }}
-          />
+    <div className="space-y-4">
+      {/* Legacy text area for backward compatibility */}
+      <Textarea
+        placeholder={translate(language, 'oofDefinitionPlaceholder')}
+        value={definitionOfDone}
+        onChange={(e) => onDefinitionChange(e.target.value)}
+        className="bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400"
+        rows={2}
+      />
 
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between bg-slate-900/30 p-3 rounded-lg border border-slate-700/30">
-            {/* Підказка по кліку */}
-            <div className="mb-2 sm:mb-0">
-              <button
-                type="button"
-                className="flex items-center text-xs text-slate-400 hover:text-purple-400 transition-colors font-semibold focus:outline-none"
-                onClick={() => setShowHint((v) => !v)}
-              >
-                <Lightbulb className="w-4 h-4 mr-1 text-purple-400" />
-                ℹ️ {t('hint')}
-              </button>
-              {showHint && (
-                <div className="mt-2 text-xs text-slate-300 bg-slate-800/10 p-2 rounded-md border border-slate-700/50 max-w-xs shadow-lg">
-                  <strong>{t('tipLabel')}</strong> {t('hintLongShort')}
-                </div>
-              )}
+      {/* Checklist section */}
+      <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/50">
+        <h4 className="text-slate-200 font-semibold mb-3 flex items-center">
+          <span className="mr-2">✅</span>
+          {translate(language, 'definitionOfDoneChecklist')}
+        </h4>
+
+        {/* Progress bar */}
+        {definitionOfDoneList.length > 0 && (
+          <div className="mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-slate-300 text-sm font-medium">{translate(language, 'progress')}</span>
+              <span className="text-slate-300 text-sm">
+                {definitionOfDoneList.filter(item => item.completed).length}/{definitionOfDoneList.length} {translate(language, 'completed').toLowerCase()}
+              </span>
             </div>
-            {/* Кнопки адаптивно */}
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleCopy}
-                disabled={!notes.trim()}
-                className="border-slate-500 text-slate-300 hover:text-slate-100 hover:bg-slate-700/10 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
-              >
-                    {isCopied ? (
-                  <>
-                    <span className="w-4 h-4 mr-1">✓</span>
-                    {t('copied')}
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 mr-1" />
-                    {t('copy')}
-                  </>
-                )}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleExport}
-                disabled={!notes.trim()}
-                className="border-slate-500 text-slate-300 hover:text-slate-100 hover:bg-slate-700/10 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
-              >
-                <Download className="w-4 h-4 mr-1" />
-                {t('export')}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleClear}
-                disabled={!notes.trim()}
-                className="border-slate-500 text-red-400 hover:text-red-200 hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
-              >
-                <Trash2 className="w-4 h-4 mr-1" />
-                {t('clear')}
-              </Button>
+            <div className="w-full bg-slate-700 rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2 rounded-full transition-all duration-300 ease-out"
+                style={{
+                  width: `${definitionOfDoneList.length > 0 ? (definitionOfDoneList.filter(item => item.completed).length / definitionOfDoneList.length) * 100 : 0}%`
+                }}
+              ></div>
+            </div>
+            <div className="text-xs text-slate-400 mt-1">
+              {Math.round((definitionOfDoneList.filter(item => item.completed).length / definitionOfDoneList.length) * 100)}% {translate(language, 'complete')}
             </div>
           </div>
+        )}
+
+        {/* Add new item */}
+        <div className="flex gap-2 mb-3">
+          <Input
+            value={newItem}
+            onChange={(e) => setNewItem(e.target.value)}
+            placeholder={translate(language, 'addNewCriterion')}
+            className="bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400"
+            onKeyPress={(e) => e.key === 'Enter' && addItem()}
+          />
+          <Button onClick={addItem} size="sm" className="bg-emerald-600 hover:bg-emerald-500">
+            <Plus className="w-4 h-4" />
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Checklist items */}
+        <div className="space-y-2">
+          {definitionOfDoneList.map((item) => (
+            <div key={item.id} className="flex items-center gap-2 group">
+              <input
+                type="checkbox"
+                checked={item.completed}
+                onChange={() => toggleItem(item.id)}
+                className="w-4 h-4 text-emerald-600 bg-slate-700 border-slate-600 rounded focus:ring-emerald-500"
+              />
+              <Input
+                value={item.text}
+                onChange={(e) => updateItem(item.id, e.target.value)}
+                className={`flex-1 bg-slate-700 border-slate-600 text-slate-100 ${
+                  item.completed ? 'line-through opacity-60' : ''
+                }`}
+              />
+              <Button
+                onClick={() => removeItem(item.id)}
+                size="sm"
+                variant="ghost"
+                className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+
+        {definitionOfDoneList.length === 0 && (
+          <p className="text-slate-400 text-sm italic">
+            {translate(language, 'noCriteriaAdded')}
+          </p>
+        )}
+      </div>
+    </div>
   );
 };
 
@@ -1771,10 +1785,6 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
   const [logs, setLogs] = useState<BlockLog[]>(() => ls.get('dw_logs', []));
   const [showSummary, setShowSummary] = useState(false);
   const [lastCompletedBlock, setLastCompletedBlock] = useState<BlockLog | null>(null);
-  const [templates, setTemplates] = useState<Template[]>(() => {
-    const stored = ls.get('dw_templates', []);
-    return stored.length > 0 ? stored : getDefaultTemplates(language);
-  });
   const [settings, setSettings] = useState<Settings>(() => ls.get('dw_settings', {
     notifications: true,
     soundEnabled: true,
@@ -1786,7 +1796,8 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     energyTracking: true,
     advancedMetrics: true
   }));
-  
+
+
   // UI state
   const [starredOOFs, setStarredOOFs] = useState<string[]>(() => ls.get('dw_starred', []));
   const [showHints, setShowHints] = useState(false);
@@ -1794,12 +1805,32 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
   const [activeTab, setActiveTab] = useState('focus');
   const [oofFilter, setOofFilter] = useState('all');
   const [editingOOF, setEditingOOF] = useState<OOF | null>(null);
+  const [showCreateOOF, setShowCreateOOF] = useState(false);
+
+  // Domain management state
+  const [customDomains, setCustomDomains] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('deepwork-custom-domains') || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [showDomainManager, setShowDomainManager] = useState(false);
+  const [newDomainName, setNewDomainName] = useState('');
+  const [editingDomain, setEditingDomain] = useState<{index: number, name: string} | null>(null);
   
+  // Get all available domains (default + custom)
+  const getAllDomains = (): string[] => {
+    const defaultDomains = ['Backend', 'Data', 'CS', 'SystemDesign', 'AlgoDS', 'Study', 'Discovery', 'Other'];
+    return [...defaultDomains, ...customDomains];
+  };
+
   // Helper function to get preferred default domain from localStorage
   const getPreferredDomain = (): Domain => {
     try {
       const stored = localStorage.getItem('deepwork-preferred-domain');
-      if (stored && ['Backend', 'Data', 'CS', 'SystemDesign', 'AlgoDS', 'Study', 'Discovery', 'Other'].includes(stored)) {
+      const allDomains = getAllDomains();
+      if (stored && allDomains.includes(stored)) {
         console.log('🔥 Using stored preferred domain:', stored);
         return stored as Domain;
       }
@@ -1808,6 +1839,38 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     }
     console.log('🔥 Using default domain: Discovery');
     return 'Discovery';
+  };
+
+  // Domain management functions
+  const saveCustomDomains = (domains: string[]) => {
+    try {
+      localStorage.setItem('deepwork-custom-domains', JSON.stringify(domains));
+      setCustomDomains(domains);
+    } catch (error) {
+      console.warn('Error saving custom domains:', error);
+    }
+  };
+
+  const addCustomDomain = (name: string) => {
+    const trimmedName = name.trim();
+    if (!trimmedName || getAllDomains().includes(trimmedName)) return;
+    const newDomains = [...customDomains, trimmedName];
+    saveCustomDomains(newDomains);
+    setNewDomainName('');
+  };
+
+  const editCustomDomain = (index: number, newName: string) => {
+    const trimmedName = newName.trim();
+    if (!trimmedName || getAllDomains().filter((_, i) => i !== index + 8).includes(trimmedName)) return; // +8 to skip default domains
+    const newDomains = [...customDomains];
+    newDomains[index] = trimmedName;
+    saveCustomDomains(newDomains);
+    setEditingDomain(null);
+  };
+
+  const removeCustomDomain = (index: number) => {
+    const newDomains = customDomains.filter((_, i) => i !== index);
+    saveCustomDomains(newDomains);
   };
 
   // Helper function to save preferred domain to localStorage
@@ -1830,11 +1893,12 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       priority: 'Medium' as Priority,
       estimatedMinutes: '90',
       definitionOfDone: '',
+      definitionOfDoneList: [] as DoD[],
       constraints: '',
       firstStep: '',
       tags: [] as string[],
-      difficulty: 3,
-      energy: 3
+      difficulty: 5,
+      energy: 5
     };
   });
 
@@ -1847,11 +1911,12 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
         priority: editingOOF.priority,
         estimatedMinutes: String(editingOOF.estimatedMinutes),
         definitionOfDone: editingOOF.definitionOfDone || '',
+        definitionOfDoneList: editingOOF.definitionOfDoneList || [],
         constraints: editingOOF.constraints || '',
         firstStep: editingOOF.firstStep || '',
         tags: editingOOF.tags || [],
-        difficulty: editingOOF.difficulty || 3,
-        energy: editingOOF.energy || 3
+        difficulty: editingOOF.difficulty || 5,
+        energy: editingOOF.energy || 5
       });
     } else {
       // reset to defaults when not editing, using preferred domain
@@ -1863,6 +1928,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
         priority: 'Medium',
         estimatedMinutes: '90',
         definitionOfDone: '',
+        definitionOfDoneList: [],
         constraints: '',
         firstStep: '',
         tags: [],
@@ -1880,16 +1946,9 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     mood: 3,
     interruptions: 0,
     flowState: false,
-    completedOOF: false,
-    notes: ''
+    completedOOF: false
   });
   
-  const [newTemplate, setNewTemplate] = useState({
-    id: '',
-    title: '',
-    body: '',
-    category: 'General'
-  });
   
   // Timer management
   const intervalRef = useRef<number | null>(null);
@@ -1905,42 +1964,9 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
   useEffect(() => ls.set('dw_checklists', checklists), [checklists]);
   useEffect(() => ls.set('dw_running', run), [run]);
   useEffect(() => ls.set('dw_logs', logs), [logs]);
-  useEffect(() => ls.set('dw_templates', templates), [templates]);
   useEffect(() => ls.set('dw_settings', settings), [settings]);
   useEffect(() => ls.set('dw_starred', starredOOFs), [starredOOFs]);
 
-  // Update templates when language changes
-  useEffect(() => {
-    const stored = ls.get('dw_templates', []);
-    if (stored.length === 0) {
-      setTemplates(getDefaultTemplates(language));
-    } else {
-      // Update existing default templates with new language
-      const updatedTemplates = stored.map((template: Template) => {
-        if (template.id === 'rag-slice') {
-          return {
-            ...template,
-            title: translate(language, 'templateRagTitle'),
-            body: translate(language, 'templateRagBody')
-          };
-        } else if (template.id === 'study-session') {
-          return {
-            ...template,
-            title: translate(language, 'templateStudyTitle'),
-            body: translate(language, 'templateStudyBody')
-          };
-        } else if (template.id === 'coding-problem') {
-          return {
-            ...template,
-            title: translate(language, 'templateCodingTitle'),
-            body: translate(language, 'templateCodingBody')
-          };
-        }
-        return template;
-      });
-      setTemplates(updatedTemplates);
-    }
-  }, [language]);
 
   // Quantum Background 3D Scene Setup
   useEffect(() => {
@@ -2086,6 +2112,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
           const realElapsedMs = now - prev.startTs - totalPausedMs;
           const realElapsedSec = Math.max(0, Math.floor(realElapsedMs / 1000));
 
+
           return {
             ...prev,
             elapsedSec: realElapsedSec,
@@ -2200,7 +2227,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
   // Enhanced OOF operations
   const addOOF = () => {
     if (!newOOF.title.trim()) return;
-    
+
     const oof: OOF = {
       id: generateId(),
       title: newOOF.title.trim(),
@@ -2209,6 +2236,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       estimatedMinutes: parseInt(String(newOOF.estimatedMinutes)) || 90,
       actualMinutes: 0,
       definitionOfDone: newOOF.definitionOfDone.trim() || undefined,
+      definitionOfDoneList: newOOF.definitionOfDoneList.length > 0 ? newOOF.definitionOfDoneList : undefined,
       constraints: newOOF.constraints.trim() || undefined,
       firstStep: newOOF.firstStep.trim() || undefined,
       planned: true,
@@ -2217,11 +2245,15 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       difficulty: newOOF.difficulty,
       energy: newOOF.energy
     };
-    
+
     setOofs(prev => [oof, ...prev]);
 
     // Save the selected domain as the new preferred default
     savePreferredDomain(oof.domain);
+
+    // Auto-collapse Create OOF section and ensure new OOF is visible
+    setShowCreateOOF(false);
+    setOofFilter('all');
 
     console.log('🔥 After adding OOF, resetting form with preferred domain:', oof.domain);
     setNewOOF({
@@ -2233,8 +2265,8 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       constraints: '',
       firstStep: '',
       tags: [],
-      difficulty: 3,
-      energy: 3
+      difficulty: 5,
+      energy: 5
     });
   };
 
@@ -2247,6 +2279,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
         priority: newOOF.priority,
         estimatedMinutes: parseInt(String(newOOF.estimatedMinutes)) || 90,
         definitionOfDone: newOOF.definitionOfDone.trim() || undefined,
+        definitionOfDoneList: newOOF.definitionOfDoneList.length > 0 ? newOOF.definitionOfDoneList : undefined,
         constraints: newOOF.constraints.trim() || undefined,
         firstStep: newOOF.firstStep.trim() || undefined,
         tags: newOOF.tags,
@@ -2263,6 +2296,14 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     setOofs(prev => prev.map(o => o.id === updatedOOF.id ? updatedOOF : o));
     setEditingOOF(null);
   };
+
+  const updateOOFDoD = (oofId: string, dodList: DoD[]) => {
+    setOofs(prev => prev.map(oof =>
+      oof.id === oofId
+        ? { ...oof, definitionOfDoneList: dodList }
+        : oof
+    ));
+  };
   
   const deleteOOF = (id: string) => {
     setOofs(prev => prev.filter(o => o.id !== id));
@@ -2270,11 +2311,38 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
   };
   
   const toggleStarOOF = (id: string) => {
-    setStarredOOFs(prev => 
-      prev.includes(id) 
+    const isCurrentlyStarred = starredOOFs.includes(id);
+
+    setStarredOOFs(prev =>
+      isCurrentlyStarred
         ? prev.filter(sid => sid !== id)
         : [...prev, id]
     );
+
+    // If starring an OOF, set it as the active timer OOF
+    if (!isCurrentlyStarred) {
+      const oof = oofs.find(o => o.id === id);
+      if (oof) {
+        console.log('🌟 Starring OOF:', oof.title);
+        setRun(prev => {
+          const newState = {
+            ...prev,
+            oofId: oof.id,
+            oofTitle: oof.title || ''
+          };
+          console.log('🌟 Updated run state:', newState);
+          return newState;
+        });
+      }
+    } else {
+      console.log('⭐ Unstarring OOF with id:', id);
+      // When unstarring, clear the selected OOF
+      setRun(prev => ({
+        ...prev,
+        oofId: undefined,
+        oofTitle: ''
+      }));
+    }
   };
   
   // Enhanced timer operations
@@ -2307,7 +2375,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       notes: ''
     });
     
-    setActiveTab('timer');
+    setActiveTab('parking');
   };
   
   const togglePause = () => {
@@ -2344,13 +2412,13 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     }));
   };
   
-  const stopBlock = () => {
+  const stopBlock = useCallback(() => {
     const minutes = Math.min(run.targetMinutes, Math.floor(run.elapsedSec / 60));
     const now = Date.now();
     const dateISO = new Date(now).toISOString().split('T')[0];
     const hour = new Date(now).getHours();
     const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
-    
+
     const blockLog: BlockLog = {
       id: run.blockId,
       dateISO,
@@ -2365,12 +2433,11 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       lr: postBlockData.lr,
       energy: postBlockData.energy,
       mood: postBlockData.mood,
-      notes: postBlockData.notes.trim() || undefined,
       interruptions: postBlockData.interruptions,
       flowState: postBlockData.flowState,
       completedOOF: postBlockData.completedOOF
     };
-    
+
     setLogs(prev => [blockLog, ...prev]);
 
     // Show summary screen
@@ -2379,13 +2446,13 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
 
     // Update OOF actual minutes
     if (run.oofId) {
-      setOofs(prev => prev.map(oof => 
-        oof.id === run.oofId 
+      setOofs(prev => prev.map(oof =>
+        oof.id === run.oofId
           ? { ...oof, actualMinutes: oof.actualMinutes + minutes, completedAt: postBlockData.completedOOF ? now : undefined }
           : oof
       ));
     }
-    
+
     // Reset states
     setRun({
       active: false,
@@ -2401,7 +2468,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       interruptions: 0,
       lastActivityTs: 0
     });
-    
+
     setPostBlockData({
       dq: 3,
       ou: 0,
@@ -2413,15 +2480,28 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       completedOOF: false,
       notes: ''
     });
-    
+
     setChecklists(prev => ({
       ...prev,
       post: { artifact: false, summary: false, nextStep: false, reflect: false }
     }));
-    
+
     setActiveTab('summary');
-  };
-  
+  }, [run.targetMinutes, run.elapsedSec, run.blockId, run.startTs, run.oofId, run.oofTitle, postBlockData, setLogs, setLastCompletedBlock, setShowSummary, setOofs, setRun, setPostBlockData, setChecklists, setActiveTab]);
+
+  // Auto-complete timer when it reaches 00:00:00
+  useEffect(() => {
+    if (run.active && !run.paused) {
+      const targetSec = run.targetMinutes * 60;
+      if (run.elapsedSec >= targetSec) {
+        // Timer has reached completion (00:00:00)
+        setTimeout(() => {
+          stopBlock();
+        }, 100); // Small delay to ensure state updates first
+      }
+    }
+  }, [run.active, run.paused, run.elapsedSec, run.targetMinutes, stopBlock]);
+
   // Enhanced parking operations
   const addParking = (text: string) => {
     if (!text.trim()) return;
@@ -2452,40 +2532,8 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     ));
   };
   
-  // Template operations with usage tracking
-  const addTemplate = () => {
-    if (!newTemplate.id.trim() || !newTemplate.title.trim() || !newTemplate.body.trim()) {
-      return;
-    }
-    
-    if (templates.find(t => t.id === newTemplate.id)) {
-      return; // Duplicate ID
-    }
-    
-    const template: Template = {
-      id: newTemplate.id.trim(),
-      title: newTemplate.title.trim(),
-      body: newTemplate.body.trim(),
-      category: newTemplate.category,
-      useCount: 0,
-      lastUsed: 0
-    };
-    
-    setTemplates(prev => [...prev, template]);
-    setNewTemplate({ id: '', title: '', body: '', category: 'General' });
-  };
   
-  const useTemplate = (templateId: string) => {
-    setTemplates(prev => prev.map(t => 
-      t.id === templateId 
-        ? { ...t, useCount: t.useCount + 1, lastUsed: Date.now() }
-        : t
-    ));
-  };
   
-  const deleteTemplate = (id: string) => {
-    setTemplates(prev => prev.filter(t => t.id !== id));
-  };
   
   // Enhanced calculations with caching
   const analytics = useMemo(() => {
@@ -2683,7 +2731,32 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
             </div>
           </div>
           
-          {/* Переміщений таймер вгору */}
+          {/* Selected OOF Card - Always Visible */}
+          {run.oofId && (
+            <div className="mt-6">
+              {(() => {
+                const selectedOOF = oofs.find(o => o.id === run.oofId);
+                if (selectedOOF) {
+                  return (
+                    <EnhancedOOFCard
+                      oof={selectedOOF}
+                      onStart={startBlock}
+                      onEdit={setEditingOOF}
+                      onDelete={deleteOOF}
+                      onToggleStar={toggleStarOOF}
+                      onUpdateDoD={updateOOFDoD}
+                      isStarred={starredOOFs.includes(selectedOOF.id)}
+                      language={language}
+                    />
+                  );
+                }
+                return null;
+              })()}
+            </div>
+          )}
+
+
+          {/* Active Timer - Show when running */}
           {run.active && (
             <div className="mt-6">
               <SmartTimer
@@ -2696,18 +2769,138 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
               />
             </div>
           )}
-          
+
+          {/* Timer Section - Always Visible */}
+          <div className="space-y-6 mt-6">
+            {!run.active ? (
+              <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
+                <CardContent className="pt-8">
+                  <div className="text-center space-y-6">
+                    <div className="space-y-2">
+                      <Clock className="w-16 h-16 text-slate-300 mx-auto" />
+                      <h3 className="text-xl font-semibold text-slate-100 mb-2">{translate(language, 'readyToStart')}</h3>
+                      <p className="text-slate-300">{translate(language, 'chooseTask')}</p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row justify-center gap-3 px-4">
+                      <Button
+                        onClick={() => startBlock(null, 25)}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
+                        size="lg"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        <span className="whitespace-nowrap">{translate(language,'pomodoro25')}</span>
+                      </Button>
+                      <Button
+                        onClick={() => startBlock(null, 60)}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
+                        size="lg"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        <span className="whitespace-nowrap">{translate(language,'standard60')}</span>
+                      </Button>
+                      <Button
+                        onClick={() => startBlock(null, 90)}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
+                        size="lg"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        <span className="whitespace-nowrap">{translate(language,'deep90')}</span>
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-6">
+                {/* Enhanced Hints */}
+                <Card className="bg-gradient-to-r from-slate-800/60 to-slate-700/40 backdrop-blur-sm border border-slate-600/50 shadow-xl">
+                  <CardContent className="pt-5">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setShowHints(!showHints)}
+                      className="w-full justify-between text-slate-100 hover:text-slate-50 hover:bg-slate-700/10 p-4 rounded-lg border border-slate-600/30"
+                    >
+                      <span className="flex items-center font-semibold">
+                        <Lightbulb className="w-5 h-5 mr-2 text-yellow-400" />
+                        {t('smartHintsTitle')}
+                      </span>
+                      {showHints ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </Button>
+
+                    {showHints && (
+                      <div className="mt-6 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Card className="bg-gradient-to-br from-emerald-900/30 to-emerald-800/20 border border-emerald-700/50 shadow-lg">
+                            <CardContent className="pt-5">
+                              <h4 className="text-emerald-300 font-bold mb-3 flex items-center text-lg">
+                                <Zap className="w-5 h-5 mr-2" />
+                                {t('microExperiment')}
+                              </h4>
+                              <p className="text-slate-200 text-sm mb-4 leading-relaxed">
+                                {t('microExperimentDesc')}
+                              </p>
+                              <ul className="text-slate-300 text-sm space-y-2">
+                                <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip1')}</li>
+                                <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip2')}</li>
+                                <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip3')}</li>
+                                <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip4')}</li>
+                              </ul>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="bg-gradient-to-br from-amber-900/30 to-orange-800/20 border border-amber-700/50 shadow-lg">
+                            <CardContent className="pt-5">
+                              <h4 className="text-amber-300 font-bold mb-3 flex items-center text-lg">
+                                <NotebookPen className="w-5 h-5 mr-2" />
+                                {t('distractionManagement')}
+                              </h4>
+                              <p className="text-slate-200 text-sm mb-4 leading-relaxed">
+                                {t('distractionDesc')}
+                              </p>
+                              <ul className="text-slate-300 text-sm space-y-2">
+                                <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip1')}</li>
+                                <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip2')}</li>
+                                <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip3')}</li>
+                                <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip4')}</li>
+                              </ul>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        <Card className="bg-gradient-to-r from-blue-900/30 to-purple-900/25 border border-blue-700/50 shadow-xl">
+                          <CardContent className="pt-5">
+                            <h4 className="text-blue-300 font-bold mb-3 flex items-center text-lg">
+                              <Brain className="w-5 h-5 mr-2" />
+                              {translate(language, 'flowState')} (Flow State)
+                            </h4>
+                            <p className="text-slate-200 text-sm leading-relaxed">
+                              <strong>{translate(language, 'flowStateSigns')}</strong> {translate(language, 'flowDescription')},
+                              {translate(language, 'flowDescriptionFull')}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Enhanced During Checklists */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Hint blocks removed as requested */}
+                </div>
+
+              </div>
+            )}
+          </div>
+
           {/* Enhanced Tab Navigation - Mobile Responsive */}
           <div className="mt-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-6 bg-slate-800/5 backdrop-blur-md border border-slate-600/50 w-full gap-0.5 md:gap-1 h-auto p-1">
+              <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 bg-slate-800/5 backdrop-blur-md border border-slate-600/50 w-full gap-0.5 md:gap-1 h-auto p-1">
                 <TabsTrigger value="focus" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
                   <Target className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
                   <span>{translate(language,'tabFocus')}</span>
-                </TabsTrigger>
-                <TabsTrigger value="timer" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
-                  <Clock className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
-                  <span>{translate(language,'tabTimer')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="parking" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
                   <NotebookPen className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
@@ -2717,27 +2910,40 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                   <BarChart3 className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
                   <span>{translate(language,'tabAnalytics')}</span>
                 </TabsTrigger>
-                <TabsTrigger value="templates" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
-                  <Copy className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
-                  <span>{translate(language,'tabTemplates')}</span>
-                </TabsTrigger>
                 <TabsTrigger value="settings" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
                   <Settings className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
                   <span>{translate(language,'tabSettings')}</span>
                 </TabsTrigger>
               </TabsList>
-              
+            </Tabs>
+          </div>
+
+
+          {/* Tab Content Sections */}
+          <div className="mt-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <div className="mt-6 max-w-7xl mx-auto">
-                {/* Focus Tab - Enhanced OOF Management */}
+                {/* Tasks Tab - Enhanced OOF Management */}
                 <TabsContent value="focus" className="space-y-6">
                   {/* OOF Creation Form */}
                   <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
                     <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
-                      <CardTitle className="text-slate-50 flex items-center space-x-2">
-                        <Target className="w-5 h-5 text-indigo-400" />
-                        <span>{translate(language,'createOOF')}</span>
+                      <CardTitle
+                        className="text-slate-50 flex items-center justify-between cursor-pointer hover:text-slate-100 transition-colors"
+                        onClick={() => setShowCreateOOF(!showCreateOOF)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Target className="w-5 h-5 text-indigo-400" />
+                          <span>{translate(language,'createOOF')}</span>
+                        </div>
+                        {showCreateOOF ? (
+                          <ChevronUp className="w-5 h-5 text-slate-400" />
+                        ) : (
+                          <ChevronDown className="w-5 h-5 text-slate-400" />
+                        )}
                       </CardTitle>
                     </CardHeader>
+                    {showCreateOOF && (
                     <CardContent className="space-y-4 pt-6">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div className="space-y-4">
@@ -2750,20 +2956,26 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                           
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <label className="text-slate-200 text-sm font-medium mb-2 block">{translate(language,'domain')}</label>
+                              <div className="flex items-center justify-between mb-2">
+                                <label className="text-slate-200 text-sm font-medium">{translate(language,'domain')}</label>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowDomainManager(true)}
+                                  className="text-xs text-indigo-400 hover:text-indigo-300 bg-slate-700 px-2 py-1 rounded border border-slate-600 hover:border-indigo-500 transition-colors"
+                                >
+                                  Manage
+                                </button>
+                              </div>
                               <select
                                 value={newOOF.domain}
                                 onChange={(e) => setNewOOF(prev => ({ ...prev, domain: e.target.value as Domain }))}
                                 className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-slate-100 focus:border-indigo-500"
                               >
-                                <option value="Backend">{translateDomain(language, 'Backend')}</option>
-                                <option value="Data">{translateDomain(language, 'Data')}</option>
-                                <option value="CS">{translateDomain(language, 'CS')}</option>
-                                <option value="SystemDesign">{translateDomain(language, 'SystemDesign')}</option>
-                                <option value="AlgoDS">{translateDomain(language, 'AlgoDS')}</option>
-                                <option value="Study">{translateDomain(language, 'Study')}</option>
-                                <option value="Discovery">{translateDomain(language, 'Discovery')}</option>
-                                <option value="Other">{translateDomain(language, 'Other')}</option>
+                                {getAllDomains().map(domain => (
+                                  <option key={domain} value={domain}>
+                                    {translateDomain(language, domain)}
+                                  </option>
+                                ))}
                               </select>
                             </div>
                             
@@ -2800,12 +3012,12 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                                   value={[newOOF.difficulty]}
                                   onValueChange={(vals) => setNewOOF(prev => ({ ...prev, difficulty: vals[0] }))}
                                   min={1}
-                                  max={5}
+                                  max={10}
                                   step={1}
                                   className="w-full [&>*]:bg-slate-600 [&_[role=slider]]:bg-indigo-500 [&_[role=slider]]:border-indigo-400 [&_[data-orientation=horizontal]]:h-2"
                                 />
                               </div>
-                              <div className="text-center text-slate-300 text-sm mt-2 font-semibold">{newOOF.difficulty}/5</div>
+                              <div className="text-center text-slate-300 text-sm mt-2 font-semibold">{newOOF.difficulty}/10</div>
                             </div>
                             
                             <div>
@@ -2815,23 +3027,23 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                                   value={[newOOF.energy]}
                                   onValueChange={(vals) => setNewOOF(prev => ({ ...prev, energy: vals[0] }))}
                                   min={1}
-                                  max={5}
+                                  max={10}
                                   step={1}
                                   className="w-full [&>*]:bg-slate-600 [&_[role=slider]]:bg-indigo-500 [&_[role=slider]]:border-indigo-400 [&_[data-orientation=horizontal]]:h-2"
                                 />
                               </div>
-                              <div className="text-center text-slate-300 text-sm mt-2 font-semibold">{newOOF.energy}/5</div>
+                              <div className="text-center text-slate-300 text-sm mt-2 font-semibold">{newOOF.energy}/10</div>
                             </div>
                           </div>
                         </div>
                         
                         <div className="space-y-4">
-                          <Textarea
-                            placeholder={translate(language, 'oofDefinitionPlaceholder')}
-                            value={newOOF.definitionOfDone}
-                            onChange={(e) => setNewOOF(prev => ({ ...prev, definitionOfDone: e.target.value }))}
-                            className="bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400"
-                            rows={3}
+                          <DefinitionOfDoneEditor
+                            definitionOfDone={newOOF.definitionOfDone}
+                            definitionOfDoneList={newOOF.definitionOfDoneList}
+                            onDefinitionChange={(value) => setNewOOF(prev => ({ ...prev, definitionOfDone: value }))}
+                            onListChange={(list) => setNewOOF(prev => ({ ...prev, definitionOfDoneList: list }))}
+                            language={language}
                           />
                           
                           <Textarea
@@ -2872,8 +3084,9 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                             </Button>
                           )}
                     </CardContent>
+                    )}
                   </Card>
-                  
+
                   {/* Виправлений OOF Filter - темніший */}
                   <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-transparent rounded-xl border border-slate-700/30 shadow-xl">
                     <div className="flex items-center space-x-3 flex-wrap">
@@ -2916,325 +3129,12 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                         onEdit={setEditingOOF}
                         onDelete={deleteOOF}
                         onToggleStar={toggleStarOOF}
+                        onUpdateDoD={updateOOFDoD}
                         isStarred={starredOOFs.includes(oof.id)}
                         language={language}
                       />
                     ))}
                   </div>
-                </TabsContent>
-                
-                {/* Timer Tab - Виправлена секція з нотатками */}
-                <TabsContent value="timer" className="space-y-6">
-                  {!run.active ? (
-                    <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
-                      <CardContent className="pt-8">
-                        <div className="text-center space-y-6">
-                          <div className="space-y-2">
-                            <Clock className="w-16 h-16 text-slate-300 mx-auto" />
-                            <h3 className="text-xl font-semibold text-slate-100 mb-2">{translate(language, 'readyToStart')}</h3>
-                            <p className="text-slate-300">{translate(language, 'chooseTask')}</p>
-                          </div>
-                          
-                          <div className="flex flex-col sm:flex-row justify-center gap-3 px-4">
-                            <Button
-                              onClick={() => startBlock(null, 25)}
-                              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
-                              size="lg"
-                            >
-                              <Play className="w-4 h-4 mr-2" />
-                              <span className="whitespace-nowrap">{translate(language,'pomodoro25')}</span>
-                            </Button>
-                            <Button
-                              onClick={() => startBlock(null, 60)}
-                              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
-                              size="lg"
-                            >
-                              <Play className="w-4 h-4 mr-2" />
-                              <span className="whitespace-nowrap">{translate(language,'standard60')}</span>
-                            </Button>
-                            <Button
-                              onClick={() => startBlock(null, 90)}
-                              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
-                              size="lg"
-                            >
-                              <Play className="w-4 h-4 mr-2" />
-                              <span className="whitespace-nowrap">{translate(language,'deep90')}</span>
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="space-y-6">
-                      {/* Секція нотаток завжди видима коли блок активний */}
-                      <NotesSection
-                        notes={postBlockData.notes}
-                        onNotesChange={(notes) => setPostBlockData(prev => ({ ...prev, notes }))}
-                        language={language}
-                      />
-                      
-                      {/* Enhanced Hints */}
-                      <Card className="bg-gradient-to-r from-slate-800/60 to-slate-700/40 backdrop-blur-sm border border-slate-600/50 shadow-xl">
-                        <CardContent className="pt-5">
-                          <Button
-                            variant="ghost"
-                            onClick={() => setShowHints(!showHints)}
-                            className="w-full justify-between text-slate-100 hover:text-slate-50 hover:bg-slate-700/10 p-4 rounded-lg border border-slate-600/30"
-                          >
-                            <span className="flex items-center font-semibold">
-                              <Lightbulb className="w-5 h-5 mr-2 text-yellow-400" />
-                              {t('smartHintsTitle')}
-                            </span>
-                            {showHints ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                          </Button>
-                          
-                          {showHints && (
-                            <div className="mt-6 space-y-4">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <Card className="bg-gradient-to-br from-emerald-900/30 to-emerald-800/20 border border-emerald-700/50 shadow-lg">
-                                  <CardContent className="pt-5">
-                                    <h4 className="text-emerald-300 font-bold mb-3 flex items-center text-lg">
-                                      <Zap className="w-5 h-5 mr-2" />
-                                      {t('microExperiment')}
-                                    </h4>
-                                    <p className="text-slate-200 text-sm mb-4 leading-relaxed">
-                                      {t('microExperimentDesc')}
-                                    </p>
-                                    <ul className="text-slate-300 text-sm space-y-2">
-                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip1')}</li>
-                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip2')}</li>
-                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip3')}</li>
-                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip4')}</li>
-                                    </ul>
-                                  </CardContent>
-                                </Card>
-                                
-                                <Card className="bg-gradient-to-br from-amber-900/30 to-orange-800/20 border border-amber-700/50 shadow-lg">
-                                  <CardContent className="pt-5">
-                                    <h4 className="text-amber-300 font-bold mb-3 flex items-center text-lg">
-                                      <NotebookPen className="w-5 h-5 mr-2" />
-                                      {t('distractionManagement')}
-                                    </h4>
-                                    <p className="text-slate-200 text-sm mb-4 leading-relaxed">
-                                      {t('distractionDesc')}
-                                    </p>
-                                    <ul className="text-slate-300 text-sm space-y-2">
-                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip1')}</li>
-                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip2')}</li>
-                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip3')}</li>
-                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip4')}</li>
-                                    </ul>
-                                  </CardContent>
-                                </Card>
-                              </div>
-                              
-                              <Card className="bg-gradient-to-r from-blue-900/30 to-purple-900/25 border border-blue-700/50 shadow-xl">
-                                <CardContent className="pt-5">
-                                  <h4 className="text-blue-300 font-bold mb-3 flex items-center text-lg">
-                                    <Brain className="w-5 h-5 mr-2" />
-                                    {translate(language, 'flowState')} (Flow State)
-                                  </h4>
-                                  <p className="text-slate-200 text-sm leading-relaxed">
-                                    <strong>{translate(language, 'flowStateSigns')}</strong> {translate(language, 'flowDescription')},
-                                    {translate(language, 'flowDescriptionFull')}
-                                  </p>
-                                </CardContent>
-                              </Card>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                      
-                      {/* Enhanced During Checklists */}
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <ChecklistTile
-                          title={translate(language, 'check_single_title')}
-                          checked={checklists.during.singleTask}
-                          onChange={(checked) => setChecklists(prev => ({
-                            ...prev,
-                            during: { ...prev.during, singleTask: checked }
-                          }))}
-                          infoContent={translate(language, 'check_single_info')}
-                          example={translate(language, 'check_single_example')}
-                          icon="🎯"
-                          language={language}
-                        />
-                        
-                        <ChecklistTile
-                          title={translate(language, 'check_scratch_title')}
-                          checked={checklists.during.scratchpad}
-                          onChange={(checked) => setChecklists(prev => ({
-                            ...prev,
-                            during: { ...prev.during, scratchpad: checked }
-                          }))}
-                          infoContent={translate(language, 'check_scratch_info')}
-                          example={translate(language, 'check_scratch_example')}
-                          icon="📝"
-                          language={language}
-                        />
-                        
-                        <ChecklistTile
-                          title={translate(language, 'check_5min_title')}
-                          checked={checklists.during.stuckRule}
-                          onChange={(checked) => setChecklists(prev => ({
-                            ...prev,
-                            during: { ...prev.during, stuckRule: checked }
-                          }))}
-                          infoContent={translate(language, 'check_5min_info')}
-                          example={translate(language, 'check_5min_example')}
-                          icon="⚡"
-                          language={language}
-                        />
-                        
-                        <ChecklistTile
-                          title={translate(language, 'check_hydration_title')}
-                          checked={checklists.during.hydration}
-                          onChange={(checked) => setChecklists(prev => ({
-                            ...prev,
-                            during: { ...prev.during, hydration: checked }
-                          }))}
-                          infoContent={translate(language, 'check_hydration_info')}
-                          example={translate(language, 'check_hydration_example')}
-                          icon="💧"
-                          language={language}
-                        />
-                      </div>
-                      
-                      {/* Block Summary Form - показується після 10 хвилин */}
-                      {run.elapsedSec > 600 && (
-                        <Card className="bg-gradient-to-r from-cyan-900/40 to-blue-900/30 border border-cyan-600/50 backdrop-blur-sm shadow-xl">
-                          <CardHeader className="bg-cyan-900/20 border-b border-cyan-700/30">
-                            <CardTitle className="text-slate-50 flex items-center space-x-2">
-                              <Save className="w-5 h-5 text-cyan-400" />
-                              <span>Підготовка до завершення блоку</span>
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-6 pt-6">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                              <div className="space-y-5">
-                                <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
-                                  <label className="text-slate-100 text-sm font-bold mb-3 block">{translate(language, 'qualityDepth')}: {postBlockData.dq}/5</label>
-                                  <Slider
-                                    value={[postBlockData.dq]}
-                                    onValueChange={(vals) => setPostBlockData(prev => ({ ...prev, dq: vals[0] }))}
-                                    min={1}
-                                    max={5}
-                                    step={1}
-                                    className="w-full"
-                                  />
-                                </div>
-                                
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
-                                    <label className="text-slate-100 text-sm font-bold mb-3 block">ОВ (Одиниці виходу)</label>
-                                    <div className="flex items-center justify-center space-x-3">
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setPostBlockData(prev => ({ ...prev, ou: Math.max(0, prev.ou - 1) }))}
-                                        className="border-slate-500 hover:bg-slate-700"
-                                      >
-                                        <Minus className="w-4 h-4" />
-                                      </Button>
-                                      <span className="text-slate-100 font-bold text-xl min-w-[50px] text-center">{postBlockData.ou}</span>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setPostBlockData(prev => ({ ...prev, ou: prev.ou + 1 }))}
-                                        className="border-slate-500 hover:bg-slate-700"
-                                      >
-                                        <Plus className="w-4 h-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
-                                    <label className="text-slate-100 text-sm font-bold mb-3 block">ПН (Повторення навчання)</label>
-                                    <div className="flex items-center justify-center space-x-3">
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setPostBlockData(prev => ({ ...prev, lr: Math.max(0, prev.lr - 1) }))}
-                                        className="border-slate-500 hover:bg-slate-700"
-                                      >
-                                        <Minus className="w-4 h-4" />
-                                      </Button>
-                                      <span className="text-slate-100 font-bold text-xl min-w-[50px] text-center">{postBlockData.lr}</span>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setPostBlockData(prev => ({ ...prev, lr: prev.lr + 1 }))}
-                                        className="border-slate-500 hover:bg-slate-700"
-                                      >
-                                        <Plus className="w-4 h-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
-                                    <label className="text-slate-100 text-sm font-bold mb-3 block">
-                                      {translate(language, 'mood')}: {postBlockData.mood}/5
-                                    </label>
-                                    <Slider
-                                      value={[postBlockData.mood]}
-                                      onValueChange={(vals) => setPostBlockData(prev => ({ ...prev, mood: vals[0] }))}
-                                      min={1}
-                                      max={5}
-                                      step={1}
-                                      className="w-full"
-                                    />
-                                  </div>
-                                  
-                                  <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
-                                    <label className="text-slate-100 text-sm font-bold mb-3 block">Перерви</label>
-                                    <div className="flex items-center justify-center space-x-3">
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setPostBlockData(prev => ({ ...prev, interruptions: Math.max(0, prev.interruptions - 1) }))}
-                                        className="border-slate-500 hover:bg-slate-700"
-                                      >
-                                        <Minus className="w-4 h-4" />
-                                      </Button>
-                                      <span className="text-slate-100 font-bold text-xl min-w-[50px] text-center">{postBlockData.interruptions}</span>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setPostBlockData(prev => ({ ...prev, interruptions: prev.interruptions + 1 }))}
-                                        className="border-slate-500 hover:bg-slate-700"
-                                      >
-                                        <Plus className="w-4 h-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                <div className="flex items-center justify-center space-x-8 p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
-                                  <div className="flex items-center space-x-3">
-                                    <Switch
-                                      checked={postBlockData.flowState}
-                                      onCheckedChange={(checked) => setPostBlockData(prev => ({ ...prev, flowState: checked }))}
-                                    />
-                                    <span className="text-slate-100 text-sm font-semibold">{t('flowStateAchieved')}</span>
-                                  </div>
-                                  
-                                  <div className="flex items-center space-x-3">
-                                    <Switch
-                                      checked={postBlockData.completedOOF}
-                                      onCheckedChange={(checked) => setPostBlockData(prev => ({ ...prev, completedOOF: checked }))}
-                                    />
-                                    <span className="text-slate-100 text-sm font-semibold">OOF завершено</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      )}
-                    </div>
-                  )}
                 </TabsContent>
                 
                 {/* Parking Tab - Enhanced Distraction Management */}
@@ -3536,257 +3436,9 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                       </div>
                     </CardContent>
                   </Card>
+
                 </TabsContent>
                 
-                {/* Templates Tab - Enhanced Template Management */}
-                <TabsContent value="templates" className="space-y-6">
-                  <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
-                    <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
-                      <CardTitle className="text-slate-50 flex items-center space-x-2">
-                        <Copy className="w-5 h-5 text-purple-400" />
-                        <span>{translate(language, 'templatesPlaybooks')}</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                      <Tabs defaultValue="all" className="w-full">
-                        <TabsList className="grid w-full grid-cols-3 bg-slate-700/10 border border-slate-600/50 shadow-lg">
-                          <TabsTrigger value="all" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 font-semibold">
-                            {translate(language, 'allTemplates')}
-                          </TabsTrigger>
-                          <TabsTrigger value="popular" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 font-semibold">
-                            {translate(language, 'popular')}
-                          </TabsTrigger>
-                          <TabsTrigger value="custom" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 font-semibold">
-                            {translate(language, 'custom')}
-                          </TabsTrigger>
-                        </TabsList>
-                        
-                        <TabsContent value="all" className="space-y-4 mt-4">
-                          <div className="grid gap-4">
-                            {templates.map(template => (
-                              <Card key={template.id} className="bg-gradient-to-br from-slate-800/80 to-slate-700/60 border border-slate-600/50 shadow-lg hover:shadow-xl transition-all duration-200 backdrop-blur-sm">
-                                <CardContent className="pt-5">
-                                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-3">
-                                    <div className="flex-1 min-w-0">
-                                      <h4 className="text-slate-100 font-bold text-lg mb-2">{template.title}</h4>
-                                      <div className="flex flex-wrap items-center gap-2 text-sm text-slate-300">
-                                        <span className="bg-slate-700/10 px-2 py-1 rounded-md border border-slate-600/50">📂 {template.category}</span>
-                                        <span className="bg-slate-700/10 px-2 py-1 rounded-md border border-slate-600/50">🔄 {template.useCount}</span>
-                                        {template.lastUsed > 0 && (
-                                          <span className="bg-slate-700/10 px-2 py-1 rounded-md border border-slate-600/50">⏰ {new Date(template.lastUsed).toLocaleDateString('uk-UA')}</span>
-                                        )}
-                                      </div>
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2 w-full sm:w-auto">
-                                      <Button
-                                        size="sm"
-                                        onClick={() => {
-                                          copyToClipboard(template.body);
-                                          useTemplate(template.id);
-                                        }}
-                                        className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-semibold shadow-lg flex-1 sm:flex-none"
-                                      >
-                                        <Copy className="w-4 h-4 mr-1" />
-                                        {translate(language, 'copyText')}
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => {
-                                          setPostBlockData(prev => ({ 
-                                            ...prev, 
-                                            notes: prev.notes + (prev.notes ? '\n\n' : '') + template.body 
-                                          }));
-                                          useTemplate(template.id);
-                                        }}
-                                        className="border-slate-500 text-slate-200 hover:bg-slate-700/10 backdrop-blur-sm flex-1 sm:flex-none"
-                                      >
-                                        {translate(language, 'toNotes')}
-                                      </Button>
-                                      {!['rag-slice', 'study-session', 'coding-problem'].includes(template.id) && (
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          onClick={() => deleteTemplate(template.id)}
-                                          className="border-red-600/50 text-red-400 hover:text-red-300 hover:bg-red-900/20 backdrop-blur-sm"
-                                        >
-                                          <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                      )}
-                                    </div>
-                                  </div>
-                                  <div 
-                                    className="bg-slate-900/5 backdrop-blur-sm border border-slate-600/50 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:bg-slate-800/10 hover:border-slate-500/50 shadow-lg"
-                                    onClick={() => {
-                                      copyToClipboard(template.body);
-                                      useTemplate(template.id);
-                                    }}
-                                  >
-                                    <pre className="text-slate-100 text-sm whitespace-pre-wrap overflow-x-auto leading-relaxed">
-                                      {template.body}
-                                    </pre>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))}
-                          </div>
-                        </TabsContent>
-                        
-                        <TabsContent value="popular" className="space-y-4 mt-4">
-                          <div className="grid gap-4">
-                            {templates
-                              .filter(t => t.useCount > 0)
-                              .sort((a, b) => b.useCount - a.useCount)
-                              .map(template => (
-                                <Card key={template.id} className="bg-gradient-to-br from-slate-800/80 to-slate-700/60 border border-slate-600/50 shadow-lg hover:shadow-xl transition-all duration-200 backdrop-blur-sm">
-                                  <CardContent className="pt-5">
-                                    <div className="flex items-center justify-between mb-4">
-                                      <div>
-                                        <h4 className="text-slate-100 font-bold text-lg flex items-center">
-                                          {template.title}
-                                          <Badge className="ml-3 bg-gradient-to-r from-amber-600 to-orange-500 text-white font-bold px-3 py-1 shadow-lg">
-                                            🔥 {template.useCount}
-                                          </Badge>
-                                        </h4>
-                                        <p className="text-slate-300 text-sm mt-2 bg-slate-700/10 px-2 py-1 rounded-md border border-slate-600/50 inline-block">
-                                          Категорія: {template.category}
-                                        </p>
-                                      </div>
-                                      <Button
-                                        size="sm"
-                                        onClick={() => {
-                                          copyToClipboard(template.body);
-                                          useTemplate(template.id);
-                                        }}
-                                        className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-semibold shadow-lg"
-                                      >
-                                        <Copy className="w-4 h-4 mr-1" />
-                                        {translate(language, 'useTemplate')}
-                                      </Button>
-                                    </div>
-                                    <div 
-                                      className="bg-slate-900/5 backdrop-blur-sm border border-slate-600/50 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:bg-slate-800/10 hover:border-slate-500/50 shadow-lg"
-                                      onClick={() => {
-                                        copyToClipboard(template.body);
-                                        useTemplate(template.id);
-                                      }}
-                                    >
-                                      <pre className="text-slate-100 text-sm whitespace-pre-wrap leading-relaxed">
-                                        {template.body}
-                                      </pre>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              ))}
-                          </div>
-                        </TabsContent>
-                        
-                        <TabsContent value="custom" className="space-y-4 mt-4">
-                          {/* Add Custom Template Form */}
-                          <Card className="bg-gradient-to-br from-slate-800/80 to-slate-700/60 border border-slate-600/50 shadow-xl backdrop-blur-sm">
-                            <CardContent className="pt-6">
-                              <h4 className="text-slate-100 font-bold mb-4 text-lg flex items-center">
-                                <Plus className="w-5 h-5 mr-2 text-indigo-400" />
-                                {translate(language, 'createCustomTemplate')}
-                              </h4>
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                                <Input
-                                  placeholder={translate(language, 'uniqueIdPlaceholder')}
-                                  value={newTemplate.id}
-                                  onChange={(e) => setNewTemplate(prev => ({ ...prev, id: e.target.value }))}
-                                  className="bg-slate-700/10 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                                />
-                                <Input
-                                  placeholder={translate(language, 'templateNamePlaceholder')}
-                                  value={newTemplate.title}
-                                  onChange={(e) => setNewTemplate(prev => ({ ...prev, title: e.target.value }))}
-                                  className="bg-slate-700/10 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                                />
-                                <Input
-                                  placeholder={translate(language, 'categoryPlaceholder')}
-                                  value={newTemplate.category}
-                                  onChange={(e) => setNewTemplate(prev => ({ ...prev, category: e.target.value }))}
-                                  className="bg-slate-700/10 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                                />
-                              </div>
-                              <Textarea
-                                placeholder={translate(language, 'templateBodyPlaceholder')}
-                                value={newTemplate.body}
-                                onChange={(e) => setNewTemplate(prev => ({ ...prev, body: e.target.value }))}
-                                className="bg-slate-700/10 border-slate-600/50 text-slate-100 placeholder-slate-400 h-32 mb-6 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl"
-                              />
-                              <Button onClick={addTemplate} className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold shadow-lg">
-                                <Plus className="w-4 h-4 mr-2" />
-                                {translate(language, 'addTemplate')}
-                              </Button>
-                            </CardContent>
-                          </Card>
-                          
-                          {/* Custom Templates List */}
-                          <div className="grid gap-4">
-                            {templates
-                              .filter(t => !['rag-slice', 'study-session', 'coding-problem'].includes(t.id))
-                              .map(template => (
-                                <Card key={template.id} className="bg-gradient-to-br from-slate-800/80 to-slate-700/60 border border-slate-600/50 shadow-lg hover:shadow-xl transition-all duration-200 backdrop-blur-sm">
-                                  <CardContent className="pt-5">
-                                    <div className="flex items-center justify-between mb-4">
-                                      <div>
-                                        <h4 className="text-slate-100 font-bold text-lg">{template.title}</h4>
-                                        <p className="text-slate-300 text-sm mt-2 bg-slate-700/10 px-2 py-1 rounded-md border border-slate-600/50 inline-block">
-                                          Категорія: {template.category}
-                                        </p>
-                                      </div>
-                                      <div className="flex space-x-2">
-                                        <Button
-                                          size="sm"
-                                          onClick={() => {
-                                            copyToClipboard(template.body);
-                                            useTemplate(template.id);
-                                          }}
-                                          className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-semibold shadow-lg"
-                                        >
-                                          <Copy className="w-4 h-4 mr-1" />
-                                          {translate(language, 'copyText')}
-                                        </Button>
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          onClick={() => deleteTemplate(template.id)}
-                                          className="border-red-600/50 text-red-400 hover:text-red-300 hover:bg-red-900/20 backdrop-blur-sm"
-                                        >
-                                          <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                      </div>
-                                    </div>
-                                    <div 
-                                      className="bg-slate-900/5 backdrop-blur-sm border border-slate-600/50 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:bg-slate-800/10 hover:border-slate-500/50 shadow-lg"
-                                      onClick={() => {
-                                        copyToClipboard(template.body);
-                                        useTemplate(template.id);
-                                      }}
-                                    >
-                                      <pre className="text-slate-100 text-sm whitespace-pre-wrap leading-relaxed">
-                                        {template.body}
-                                      </pre>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              ))}
-                          </div>
-                        </TabsContent>
-                      </Tabs>
-                      
-                      {copyStatus && (
-                        <div className="mt-6 p-4 bg-gradient-to-r from-emerald-900/40 to-emerald-800/30 border border-emerald-600/50 rounded-xl backdrop-blur-sm shadow-xl">
-                          <p className="text-emerald-200 text-sm text-center font-semibold flex items-center justify-center">
-                            <span className="mr-2">✅</span>
-                            {copyStatus}
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
                 
                 {/* Settings Tab - System Configuration */}
                 <TabsContent value="settings" className="space-y-6">
@@ -3923,7 +3575,6 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                               const data = {
                                 oofs,
                                 logs,
-                                templates,
                                 parking,
                                 settings,
                                 starredOOFs,
@@ -3956,7 +3607,6 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                                     const data = JSON.parse(event.target?.result as string);
                                     if (data.oofs) setOofs(data.oofs);
                                     if (data.logs) setLogs(data.logs);
-                                    if (data.templates) setTemplates(data.templates);
                                     if (data.parking) setParking(data.parking);
                                     if (data.settings) setSettings(data.settings);
                                     if (data.starredOOFs) setStarredOOFs(data.starredOOFs);
@@ -3990,6 +3640,112 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
           </div>
         </div>
       </div>
+
+      {/* Domain Management Modal */}
+      {showDomainManager && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-800 border border-slate-600 rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-slate-100">Manage Domains</h3>
+                <button
+                  onClick={() => setShowDomainManager(false)}
+                  className="text-slate-400 hover:text-slate-200 p-1"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Add new domain */}
+              <div className="mb-6">
+                <label className="text-slate-200 text-sm font-medium mb-2 block">Add New Domain</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newDomainName}
+                    onChange={(e) => setNewDomainName(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addCustomDomain(newDomainName)}
+                    placeholder="Enter domain name"
+                    className="flex-1 bg-slate-700 border border-slate-600 rounded px-3 py-2 text-slate-100 placeholder-slate-400 focus:border-indigo-500"
+                  />
+                  <button
+                    onClick={() => addCustomDomain(newDomainName)}
+                    disabled={!newDomainName.trim() || getAllDomains().includes(newDomainName.trim())}
+                    className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              {/* Default domains */}
+              <div className="mb-4">
+                <h4 className="text-slate-200 text-sm font-medium mb-2">Default Domains</h4>
+                <div className="space-y-2">
+                  {['Backend', 'Data', 'CS', 'SystemDesign', 'AlgoDS', 'Study', 'Discovery', 'Other'].map(domain => (
+                    <div key={domain} className="flex items-center justify-between bg-slate-700/50 px-3 py-2 rounded">
+                      <span className="text-slate-200">{translateDomain(language, domain)}</span>
+                      <span className="text-xs text-slate-400">Default</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom domains */}
+              {customDomains.length > 0 && (
+                <div>
+                  <h4 className="text-slate-200 text-sm font-medium mb-2">Custom Domains</h4>
+                  <div className="space-y-2">
+                    {customDomains.map((domain, index) => (
+                      <div key={index} className="flex items-center justify-between bg-slate-700 px-3 py-2 rounded">
+                        {editingDomain?.index === index ? (
+                          <input
+                            type="text"
+                            value={editingDomain.name}
+                            onChange={(e) => setEditingDomain({...editingDomain, name: e.target.value})}
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') editCustomDomain(index, editingDomain.name);
+                              if (e.key === 'Escape') setEditingDomain(null);
+                            }}
+                            onBlur={() => editCustomDomain(index, editingDomain.name)}
+                            autoFocus
+                            className="bg-slate-600 border border-slate-500 rounded px-2 py-1 text-slate-100 text-sm flex-1"
+                          />
+                        ) : (
+                          <span className="text-slate-200">{domain}</span>
+                        )}
+                        <div className="flex gap-2 ml-2">
+                          <button
+                            onClick={() => setEditingDomain({index, name: domain})}
+                            className="text-xs text-indigo-400 hover:text-indigo-300 px-2 py-1 rounded border border-slate-600 hover:border-indigo-500"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => removeCustomDomain(index)}
+                            className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded border border-slate-600 hover:border-red-500"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end mt-6">
+                <button
+                  onClick={() => setShowDomainManager(false)}
+                  className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded transition-colors"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
