@@ -23,6 +23,12 @@ import { ResponsiveContainer, ComposedChart, Area, Bar, CartesianGrid, XAxis, YA
 // Three.js for quantum background
 import * as THREE from 'three';
 
+type DoD = {
+  id: string;
+  text: string;
+  completed: boolean;
+};
+
 type OOF = {
   id: string;
   title: string;
@@ -30,7 +36,8 @@ type OOF = {
   priority: 'Low' | 'Medium' | 'High' | 'Critical';
   estimatedMinutes: number;
   actualMinutes: number;
-  definitionOfDone?: string;
+  definitionOfDone?: string; // Keep for backward compatibility
+  definitionOfDoneList?: DoD[]; // New checklist format
   constraints?: string;
   firstStep?: string;
   planned: boolean;
@@ -142,12 +149,12 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
     backToHome: 'Back to Catalog',
     resetData: 'Reset data',
     resetConfirm: 'Are you sure you want to reset all focus data? This will clear session logs and progress.',
-    notesTitle: 'Current session notes',
-    notesPlaceholder: 'Capture ideas, insights, questions and conclusions while working...',
     hint: 'Hint',
     copied: 'Copied',
     export: 'Export',
     clear: 'Clear',
+    save: 'Save',
+    saved: 'Saved!',
     today: 'Today',
     week: 'Week',
     streak: 'Streak',
@@ -156,18 +163,32 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
     createOOF: 'Create OOF',
     launch: 'Launch',
     show: 'Show',
-    hide: 'Hide'
+    hide: 'Hide',
+    pause: 'Pause',
+    resume: 'Resume',
+    reset: 'Reset',
+    finish: 'Finish',
+    remaining: 'Remaining',
+    completed: 'Completed',
+    overtime: 'Overtime'
   },
   UA: {
     backToHome: 'На головну',
     resetData: 'Скинути дані',
     resetConfirm: 'Ви впевнені, що хочете скинути всі дані фокусу? Це очистить журнал сесій і статистику.',
-    notesTitle: 'Нотатки поточної сесії',
-    notesPlaceholder: 'Записуйте ідеї, інсайти, питання та висновки під час роботи...',
     hint: 'Підказка',
     copied: 'Скопійовано',
     export: 'Експорт',
     clear: 'Очистити',
+    save: 'Зберегти',
+    saved: 'Збережено!',
+    freeSession: 'Вільна сесія',
+    noOofNotesYet: 'Поки немає нотаток OOF сесій. Запустіть таймер з OOF і збережіть нотатки!',
+    noFreeNotesYet: 'Поки немає нотаток вільних сесій. Запустіть вільний таймер і збережіть нотатки!',
+    confirmDeleteNote: 'Ви впевнені, що хочете видалити цю нотатку?',
+    confirmDeleteAllNotes: 'Ви впевнені, що хочете видалити ВСІ збережені нотатки? Це назавжди видалить всі нотатки OOF та вільних сесій і не може бути скасовано.',
+    confirmDeleteOofNotes: 'Ви впевнені, що хочете видалити всі нотатки OOF сесій? Це не може бути скасовано.',
+    confirmDeleteFreeNotes: 'Ви впевнені, що хочете видалити всі нотатки вільних сесій? Це не може бути скасовано.',
     today: 'Сьогодні',
     week: 'Тиждень',
     streak: 'Стрік',
@@ -176,12 +197,19 @@ const TRANSLATIONS: Record<string, Record<string, any>> = {
     createOOF: 'Створити OOF',
     launch: 'Запустити',
     show: 'Показати',
-    hide: 'Сховати'
+    hide: 'Сховати',
+    pause: 'Пауза',
+    resume: 'Продовжити',
+    reset: 'Скинути',
+    finish: 'Завершити',
+    remaining: 'Залишилось',
+    completed: 'Завершено',
+    overtime: 'Додатково'
   }
 };
 
 // additional keys used across the artifact UI
-TRANSLATIONS.EN.tabFocus = 'Focus';
+TRANSLATIONS.EN.tabFocus = 'Tasks';
 TRANSLATIONS.EN.tabTimer = 'Timer';
 TRANSLATIONS.EN.tabParking = 'Parking';
 TRANSLATIONS.EN.tabAnalytics = 'Analytics';
@@ -194,7 +222,7 @@ TRANSLATIONS.EN.oofTitlePlaceholder = 'Task or project name';
 TRANSLATIONS.EN.oofDefinitionPlaceholder = 'Definition of Done - how will you know the task is done?';
 TRANSLATIONS.EN.constraintsPlaceholder = 'Constraints & context';
 TRANSLATIONS.EN.firstStepPlaceholder = 'Specific first step';
-TRANSLATIONS.EN.readyPrompt = 'Choose a task from the "Focus" tab or start free mode';
+TRANSLATIONS.EN.readyPrompt = 'Choose a task from the "Tasks" tab or start free mode';
 TRANSLATIONS.EN.tipLabel = 'Tip:';
 TRANSLATIONS.EN.hintLongShort = 'Use templates from the Templates tab — the "To notes" button inserts them here.';
 TRANSLATIONS.EN.check_single_title = 'Single task';
@@ -227,13 +255,19 @@ TRANSLATIONS.EN.highPriority = 'Important';
 TRANSLATIONS.EN.inProgress = 'In Progress';
 TRANSLATIONS.EN.completed = 'Completed';
 TRANSLATIONS.EN.entries = 'entries';
-TRANSLATIONS.EN.smartParkingList = 'Smart parking list';
+TRANSLATIONS.EN.definitionOfDoneChecklist = 'Definition of Done Checklist';
+TRANSLATIONS.EN.definitionOfDone = 'Definition of Done';
+TRANSLATIONS.EN.progress = 'Progress';
+TRANSLATIONS.EN.addNewCriterion = 'Add new criterion...';
+TRANSLATIONS.EN.noCriteriaAdded = 'No criteria added yet. Add specific criteria to track completion.';
+TRANSLATIONS.EN.complete = 'complete';
+TRANSLATIONS.EN.smartParkingList = 'Parking list';
 TRANSLATIONS.EN.todaysProductivity = 'Today\'s productivity';
 TRANSLATIONS.EN.achievements = 'Achievements';
 TRANSLATIONS.EN.productivityDynamics = 'Productivity dynamics (14 days)';
 TRANSLATIONS.EN.hintLong = 'Tip: use templates from the Templates tab — the "To notes" button inserts them here.';
 TRANSLATIONS.EN.readyToStart = 'Ready to start deep work?';
-TRANSLATIONS.EN.chooseTask = 'Choose a task from the "Focus" tab or start free mode';
+TRANSLATIONS.EN.chooseTask = 'Choose a task from the "Tasks" tab or start free mode';
 TRANSLATIONS.EN.useShiftEnter = 'Use Shift+Enter for newline, Enter to add';
 TRANSLATIONS.EN.copy = 'Copy';
 TRANSLATIONS.EN.copyStatus = 'Copied!';
@@ -394,12 +428,18 @@ TRANSLATIONS.EN.flowStateAchieved = 'Flow state achieved';
 TRANSLATIONS.UA.flowStateAchieved = 'Стан потоку досягнуто';
 
 // Smart hints header translations
-TRANSLATIONS.EN.smartHintsTitle = 'Smart tips and micro-experiments';
-TRANSLATIONS.UA.smartHintsTitle = 'Розумні підказки та мікроексперименти';
+TRANSLATIONS.EN.smartHintsTitle = 'Tips';
+TRANSLATIONS.UA.smartHintsTitle = 'Підказки';
 
 // Time unit translations
 TRANSLATIONS.EN.hoursShort = 'h';
 TRANSLATIONS.UA.hoursShort = 'г';
+TRANSLATIONS.EN.hours = 'HOURS';
+TRANSLATIONS.EN.minutes = 'MINUTES';
+TRANSLATIONS.EN.seconds = 'SECONDS';
+TRANSLATIONS.UA.hours = 'ГОДИНИ';
+TRANSLATIONS.UA.minutes = 'ХВИЛИНИ';
+TRANSLATIONS.UA.seconds = 'СЕКУНДИ';
 TRANSLATIONS.EN.today = 'Today';
 TRANSLATIONS.EN.week = 'Week';
 TRANSLATIONS.EN.streak = 'Streak';
@@ -407,7 +447,7 @@ TRANSLATIONS.UA.today = 'Сьогодні';
 TRANSLATIONS.UA.week = 'Тиждень';
 TRANSLATIONS.UA.streak = 'Стрік';
 
-TRANSLATIONS.UA.tabFocus = 'Фокус';
+TRANSLATIONS.UA.tabFocus = 'Задачі';
 TRANSLATIONS.UA.tabTimer = 'Таймер';
 TRANSLATIONS.UA.tabParking = 'Паркінг';
 TRANSLATIONS.UA.tabAnalytics = 'Аналітика';
@@ -452,7 +492,13 @@ TRANSLATIONS.UA.highPriority = 'Важливі';
 TRANSLATIONS.UA.inProgress = 'В роботі';
 TRANSLATIONS.UA.completed = 'Завершені';
 TRANSLATIONS.UA.entries = 'записів';
-TRANSLATIONS.UA.smartParkingList = 'Розумний паркувальний список';
+TRANSLATIONS.UA.definitionOfDoneChecklist = 'Чекліст критеріїв завершення';
+TRANSLATIONS.UA.definitionOfDone = 'Критерії завершення';
+TRANSLATIONS.UA.progress = 'Прогрес';
+TRANSLATIONS.UA.addNewCriterion = 'Додати новий критерій...';
+TRANSLATIONS.UA.noCriteriaAdded = 'Критерії ще не додано. Додайте конкретні критерії для відстеження завершення.';
+TRANSLATIONS.UA.complete = 'завершено';
+TRANSLATIONS.UA.smartParkingList = 'Паркувальний список';
 TRANSLATIONS.UA.todaysProductivity = 'Сьогоднішня продуктивність';
 TRANSLATIONS.UA.achievements = 'Досягнення';
 TRANSLATIONS.UA.productivityDynamics = 'Динаміка продуктивності (14 днів)';
@@ -718,86 +764,98 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec, language 
   const targetSec = run.targetMinutes * 60;
   const progress = Math.min(100, Math.round((elapsedSec / targetSec) * 100));
   const remainingMin = Math.ceil((targetSec - elapsedSec) / 60);
-  
+
   // Activity detection
   const isNearComplete = progress > 85;
   const isOvertime = progress > 100;
-  
+
+  // Get time units for countdown display (remaining time)
+  const remainingSec = Math.max(0, targetSec - elapsedSec);
+  const timeUnits = formatTimeUnits(remainingSec);
+
   return (
-    <Card className={`bg-transparent border-2 ${isOvertime ? 'border-amber-500/70' : isNearComplete ? 'border-emerald-500/70' : 'border-slate-600/50'} shadow-2xl`}>
+    <Card className={`bg-slate-800/5 backdrop-blur-md border-2 ${isOvertime ? 'border-amber-500/70' : isNearComplete ? 'border-emerald-500/70' : 'border-slate-600/30'} shadow-2xl`}>
       <CardContent className="pt-6">
         <div className="text-center space-y-6">
           <div>
-            <h3 className="text-xl font-semibold text-slate-200 mb-2">{run.oofTitle}</h3>
-            <div className="text-5xl font-mono font-bold text-emerald-400 mb-2">
-              {formatTime(elapsedSec)}
-            </div>
-            <div className="text-sm text-slate-400">
-              {isOvertime ? 
-                <span className="text-amber-400 font-semibold">{translate(language, 'overtime')} +{remainingMin-run.targetMinutes} {translate(language, 'min')}</span> :
-                <span>{translate(language, 'remaining')}: {remainingMin} {translate(language, 'min')} ({progress}%)</span>
-              }
-            </div>
-          </div>
-          
-          {/* Enhanced Progress Ring */}
-          <div className="relative w-40 h-40 mx-auto">
-            <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 36 36">
-              <path
-                className="text-slate-700"
-                stroke="currentColor"
-                strokeWidth="3"
-                fill="none"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-              <path
-                className={isOvertime ? "text-amber-400" : "text-emerald-400"}
-                stroke="currentColor"
-                strokeWidth="3"
-                fill="none"
-                strokeDasharray={`${Math.min(progress, 100)}, 100`}
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <div className={`text-2xl font-bold ${isOvertime ? 'text-amber-400' : 'text-emerald-400'}`}>
+            {/* Linear Progress Bar */}
+            <div className="mb-6 px-2">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm text-slate-400">
+                  {translate(language, 'remaining')}: {remainingMin} {translate(language, 'min')}
+                </span>
+                <span className={`text-sm font-semibold ${isOvertime ? 'text-amber-400' : 'text-emerald-400'}`}>
                   {progress}%
-                </div>
-                <div className="text-xs text-slate-400">готово</div>
+                </span>
+              </div>
+              <div className="w-full bg-slate-700/30 rounded-full h-3 overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-500 ease-out rounded-full ${
+                    isOvertime ? 'bg-gradient-to-r from-amber-500 to-red-500' : 'bg-gradient-to-r from-emerald-500 to-emerald-400'
+                  }`}
+                  style={{ width: `${Math.min(progress, 100)}%` }}
+                />
               </div>
             </div>
+
+            {/* Three-Tile Timer Display */}
+            <div className="bg-slate-900/20 backdrop-blur-sm border border-slate-600/20 rounded-2xl p-4 sm:p-6 mb-6">
+              <div className="flex gap-2 sm:gap-3 md:gap-4">
+                <AnimatedDigit value={timeUnits.hours} label="HOURS" language={language} />
+                <AnimatedDigit value={timeUnits.minutes} label="MINUTES" language={language} />
+                <AnimatedDigit value={timeUnits.seconds} label="SECONDS" language={language} />
+              </div>
+            </div>
+
+            {isOvertime && (
+              <div className="text-center mt-2">
+                <span className="text-amber-400 font-semibold text-sm">
+                  {translate(language, 'overtime')} +{remainingMin-run.targetMinutes} {translate(language, 'min')}
+                </span>
+              </div>
+            )}
           </div>
-          
-          <div className="flex flex-col sm:flex-row justify-center gap-3 px-4">
+        </div>
+
+        {/* Control Buttons */}
+          <div className="flex flex-row justify-center gap-3 sm:gap-4 px-4 sm:px-0">
             <Button
               onClick={onTogglePause}
               variant="outline"
               size="lg"
-              className="border-slate-600 text-slate-300 hover:text-slate-100 flex-1 sm:flex-none"
+              className="border-slate-600 text-slate-300 hover:text-slate-100 hover:border-slate-500 flex-1 sm:flex-none min-h-[44px] sm:min-h-[48px] px-3 sm:px-4"
             >
-              {run.paused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+              {run.paused ? (
+                <>
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
+                  <span className="hidden sm:inline">{translate(language, 'resume')}</span>
+                </>
+              ) : (
+                <>
+                  <Pause className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
+                  <span className="hidden sm:inline">{translate(language, 'pause')}</span>
+                </>
+              )}
             </Button>
             <Button
               onClick={onReset}
               variant="outline"
               size="lg"
-              className="border-slate-600 text-slate-300 hover:text-slate-100 flex-1 sm:flex-none"
+              className="border-slate-600 text-slate-300 hover:text-slate-100 hover:border-slate-500 flex-1 sm:flex-none min-h-[44px] sm:min-h-[48px] px-3 sm:px-4"
             >
-              <RotateCcw className="w-5 h-5" />
+              <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
+              <span className="hidden sm:inline">{translate(language, 'reset')}</span>
             </Button>
             <Button
               onClick={onStop}
               variant="default"
               size="lg"
-              className="bg-cyan-600 hover:bg-cyan-700 flex-1 sm:flex-none"
+              className="bg-cyan-600 hover:bg-cyan-700 flex-1 sm:flex-none min-h-[44px] sm:min-h-[48px] px-3 sm:px-4"
             >
-              <Square className="w-5 h-5 mr-2" />
-              {translate(language, 'finish')}
+              <Square className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">{translate(language, 'finish')}</span>
             </Button>
           </div>
-        </div>
       </CardContent>
     </Card>
   );
@@ -1274,7 +1332,7 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
   );
 };
 
-const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarred, language = 'EN' }: { oof: OOF; onStart: (oof:OOF, minutes:number)=>void; onEdit: (oof:OOF)=>void; onDelete: (id:string)=>void; onToggleStar: (id:string)=>void; isStarred:boolean; language?:string }) => {
+const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, onUpdateDoD, isStarred, language = 'EN' }: { oof: OOF; onStart: (oof:OOF, minutes:number)=>void; onEdit: (oof:OOF)=>void; onDelete: (id:string)=>void; onToggleStar: (id:string)=>void; onUpdateDoD?: (oofId: string, dodList: DoD[])=>void; isStarred:boolean; language?:string }) => {
   const priorityColors = {
     Low: { bg: 'bg-slate-800/10', text: 'text-slate-300', border: 'border-slate-600' },
     Medium: { bg: 'bg-blue-900/60', text: 'text-blue-400', border: 'border-blue-700' },
@@ -1282,6 +1340,15 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
     Critical: { bg: 'bg-red-900/60', text: 'text-red-400', border: 'border-red-700' }
   };
   
+  const toggleDoD = (dodId: string) => {
+    if (oof.definitionOfDoneList && onUpdateDoD) {
+      const updatedList = oof.definitionOfDoneList.map(item =>
+        item.id === dodId ? { ...item, completed: !item.completed } : item
+      );
+      onUpdateDoD(oof.id, updatedList);
+    }
+  };
+
   const getDomainConfig = (language: string, domain: string) => {
     const defaultConfigs: Record<string, { label: string, color: string, bgColor: string }> = {
       Backend: { label: translateDomain(language, 'Backend'), color: 'text-blue-400', bgColor: 'bg-blue-900/40' },
@@ -1358,6 +1425,50 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
           <p className="text-slate-300 text-sm mb-2 bg-slate-800/5 p-2 rounded-lg border border-slate-700/50">
             ✅ DoD: {oof.definitionOfDone}
           </p>
+        )}
+        {oof.definitionOfDoneList && oof.definitionOfDoneList.length > 0 && (
+          <div className="bg-slate-800/5 p-3 rounded-lg border border-slate-700/50 mb-2">
+            <h5 className="text-slate-200 font-semibold text-sm mb-2 flex items-center">
+              <span className="mr-2">✅</span>
+              {translate(language, 'definitionOfDone')} ({oof.definitionOfDoneList.filter(item => item.completed).length}/{oof.definitionOfDoneList.length})
+            </h5>
+
+            {/* Progress bar */}
+            <div className="mb-3">
+              <div className="w-full bg-slate-700 rounded-full h-1.5 mb-1">
+                <div
+                  className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-1.5 rounded-full transition-all duration-300 ease-out"
+                  style={{
+                    width: `${(oof.definitionOfDoneList.filter(item => item.completed).length / oof.definitionOfDoneList.length) * 100}%`
+                  }}
+                ></div>
+              </div>
+              <div className="text-xs text-slate-400">
+                {Math.round((oof.definitionOfDoneList.filter(item => item.completed).length / oof.definitionOfDoneList.length) * 100)}% {translate(language, 'complete')}
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              {oof.definitionOfDoneList.map((item) => (
+                <div key={item.id} className="flex items-center gap-2 text-sm group">
+                  <button
+                    onClick={() => toggleDoD(item.id)}
+                    className={`w-4 h-4 flex items-center justify-center rounded cursor-pointer transition-colors hover:scale-110 ${
+                      item.completed
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-slate-600 border border-slate-500 hover:bg-slate-500'
+                    }`}
+                  >
+                    {item.completed && '✓'}
+                  </button>
+                  <span className={`text-slate-300 ${item.completed ? 'line-through opacity-60' : ''} cursor-pointer`}
+                        onClick={() => toggleDoD(item.id)}>
+                    {item.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
         {oof.firstStep && (
           <p className="text-slate-300 text-sm mb-3 bg-slate-800/5 p-2 rounded-lg border border-slate-700/50">
@@ -1553,6 +1664,53 @@ const formatTime = (seconds: number) => {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 };
 
+const formatTimeUnits = (seconds: number) => {
+  const totalMinutes = Math.floor(seconds / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  const secs = seconds % 60;
+
+  return {
+    hours: hours.toString().padStart(2, '0'),
+    minutes: minutes.toString().padStart(2, '0'),
+    seconds: secs.toString().padStart(2, '0')
+  };
+};
+
+const AnimatedDigit = ({ value, label, language = 'EN' }: { value: string; label: string; language?: string }) => {
+  const [displayValue, setDisplayValue] = useState(value);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (value !== displayValue) {
+      setIsAnimating(true);
+
+      // Start animation after a short delay to allow for cascade effect
+      const timeout = setTimeout(() => {
+        setDisplayValue(value);
+        setTimeout(() => setIsAnimating(false), 300);
+      }, 100);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [value, displayValue]);
+
+  return (
+    <div className="flex-1 bg-slate-800/20 backdrop-blur-sm border border-slate-600/30 rounded-xl p-3 sm:p-4 text-center group hover:border-slate-500/50 transition-all duration-300 hover:bg-slate-800/30">
+      <div className={`text-2xl sm:text-3xl md:text-4xl font-mono font-bold mb-1 sm:mb-2 tabular-nums transition-all duration-300 ${
+        isAnimating
+          ? 'text-emerald-300 scale-110 transform'
+          : 'text-emerald-400 group-hover:text-emerald-300'
+        }`}>
+        {displayValue}
+      </div>
+      <div className="text-xs sm:text-sm uppercase tracking-wider text-slate-400 font-semibold">
+        {translate(language, label.toLowerCase())}
+      </div>
+    </div>
+  );
+};
+
 const AddInline = ({ placeholder, onAdd, buttonText = "Додати", language = 'EN' }: { placeholder?: string; onAdd: (text:string)=>void; buttonText?: string; language?: string }) => {
   const [text, setText] = useState("");
   
@@ -1625,131 +1783,142 @@ const ChecklistTile = ({ title, checked, onChange, infoContent, example, icon, l
   );
 };
 
-const NotesSection = ({ notes, onNotesChange, className = "", language = 'EN' }: { notes:string; onNotesChange:(v:string)=>void; className?:string; language?:string }) => {
-  const [isCopied, setIsCopied] = useState(false);
-  const [showHint, setShowHint] = useState(false);
 
-  const t = (key: string) => (TRANSLATIONS[language] && TRANSLATIONS[language][key]) || TRANSLATIONS['EN'][key] || key;
+// Definition of Done Editor Component
+const DefinitionOfDoneEditor = ({
+  definitionOfDone,
+  definitionOfDoneList,
+  onDefinitionChange,
+  onListChange,
+  language = 'EN'
+}: {
+  definitionOfDone: string;
+  definitionOfDoneList: DoD[];
+  onDefinitionChange: (value: string) => void;
+  onListChange: (list: DoD[]) => void;
+  language?: string;
+}) => {
+  const [newItem, setNewItem] = useState('');
 
-  const handleCopy = async () => {
-    if (notes.trim()) {
-      try {
-        await navigator.clipboard.writeText(notes);
-        setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 2000);
-      } catch (err) {
-        console.error('Failed to copy text: ', err);
-      }
+  const addItem = () => {
+    if (newItem.trim()) {
+      const newDoD: DoD = {
+        id: Date.now().toString(),
+        text: newItem.trim(),
+        completed: false
+      };
+      onListChange([...definitionOfDoneList, newDoD]);
+      setNewItem('');
     }
   };
 
-  const handleClear = () => {
-    onNotesChange('');
+  const removeItem = (id: string) => {
+    onListChange(definitionOfDoneList.filter(item => item.id !== id));
   };
 
-  const handleExport = () => {
-    if (notes.trim()) {
-      const blob = new Blob([notes], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `session-notes-${new Date().toISOString().split('T')[0]}.txt`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
+  const toggleItem = (id: string) => {
+    onListChange(definitionOfDoneList.map(item =>
+      item.id === id ? { ...item, completed: !item.completed } : item
+    ));
   };
 
-  const wordCount = notes.trim().length ? notes.trim().split(/\s+/).filter(word => word.length > 0).length : 0;
-  const charCount = notes.length;
+  const updateItem = (id: string, newText: string) => {
+    onListChange(definitionOfDoneList.map(item =>
+      item.id === id ? { ...item, text: newText } : item
+    ));
+  };
 
   return (
-    <Card className={`bg-slate-800/10 border-slate-600/70 shadow-xl ${className}`}>
-      <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
-        <CardTitle className="text-slate-100 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <NotebookPen className="w-5 h-5 text-purple-400" />
-            <span>{t('notesTitle')}</span>
-          </div>
-            <div className="flex items-center space-x-2 text-xs text-slate-400">
-            <span>{wordCount} {t('words')}</span>
-            <span>•</span>
-            <span>{charCount} {t('chars')}</span>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-6 pb-4">
-        <div className="space-y-4">
-            <Textarea
-            placeholder={t('notesPlaceholder')}
-            value={notes}
-            onChange={(e) => onNotesChange(e.target.value)}
-            className="bg-slate-900/5 border-slate-600/50 text-slate-100 placeholder-slate-400 min-h-[100px] md:min-h-[175px] rounded-xl resize-y focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors duration-200"
-            style={{ minHeight: '100px', maxHeight: '400px' }}
-          />
+    <div className="space-y-4">
+      {/* Legacy text area for backward compatibility */}
+      <Textarea
+        placeholder={translate(language, 'oofDefinitionPlaceholder')}
+        value={definitionOfDone}
+        onChange={(e) => onDefinitionChange(e.target.value)}
+        className="bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400"
+        rows={2}
+      />
 
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between bg-slate-900/30 p-3 rounded-lg border border-slate-700/30">
-            {/* Підказка по кліку */}
-            <div className="mb-2 sm:mb-0">
-              <button
-                type="button"
-                className="flex items-center text-xs text-slate-400 hover:text-purple-400 transition-colors font-semibold focus:outline-none"
-                onClick={() => setShowHint((v) => !v)}
-              >
-                <Lightbulb className="w-4 h-4 mr-1 text-purple-400" />
-                ℹ️ {t('hint')}
-              </button>
-              {showHint && (
-                <div className="mt-2 text-xs text-slate-300 bg-slate-800/10 p-2 rounded-md border border-slate-700/50 max-w-xs shadow-lg">
-                  <strong>{t('tipLabel')}</strong> {t('hintLongShort')}
-                </div>
-              )}
+      {/* Checklist section */}
+      <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/50">
+        <h4 className="text-slate-200 font-semibold mb-3 flex items-center">
+          <span className="mr-2">✅</span>
+          {translate(language, 'definitionOfDoneChecklist')}
+        </h4>
+
+        {/* Progress bar */}
+        {definitionOfDoneList.length > 0 && (
+          <div className="mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-slate-300 text-sm font-medium">{translate(language, 'progress')}</span>
+              <span className="text-slate-300 text-sm">
+                {definitionOfDoneList.filter(item => item.completed).length}/{definitionOfDoneList.length} {translate(language, 'completed').toLowerCase()}
+              </span>
             </div>
-            {/* Кнопки адаптивно */}
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleCopy}
-                disabled={!notes.trim()}
-                className="border-slate-500 text-slate-300 hover:text-slate-100 hover:bg-slate-700/10 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
-              >
-                    {isCopied ? (
-                  <>
-                    <span className="w-4 h-4 mr-1">✓</span>
-                    {t('copied')}
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 mr-1" />
-                    {t('copy')}
-                  </>
-                )}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleExport}
-                disabled={!notes.trim()}
-                className="border-slate-500 text-slate-300 hover:text-slate-100 hover:bg-slate-700/10 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
-              >
-                <Download className="w-4 h-4 mr-1" />
-                {t('export')}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleClear}
-                disabled={!notes.trim()}
-                className="border-slate-500 text-red-400 hover:text-red-200 hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
-              >
-                <Trash2 className="w-4 h-4 mr-1" />
-                {t('clear')}
-              </Button>
+            <div className="w-full bg-slate-700 rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2 rounded-full transition-all duration-300 ease-out"
+                style={{
+                  width: `${definitionOfDoneList.length > 0 ? (definitionOfDoneList.filter(item => item.completed).length / definitionOfDoneList.length) * 100 : 0}%`
+                }}
+              ></div>
+            </div>
+            <div className="text-xs text-slate-400 mt-1">
+              {Math.round((definitionOfDoneList.filter(item => item.completed).length / definitionOfDoneList.length) * 100)}% {translate(language, 'complete')}
             </div>
           </div>
+        )}
+
+        {/* Add new item */}
+        <div className="flex gap-2 mb-3">
+          <Input
+            value={newItem}
+            onChange={(e) => setNewItem(e.target.value)}
+            placeholder={translate(language, 'addNewCriterion')}
+            className="bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400"
+            onKeyPress={(e) => e.key === 'Enter' && addItem()}
+          />
+          <Button onClick={addItem} size="sm" className="bg-emerald-600 hover:bg-emerald-500">
+            <Plus className="w-4 h-4" />
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Checklist items */}
+        <div className="space-y-2">
+          {definitionOfDoneList.map((item) => (
+            <div key={item.id} className="flex items-center gap-2 group">
+              <input
+                type="checkbox"
+                checked={item.completed}
+                onChange={() => toggleItem(item.id)}
+                className="w-4 h-4 text-emerald-600 bg-slate-700 border-slate-600 rounded focus:ring-emerald-500"
+              />
+              <Input
+                value={item.text}
+                onChange={(e) => updateItem(item.id, e.target.value)}
+                className={`flex-1 bg-slate-700 border-slate-600 text-slate-100 ${
+                  item.completed ? 'line-through opacity-60' : ''
+                }`}
+              />
+              <Button
+                onClick={() => removeItem(item.id)}
+                size="sm"
+                variant="ghost"
+                className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+
+        {definitionOfDoneList.length === 0 && (
+          <p className="text-slate-400 text-sm italic">
+            {translate(language, 'noCriteriaAdded')}
+          </p>
+        )}
+      </div>
+    </div>
   );
 };
 
@@ -1796,7 +1965,8 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     energyTracking: true,
     advancedMetrics: true
   }));
-  
+
+
   // UI state
   const [starredOOFs, setStarredOOFs] = useState<string[]>(() => ls.get('dw_starred', []));
   const [showHints, setShowHints] = useState(false);
@@ -1804,6 +1974,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
   const [activeTab, setActiveTab] = useState('focus');
   const [oofFilter, setOofFilter] = useState('all');
   const [editingOOF, setEditingOOF] = useState<OOF | null>(null);
+  const [showCreateOOF, setShowCreateOOF] = useState(false);
 
   // Domain management state
   const [customDomains, setCustomDomains] = useState<string[]>(() => {
@@ -1891,6 +2062,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       priority: 'Medium' as Priority,
       estimatedMinutes: '90',
       definitionOfDone: '',
+      definitionOfDoneList: [] as DoD[],
       constraints: '',
       firstStep: '',
       tags: [] as string[],
@@ -1908,6 +2080,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
         priority: editingOOF.priority,
         estimatedMinutes: String(editingOOF.estimatedMinutes),
         definitionOfDone: editingOOF.definitionOfDone || '',
+        definitionOfDoneList: editingOOF.definitionOfDoneList || [],
         constraints: editingOOF.constraints || '',
         firstStep: editingOOF.firstStep || '',
         tags: editingOOF.tags || [],
@@ -1924,6 +2097,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
         priority: 'Medium',
         estimatedMinutes: '90',
         definitionOfDone: '',
+        definitionOfDoneList: [],
         constraints: '',
         firstStep: '',
         tags: [],
@@ -1941,8 +2115,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     mood: 3,
     interruptions: 0,
     flowState: false,
-    completedOOF: false,
-    notes: ''
+    completedOOF: false
   });
   
   const [newTemplate, setNewTemplate] = useState({
@@ -2261,7 +2434,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
   // Enhanced OOF operations
   const addOOF = () => {
     if (!newOOF.title.trim()) return;
-    
+
     const oof: OOF = {
       id: generateId(),
       title: newOOF.title.trim(),
@@ -2270,6 +2443,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       estimatedMinutes: parseInt(String(newOOF.estimatedMinutes)) || 90,
       actualMinutes: 0,
       definitionOfDone: newOOF.definitionOfDone.trim() || undefined,
+      definitionOfDoneList: newOOF.definitionOfDoneList.length > 0 ? newOOF.definitionOfDoneList : undefined,
       constraints: newOOF.constraints.trim() || undefined,
       firstStep: newOOF.firstStep.trim() || undefined,
       planned: true,
@@ -2278,11 +2452,15 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       difficulty: newOOF.difficulty,
       energy: newOOF.energy
     };
-    
+
     setOofs(prev => [oof, ...prev]);
 
     // Save the selected domain as the new preferred default
     savePreferredDomain(oof.domain);
+
+    // Auto-collapse Create OOF section and ensure new OOF is visible
+    setShowCreateOOF(false);
+    setOofFilter('all');
 
     console.log('🔥 After adding OOF, resetting form with preferred domain:', oof.domain);
     setNewOOF({
@@ -2308,6 +2486,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
         priority: newOOF.priority,
         estimatedMinutes: parseInt(String(newOOF.estimatedMinutes)) || 90,
         definitionOfDone: newOOF.definitionOfDone.trim() || undefined,
+        definitionOfDoneList: newOOF.definitionOfDoneList.length > 0 ? newOOF.definitionOfDoneList : undefined,
         constraints: newOOF.constraints.trim() || undefined,
         firstStep: newOOF.firstStep.trim() || undefined,
         tags: newOOF.tags,
@@ -2324,6 +2503,14 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     setOofs(prev => prev.map(o => o.id === updatedOOF.id ? updatedOOF : o));
     setEditingOOF(null);
   };
+
+  const updateOOFDoD = (oofId: string, dodList: DoD[]) => {
+    setOofs(prev => prev.map(oof =>
+      oof.id === oofId
+        ? { ...oof, definitionOfDoneList: dodList }
+        : oof
+    ));
+  };
   
   const deleteOOF = (id: string) => {
     setOofs(prev => prev.filter(o => o.id !== id));
@@ -2331,11 +2518,38 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
   };
   
   const toggleStarOOF = (id: string) => {
-    setStarredOOFs(prev => 
-      prev.includes(id) 
+    const isCurrentlyStarred = starredOOFs.includes(id);
+
+    setStarredOOFs(prev =>
+      isCurrentlyStarred
         ? prev.filter(sid => sid !== id)
         : [...prev, id]
     );
+
+    // If starring an OOF, set it as the active timer OOF
+    if (!isCurrentlyStarred) {
+      const oof = oofs.find(o => o.id === id);
+      if (oof) {
+        console.log('🌟 Starring OOF:', oof.title);
+        setRun(prev => {
+          const newState = {
+            ...prev,
+            oofId: oof.id,
+            oofTitle: oof.title || ''
+          };
+          console.log('🌟 Updated run state:', newState);
+          return newState;
+        });
+      }
+    } else {
+      console.log('⭐ Unstarring OOF with id:', id);
+      // When unstarring, clear the selected OOF
+      setRun(prev => ({
+        ...prev,
+        oofId: undefined,
+        oofTitle: ''
+      }));
+    }
   };
   
   // Enhanced timer operations
@@ -2368,7 +2582,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       notes: ''
     });
     
-    setActiveTab('timer');
+    setActiveTab('parking');
   };
   
   const togglePause = () => {
@@ -2426,7 +2640,6 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       lr: postBlockData.lr,
       energy: postBlockData.energy,
       mood: postBlockData.mood,
-      notes: postBlockData.notes.trim() || undefined,
       interruptions: postBlockData.interruptions,
       flowState: postBlockData.flowState,
       completedOOF: postBlockData.completedOOF
@@ -2744,7 +2957,32 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
             </div>
           </div>
           
-          {/* Переміщений таймер вгору */}
+          {/* Selected OOF Card - Always Visible */}
+          {run.oofId && (
+            <div className="mt-6">
+              {(() => {
+                const selectedOOF = oofs.find(o => o.id === run.oofId);
+                if (selectedOOF) {
+                  return (
+                    <EnhancedOOFCard
+                      oof={selectedOOF}
+                      onStart={startBlock}
+                      onEdit={setEditingOOF}
+                      onDelete={deleteOOF}
+                      onToggleStar={toggleStarOOF}
+                      onUpdateDoD={updateOOFDoD}
+                      isStarred={starredOOFs.includes(selectedOOF.id)}
+                      language={language}
+                    />
+                  );
+                }
+                return null;
+              })()}
+            </div>
+          )}
+
+
+          {/* Active Timer - Show when running */}
           {run.active && (
             <div className="mt-6">
               <SmartTimer
@@ -2757,18 +2995,138 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
               />
             </div>
           )}
-          
+
+          {/* Timer Section - Always Visible */}
+          <div className="space-y-6 mt-6">
+            {!run.active ? (
+              <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
+                <CardContent className="pt-8">
+                  <div className="text-center space-y-6">
+                    <div className="space-y-2">
+                      <Clock className="w-16 h-16 text-slate-300 mx-auto" />
+                      <h3 className="text-xl font-semibold text-slate-100 mb-2">{translate(language, 'readyToStart')}</h3>
+                      <p className="text-slate-300">{translate(language, 'chooseTask')}</p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row justify-center gap-3 px-4">
+                      <Button
+                        onClick={() => startBlock(null, 25)}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
+                        size="lg"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        <span className="whitespace-nowrap">{translate(language,'pomodoro25')}</span>
+                      </Button>
+                      <Button
+                        onClick={() => startBlock(null, 60)}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
+                        size="lg"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        <span className="whitespace-nowrap">{translate(language,'standard60')}</span>
+                      </Button>
+                      <Button
+                        onClick={() => startBlock(null, 90)}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
+                        size="lg"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        <span className="whitespace-nowrap">{translate(language,'deep90')}</span>
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-6">
+                {/* Enhanced Hints */}
+                <Card className="bg-gradient-to-r from-slate-800/60 to-slate-700/40 backdrop-blur-sm border border-slate-600/50 shadow-xl">
+                  <CardContent className="pt-5">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setShowHints(!showHints)}
+                      className="w-full justify-between text-slate-100 hover:text-slate-50 hover:bg-slate-700/10 p-4 rounded-lg border border-slate-600/30"
+                    >
+                      <span className="flex items-center font-semibold">
+                        <Lightbulb className="w-5 h-5 mr-2 text-yellow-400" />
+                        {t('smartHintsTitle')}
+                      </span>
+                      {showHints ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </Button>
+
+                    {showHints && (
+                      <div className="mt-6 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Card className="bg-gradient-to-br from-emerald-900/30 to-emerald-800/20 border border-emerald-700/50 shadow-lg">
+                            <CardContent className="pt-5">
+                              <h4 className="text-emerald-300 font-bold mb-3 flex items-center text-lg">
+                                <Zap className="w-5 h-5 mr-2" />
+                                {t('microExperiment')}
+                              </h4>
+                              <p className="text-slate-200 text-sm mb-4 leading-relaxed">
+                                {t('microExperimentDesc')}
+                              </p>
+                              <ul className="text-slate-300 text-sm space-y-2">
+                                <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip1')}</li>
+                                <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip2')}</li>
+                                <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip3')}</li>
+                                <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip4')}</li>
+                              </ul>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="bg-gradient-to-br from-amber-900/30 to-orange-800/20 border border-amber-700/50 shadow-lg">
+                            <CardContent className="pt-5">
+                              <h4 className="text-amber-300 font-bold mb-3 flex items-center text-lg">
+                                <NotebookPen className="w-5 h-5 mr-2" />
+                                {t('distractionManagement')}
+                              </h4>
+                              <p className="text-slate-200 text-sm mb-4 leading-relaxed">
+                                {t('distractionDesc')}
+                              </p>
+                              <ul className="text-slate-300 text-sm space-y-2">
+                                <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip1')}</li>
+                                <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip2')}</li>
+                                <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip3')}</li>
+                                <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip4')}</li>
+                              </ul>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        <Card className="bg-gradient-to-r from-blue-900/30 to-purple-900/25 border border-blue-700/50 shadow-xl">
+                          <CardContent className="pt-5">
+                            <h4 className="text-blue-300 font-bold mb-3 flex items-center text-lg">
+                              <Brain className="w-5 h-5 mr-2" />
+                              {translate(language, 'flowState')} (Flow State)
+                            </h4>
+                            <p className="text-slate-200 text-sm leading-relaxed">
+                              <strong>{translate(language, 'flowStateSigns')}</strong> {translate(language, 'flowDescription')},
+                              {translate(language, 'flowDescriptionFull')}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Enhanced During Checklists */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Hint blocks removed as requested */}
+                </div>
+
+              </div>
+            )}
+          </div>
+
           {/* Enhanced Tab Navigation - Mobile Responsive */}
           <div className="mt-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-6 bg-slate-800/5 backdrop-blur-md border border-slate-600/50 w-full gap-0.5 md:gap-1 h-auto p-1">
+              <TabsList className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-5 bg-slate-800/5 backdrop-blur-md border border-slate-600/50 w-full gap-0.5 md:gap-1 h-auto p-1">
                 <TabsTrigger value="focus" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
                   <Target className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
                   <span>{translate(language,'tabFocus')}</span>
-                </TabsTrigger>
-                <TabsTrigger value="timer" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
-                  <Clock className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
-                  <span>{translate(language,'tabTimer')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="parking" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
                   <NotebookPen className="w-4 h-4 mb-1 md:mb-0 md:mr-1" />
@@ -2787,18 +3145,35 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                   <span>{translate(language,'tabSettings')}</span>
                 </TabsTrigger>
               </TabsList>
-              
+            </Tabs>
+          </div>
+
+
+          {/* Tab Content Sections */}
+          <div className="mt-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <div className="mt-6 max-w-7xl mx-auto">
-                {/* Focus Tab - Enhanced OOF Management */}
+                {/* Tasks Tab - Enhanced OOF Management */}
                 <TabsContent value="focus" className="space-y-6">
                   {/* OOF Creation Form */}
                   <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
                     <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
-                      <CardTitle className="text-slate-50 flex items-center space-x-2">
-                        <Target className="w-5 h-5 text-indigo-400" />
-                        <span>{translate(language,'createOOF')}</span>
+                      <CardTitle
+                        className="text-slate-50 flex items-center justify-between cursor-pointer hover:text-slate-100 transition-colors"
+                        onClick={() => setShowCreateOOF(!showCreateOOF)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Target className="w-5 h-5 text-indigo-400" />
+                          <span>{translate(language,'createOOF')}</span>
+                        </div>
+                        {showCreateOOF ? (
+                          <ChevronUp className="w-5 h-5 text-slate-400" />
+                        ) : (
+                          <ChevronDown className="w-5 h-5 text-slate-400" />
+                        )}
                       </CardTitle>
                     </CardHeader>
+                    {showCreateOOF && (
                     <CardContent className="space-y-4 pt-6">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div className="space-y-4">
@@ -2893,12 +3268,12 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                         </div>
                         
                         <div className="space-y-4">
-                          <Textarea
-                            placeholder={translate(language, 'oofDefinitionPlaceholder')}
-                            value={newOOF.definitionOfDone}
-                            onChange={(e) => setNewOOF(prev => ({ ...prev, definitionOfDone: e.target.value }))}
-                            className="bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400"
-                            rows={3}
+                          <DefinitionOfDoneEditor
+                            definitionOfDone={newOOF.definitionOfDone}
+                            definitionOfDoneList={newOOF.definitionOfDoneList}
+                            onDefinitionChange={(value) => setNewOOF(prev => ({ ...prev, definitionOfDone: value }))}
+                            onListChange={(list) => setNewOOF(prev => ({ ...prev, definitionOfDoneList: list }))}
+                            language={language}
                           />
                           
                           <Textarea
@@ -2939,8 +3314,9 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                             </Button>
                           )}
                     </CardContent>
+                    )}
                   </Card>
-                  
+
                   {/* Виправлений OOF Filter - темніший */}
                   <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-transparent rounded-xl border border-slate-700/30 shadow-xl">
                     <div className="flex items-center space-x-3 flex-wrap">
@@ -2983,325 +3359,12 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                         onEdit={setEditingOOF}
                         onDelete={deleteOOF}
                         onToggleStar={toggleStarOOF}
+                        onUpdateDoD={updateOOFDoD}
                         isStarred={starredOOFs.includes(oof.id)}
                         language={language}
                       />
                     ))}
                   </div>
-                </TabsContent>
-                
-                {/* Timer Tab - Виправлена секція з нотатками */}
-                <TabsContent value="timer" className="space-y-6">
-                  {!run.active ? (
-                    <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
-                      <CardContent className="pt-8">
-                        <div className="text-center space-y-6">
-                          <div className="space-y-2">
-                            <Clock className="w-16 h-16 text-slate-300 mx-auto" />
-                            <h3 className="text-xl font-semibold text-slate-100 mb-2">{translate(language, 'readyToStart')}</h3>
-                            <p className="text-slate-300">{translate(language, 'chooseTask')}</p>
-                          </div>
-                          
-                          <div className="flex flex-col sm:flex-row justify-center gap-3 px-4">
-                            <Button
-                              onClick={() => startBlock(null, 25)}
-                              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
-                              size="lg"
-                            >
-                              <Play className="w-4 h-4 mr-2" />
-                              <span className="whitespace-nowrap">{translate(language,'pomodoro25')}</span>
-                            </Button>
-                            <Button
-                              onClick={() => startBlock(null, 60)}
-                              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
-                              size="lg"
-                            >
-                              <Play className="w-4 h-4 mr-2" />
-                              <span className="whitespace-nowrap">{translate(language,'standard60')}</span>
-                            </Button>
-                            <Button
-                              onClick={() => startBlock(null, 90)}
-                              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex-1 sm:flex-none"
-                              size="lg"
-                            >
-                              <Play className="w-4 h-4 mr-2" />
-                              <span className="whitespace-nowrap">{translate(language,'deep90')}</span>
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="space-y-6">
-                      {/* Секція нотаток завжди видима коли блок активний */}
-                      <NotesSection
-                        notes={postBlockData.notes}
-                        onNotesChange={(notes) => setPostBlockData(prev => ({ ...prev, notes }))}
-                        language={language}
-                      />
-                      
-                      {/* Enhanced Hints */}
-                      <Card className="bg-gradient-to-r from-slate-800/60 to-slate-700/40 backdrop-blur-sm border border-slate-600/50 shadow-xl">
-                        <CardContent className="pt-5">
-                          <Button
-                            variant="ghost"
-                            onClick={() => setShowHints(!showHints)}
-                            className="w-full justify-between text-slate-100 hover:text-slate-50 hover:bg-slate-700/10 p-4 rounded-lg border border-slate-600/30"
-                          >
-                            <span className="flex items-center font-semibold">
-                              <Lightbulb className="w-5 h-5 mr-2 text-yellow-400" />
-                              {t('smartHintsTitle')}
-                            </span>
-                            {showHints ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                          </Button>
-                          
-                          {showHints && (
-                            <div className="mt-6 space-y-4">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <Card className="bg-gradient-to-br from-emerald-900/30 to-emerald-800/20 border border-emerald-700/50 shadow-lg">
-                                  <CardContent className="pt-5">
-                                    <h4 className="text-emerald-300 font-bold mb-3 flex items-center text-lg">
-                                      <Zap className="w-5 h-5 mr-2" />
-                                      {t('microExperiment')}
-                                    </h4>
-                                    <p className="text-slate-200 text-sm mb-4 leading-relaxed">
-                                      {t('microExperimentDesc')}
-                                    </p>
-                                    <ul className="text-slate-300 text-sm space-y-2">
-                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip1')}</li>
-                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip2')}</li>
-                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip3')}</li>
-                                      <li className="flex items-start"><span className="text-emerald-400 mr-2">•</span>{t('microTip4')}</li>
-                                    </ul>
-                                  </CardContent>
-                                </Card>
-                                
-                                <Card className="bg-gradient-to-br from-amber-900/30 to-orange-800/20 border border-amber-700/50 shadow-lg">
-                                  <CardContent className="pt-5">
-                                    <h4 className="text-amber-300 font-bold mb-3 flex items-center text-lg">
-                                      <NotebookPen className="w-5 h-5 mr-2" />
-                                      {t('distractionManagement')}
-                                    </h4>
-                                    <p className="text-slate-200 text-sm mb-4 leading-relaxed">
-                                      {t('distractionDesc')}
-                                    </p>
-                                    <ul className="text-slate-300 text-sm space-y-2">
-                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip1')}</li>
-                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip2')}</li>
-                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip3')}</li>
-                                      <li className="flex items-start"><span className="text-amber-400 mr-2">•</span>{t('distractionTip4')}</li>
-                                    </ul>
-                                  </CardContent>
-                                </Card>
-                              </div>
-                              
-                              <Card className="bg-gradient-to-r from-blue-900/30 to-purple-900/25 border border-blue-700/50 shadow-xl">
-                                <CardContent className="pt-5">
-                                  <h4 className="text-blue-300 font-bold mb-3 flex items-center text-lg">
-                                    <Brain className="w-5 h-5 mr-2" />
-                                    {translate(language, 'flowState')} (Flow State)
-                                  </h4>
-                                  <p className="text-slate-200 text-sm leading-relaxed">
-                                    <strong>{translate(language, 'flowStateSigns')}</strong> {translate(language, 'flowDescription')},
-                                    {translate(language, 'flowDescriptionFull')}
-                                  </p>
-                                </CardContent>
-                              </Card>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                      
-                      {/* Enhanced During Checklists */}
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <ChecklistTile
-                          title={translate(language, 'check_single_title')}
-                          checked={checklists.during.singleTask}
-                          onChange={(checked) => setChecklists(prev => ({
-                            ...prev,
-                            during: { ...prev.during, singleTask: checked }
-                          }))}
-                          infoContent={translate(language, 'check_single_info')}
-                          example={translate(language, 'check_single_example')}
-                          icon="🎯"
-                          language={language}
-                        />
-                        
-                        <ChecklistTile
-                          title={translate(language, 'check_scratch_title')}
-                          checked={checklists.during.scratchpad}
-                          onChange={(checked) => setChecklists(prev => ({
-                            ...prev,
-                            during: { ...prev.during, scratchpad: checked }
-                          }))}
-                          infoContent={translate(language, 'check_scratch_info')}
-                          example={translate(language, 'check_scratch_example')}
-                          icon="📝"
-                          language={language}
-                        />
-                        
-                        <ChecklistTile
-                          title={translate(language, 'check_5min_title')}
-                          checked={checklists.during.stuckRule}
-                          onChange={(checked) => setChecklists(prev => ({
-                            ...prev,
-                            during: { ...prev.during, stuckRule: checked }
-                          }))}
-                          infoContent={translate(language, 'check_5min_info')}
-                          example={translate(language, 'check_5min_example')}
-                          icon="⚡"
-                          language={language}
-                        />
-                        
-                        <ChecklistTile
-                          title={translate(language, 'check_hydration_title')}
-                          checked={checklists.during.hydration}
-                          onChange={(checked) => setChecklists(prev => ({
-                            ...prev,
-                            during: { ...prev.during, hydration: checked }
-                          }))}
-                          infoContent={translate(language, 'check_hydration_info')}
-                          example={translate(language, 'check_hydration_example')}
-                          icon="💧"
-                          language={language}
-                        />
-                      </div>
-                      
-                      {/* Block Summary Form - показується після 10 хвилин */}
-                      {run.elapsedSec > 600 && (
-                        <Card className="bg-gradient-to-r from-cyan-900/40 to-blue-900/30 border border-cyan-600/50 backdrop-blur-sm shadow-xl">
-                          <CardHeader className="bg-cyan-900/20 border-b border-cyan-700/30">
-                            <CardTitle className="text-slate-50 flex items-center space-x-2">
-                              <Save className="w-5 h-5 text-cyan-400" />
-                              <span>Підготовка до завершення блоку</span>
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-6 pt-6">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                              <div className="space-y-5">
-                                <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
-                                  <label className="text-slate-100 text-sm font-bold mb-3 block">{translate(language, 'qualityDepth')}: {postBlockData.dq}/5</label>
-                                  <Slider
-                                    value={[postBlockData.dq]}
-                                    onValueChange={(vals) => setPostBlockData(prev => ({ ...prev, dq: vals[0] }))}
-                                    min={1}
-                                    max={5}
-                                    step={1}
-                                    className="w-full"
-                                  />
-                                </div>
-                                
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
-                                    <label className="text-slate-100 text-sm font-bold mb-3 block">ОВ (Одиниці виходу)</label>
-                                    <div className="flex items-center justify-center space-x-3">
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setPostBlockData(prev => ({ ...prev, ou: Math.max(0, prev.ou - 1) }))}
-                                        className="border-slate-500 hover:bg-slate-700"
-                                      >
-                                        <Minus className="w-4 h-4" />
-                                      </Button>
-                                      <span className="text-slate-100 font-bold text-xl min-w-[50px] text-center">{postBlockData.ou}</span>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setPostBlockData(prev => ({ ...prev, ou: prev.ou + 1 }))}
-                                        className="border-slate-500 hover:bg-slate-700"
-                                      >
-                                        <Plus className="w-4 h-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
-                                    <label className="text-slate-100 text-sm font-bold mb-3 block">ПН (Повторення навчання)</label>
-                                    <div className="flex items-center justify-center space-x-3">
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setPostBlockData(prev => ({ ...prev, lr: Math.max(0, prev.lr - 1) }))}
-                                        className="border-slate-500 hover:bg-slate-700"
-                                      >
-                                        <Minus className="w-4 h-4" />
-                                      </Button>
-                                      <span className="text-slate-100 font-bold text-xl min-w-[50px] text-center">{postBlockData.lr}</span>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setPostBlockData(prev => ({ ...prev, lr: prev.lr + 1 }))}
-                                        className="border-slate-500 hover:bg-slate-700"
-                                      >
-                                        <Plus className="w-4 h-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
-                                    <label className="text-slate-100 text-sm font-bold mb-3 block">
-                                      {translate(language, 'mood')}: {postBlockData.mood}/5
-                                    </label>
-                                    <Slider
-                                      value={[postBlockData.mood]}
-                                      onValueChange={(vals) => setPostBlockData(prev => ({ ...prev, mood: vals[0] }))}
-                                      min={1}
-                                      max={5}
-                                      step={1}
-                                      className="w-full"
-                                    />
-                                  </div>
-                                  
-                                  <div className="p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50">
-                                    <label className="text-slate-100 text-sm font-bold mb-3 block">Перерви</label>
-                                    <div className="flex items-center justify-center space-x-3">
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setPostBlockData(prev => ({ ...prev, interruptions: Math.max(0, prev.interruptions - 1) }))}
-                                        className="border-slate-500 hover:bg-slate-700"
-                                      >
-                                        <Minus className="w-4 h-4" />
-                                      </Button>
-                                      <span className="text-slate-100 font-bold text-xl min-w-[50px] text-center">{postBlockData.interruptions}</span>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setPostBlockData(prev => ({ ...prev, interruptions: prev.interruptions + 1 }))}
-                                        className="border-slate-500 hover:bg-slate-700"
-                                      >
-                                        <Plus className="w-4 h-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                <div className="flex items-center justify-center space-x-8 p-4 bg-slate-800/10 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
-                                  <div className="flex items-center space-x-3">
-                                    <Switch
-                                      checked={postBlockData.flowState}
-                                      onCheckedChange={(checked) => setPostBlockData(prev => ({ ...prev, flowState: checked }))}
-                                    />
-                                    <span className="text-slate-100 text-sm font-semibold">{t('flowStateAchieved')}</span>
-                                  </div>
-                                  
-                                  <div className="flex items-center space-x-3">
-                                    <Switch
-                                      checked={postBlockData.completedOOF}
-                                      onCheckedChange={(checked) => setPostBlockData(prev => ({ ...prev, completedOOF: checked }))}
-                                    />
-                                    <span className="text-slate-100 text-sm font-semibold">OOF завершено</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      )}
-                    </div>
-                  )}
                 </TabsContent>
                 
                 {/* Parking Tab - Enhanced Distraction Management */}
@@ -3603,6 +3666,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                       </div>
                     </CardContent>
                   </Card>
+
                 </TabsContent>
                 
                 {/* Templates Tab - Enhanced Template Management */}
