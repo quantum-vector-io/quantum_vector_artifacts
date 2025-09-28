@@ -642,29 +642,29 @@ const QuickStats = ({ logs, className = "", onResetData, language = 'EN' }: { lo
   const streak = calculateStreak(logs);
   
   return (
-    <div className={`grid grid-cols-3 gap-4 ${className}`}>
+    <div className={`grid grid-cols-3 gap-1 ${className}`}>
       <Card className="bg-slate-800/5 backdrop-blur-md border-emerald-500/60 shadow-2xl shadow-emerald-500/20">
-        <CardContent className="pt-4">
+        <CardContent className="pt-2 pb-2">
           <div className="text-center">
-            <div className="text-3xl font-bold text-emerald-300">{Math.round(todayTime/60 * 10)/10}{translate(language,'hoursShort')}</div>
+            <div className="text-2xl font-bold text-emerald-300">{Math.round(todayTime/60 * 10)/10}{translate(language,'hoursShort')}</div>
             <div className="text-slate-200 text-sm font-medium">{translate(language,'today')}</div>
           </div>
         </CardContent>
       </Card>
       <Card className="bg-slate-800/5 backdrop-blur-md border-blue-500/60 shadow-2xl shadow-blue-500/20">
-        <CardContent className="pt-4">
+        <CardContent className="pt-2 pb-2">
           <div className="text-center">
-            <div className="text-3xl font-bold text-blue-300">{Math.round(weekTime/60 * 10)/10}{translate(language,'hoursShort')}</div>
+            <div className="text-2xl font-bold text-blue-300">{Math.round(weekTime/60 * 10)/10}{translate(language,'hoursShort')}</div>
             <div className="text-slate-200 text-sm font-medium">{translate(language,'week')}</div>
           </div>
         </CardContent>
       </Card>
       <Card className="bg-slate-800/5 backdrop-blur-md border-amber-500/60 shadow-2xl shadow-amber-500/20">
-        <CardContent className="pt-4">
+        <CardContent className="pt-2 pb-2">
           {/* Reset button removed here to avoid duplication; top header contains the single Reset */}
           <div className="text-center">
-            <div className="text-3xl font-bold text-amber-300 flex items-center justify-center">
-              <Flame className="w-7 h-7 mr-1" />
+            <div className="text-2xl font-bold text-amber-300 flex items-center justify-center">
+              <Flame className="w-5 h-5 mr-1" />
               {streak}
             </div>
             <div className="text-slate-200 text-sm font-medium">{translate(language,'streak')}</div>
@@ -715,12 +715,12 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec, language 
     <>
 
       <Card className={`bg-slate-800/5 backdrop-blur-md border-2 ${isOvertime ? 'border-amber-500/70' : isNearComplete ? 'border-emerald-500/70' : 'border-slate-600/30'} shadow-2xl`}>
-        <CardContent className="pt-6">
-          <div className="text-center space-y-6">
+        <CardContent className="pt-2">
+          <div className="text-center space-y-2">
             <div>
               {/* Linear Progress Bar */}
-              <div className="mb-6 px-2">
-                <div className="flex justify-between items-center mb-2">
+              <div className="mb-1 px-2">
+                <div className="flex justify-between items-center mb-1">
                   <span className="text-sm text-slate-400">
                     {translate(language, 'remaining')}: {remainingMin} {translate(language, 'min')}
                   </span>
@@ -739,8 +739,8 @@ const SmartTimer = ({ run, onTogglePause, onReset, onStop, elapsedSec, language 
               </div>
 
               {/* Three-Tile Timer Display */}
-              <div className="bg-slate-900/20 backdrop-blur-sm border border-slate-600/20 rounded-2xl p-4 sm:p-6 mb-6">
-                <div className="flex gap-2 sm:gap-3 md:gap-4">
+              <div className="bg-slate-900/20 backdrop-blur-sm border border-slate-600/20 rounded-xl p-2 sm:p-3 mb-1">
+                <div className="flex gap-1 sm:gap-2 md:gap-3">
                   <AnimatedDigit value={timeUnits.hours} label="HOURS" language={language} />
                   <AnimatedDigit value={timeUnits.minutes} label="MINUTES" language={language} />
                   <AnimatedDigit value={timeUnits.seconds} label="SECONDS" language={language} />
@@ -869,7 +869,7 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ backgroundColor: 'transparent' }}>
+    <div className="min-h-[500px] flex items-center justify-center p-2 relative overflow-hidden" style={{ backgroundColor: 'transparent' }}>
       {/* Animated background stars */}
       <div className="absolute inset-0 pointer-events-none">
         {generateStars()}
@@ -878,19 +878,19 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
       {/* Cosmic gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-slate-900/40 to-black/60 pointer-events-none" />
 
-      <Card className={`relative z-10 w-full max-w-3xl mx-auto bg-slate-900/80 backdrop-blur-xl border-slate-700/40 shadow-2xl transition-all duration-1000 ${
+      <Card className={`relative z-10 w-full max-w-2xl mx-auto bg-slate-900/80 backdrop-blur-xl border-slate-700/40 shadow-2xl transition-all duration-1000 ${
         animationPhase >= 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
       }`}>
         <CardHeader className={`text-center bg-slate-800/50 backdrop-blur border-b border-slate-700/30 transition-all duration-800 delay-200 ${
           animationPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
-          <div className="mb-4">
-            <div className="text-7xl mb-3 animate-bounce">🎉</div>
-            <CardTitle className="text-4xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">
+          <div className="mb-1">
+            <div className="text-5xl mb-1 animate-bounce">🎉</div>
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent mb-1">
               {t('blockCompleted')}
             </CardTitle>
-            <p className="text-slate-300 text-xl">{t('wellDone')}</p>
-            <div className="mt-4 flex justify-center space-x-2">
+            <p className="text-slate-300 text-lg">{t('wellDone')}</p>
+            <div className="mt-2 flex justify-center space-x-2">
               {[0, 1, 2, 3].map((dot) => (
                 <div
                   key={dot}
@@ -903,13 +903,13 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
           </div>
         </CardHeader>
 
-        <CardContent className="p-8">
+        <CardContent className="p-4">
           {/* Enhanced Stats Grid with animations */}
-          <div className={`grid grid-cols-2 md:grid-cols-4 gap-6 mb-8 transition-all duration-800 delay-400 ${
+          <div className={`grid grid-cols-2 md:grid-cols-4 gap-2 mb-1 transition-all duration-800 delay-400 ${
             animationPhase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
           }`}>
-            <div className="text-center p-6 bg-gradient-to-br from-emerald-900/40 to-emerald-800/20 rounded-2xl border border-emerald-700/30 hover:border-emerald-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/20">
-              <div className="text-4xl font-bold text-emerald-400 mb-2 animate-pulse">{block.minutes}</div>
+            <div className="text-center p-3 bg-gradient-to-br from-emerald-900/40 to-emerald-800/20 rounded-xl border border-emerald-700/30 hover:border-emerald-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/20">
+              <div className="text-3xl font-bold text-emerald-400 mb-1 animate-pulse">{block.minutes}</div>
               <div className="text-slate-300 text-sm font-medium">{t('minutes')}</div>
               <div className="text-xs text-slate-400 mt-1">{t('timeSpent')}</div>
               {/* Visual indicator */}
@@ -921,8 +921,8 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
               </div>
             </div>
 
-            <div className="text-center p-6 bg-gradient-to-br from-blue-900/40 to-blue-800/20 rounded-2xl border border-blue-700/30 hover:border-blue-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20">
-              <div className="text-4xl font-bold text-blue-400 mb-2">{block.dq}</div>
+            <div className="text-center p-3 bg-gradient-to-br from-blue-900/40 to-blue-800/20 rounded-xl border border-blue-700/30 hover:border-blue-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20">
+              <div className="text-3xl font-bold text-blue-400 mb-1">{block.dq}</div>
               <div className="text-slate-300 text-sm font-medium">DQ</div>
               <div className="text-xs text-slate-400 mt-1">{t('qualityRating')}</div>
               {/* Quality stars */}
@@ -938,8 +938,8 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
               </div>
             </div>
 
-            <div className="text-center p-6 bg-gradient-to-br from-yellow-900/40 to-orange-800/20 rounded-2xl border border-yellow-700/30 hover:border-yellow-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/20">
-              <div className={`text-4xl font-bold mb-2 ${getEnergyColor(block.energy)}`}>{block.energy}</div>
+            <div className="text-center p-3 bg-gradient-to-br from-yellow-900/40 to-orange-800/20 rounded-xl border border-yellow-700/30 hover:border-yellow-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/20">
+              <div className={`text-3xl font-bold mb-1 ${getEnergyColor(block.energy)}`}>{block.energy}</div>
               <div className="text-slate-300 text-sm font-medium">{t('energy')}</div>
               <div className="text-xs text-slate-400 mt-1">{t('energyLevel')}</div>
               {/* Energy bar */}
@@ -955,8 +955,8 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
               </div>
             </div>
 
-            <div className="text-center p-6 bg-gradient-to-br from-purple-900/40 to-indigo-800/20 rounded-2xl border border-purple-700/30 hover:border-purple-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20">
-              <div className="text-4xl font-bold text-purple-400 mb-2">{dailyProgress}%</div>
+            <div className="text-center p-3 bg-gradient-to-br from-purple-900/40 to-indigo-800/20 rounded-xl border border-purple-700/30 hover:border-purple-500/50 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20">
+              <div className="text-3xl font-bold text-purple-400 mb-1">{dailyProgress}%</div>
               <div className="text-slate-300 text-sm font-medium">{t('dailyProgress')}</div>
               <div className="text-xs text-slate-400 mt-1">{Math.round(analytics.today.dh * 10) / 10}h / {settings.dailyGoal / 60}h</div>
               {/* Circular progress */}
@@ -989,10 +989,10 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
 
           {/* Enhanced Parking Lot Ideas */}
           {parking && parking.length > 0 && (
-            <div className={`mb-8 transition-all duration-800 delay-600 ${
+            <div className={`mb-1 transition-all duration-800 delay-600 ${
               animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}>
-              <div className="flex items-center justify-between mb-4 p-4 bg-gradient-to-r from-amber-900/30 to-orange-900/30 rounded-xl border border-amber-700/30">
+              <div className="flex items-center justify-between mb-1 p-2 bg-gradient-to-r from-amber-900/30 to-orange-900/30 rounded-xl border border-amber-700/30">
                 <div className="flex items-center">
                   <NotebookPen className="w-6 h-6 text-amber-400 mr-3 animate-pulse" />
                   <span className="text-slate-100 font-bold text-lg">{translate(language, 'smartParkingList')}</span>
@@ -1005,7 +1005,7 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
                 {parking.slice(0, 6).map((item, index) => (
                   <div
                     key={item.id}
-                    className="flex items-center p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/30 rounded-xl border border-slate-600/20 hover:border-amber-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                    className="flex items-center p-2 bg-gradient-to-r from-slate-800/50 to-slate-700/30 rounded-xl border border-slate-600/20 hover:border-amber-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <div className="flex-1">
@@ -1032,10 +1032,10 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
           )}
 
           {/* Enhanced Progress Bar */}
-          <div className={`mb-8 transition-all duration-800 delay-700 ${
+          <div className={`mb-1 transition-all duration-800 delay-700 ${
             animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            <div className="flex justify-between items-center mb-4 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/30 rounded-xl border border-slate-600/20">
+            <div className="flex justify-between items-center mb-1 p-2 bg-gradient-to-r from-slate-800/50 to-slate-700/30 rounded-xl border border-slate-600/20">
               <div className="flex items-center">
                 <span className="text-slate-100 font-bold text-lg mr-3">{t('dailyProgress')}</span>
                 <div className="bg-purple-500/20 px-3 py-1 rounded-full border border-purple-500/30">
@@ -1069,11 +1069,11 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
           </div>
 
           {/* Enhanced Special Achievements */}
-          <div className={`space-y-4 mb-8 transition-all duration-800 delay-800 ${
+          <div className={`space-y-2 mb-1 transition-all duration-800 delay-800 ${
             animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
             {block.completedOOF && (
-              <div className="flex items-center p-4 bg-gradient-to-r from-emerald-900/40 to-green-900/30 rounded-xl border border-emerald-700/30 hover:border-emerald-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-500/20">
+              <div className="flex items-center p-2 bg-gradient-to-r from-emerald-900/40 to-green-900/30 rounded-xl border border-emerald-700/30 hover:border-emerald-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-500/20">
                 <div className="text-3xl mr-4 animate-bounce">✅</div>
                 <div className="flex-1">
                   <div className="text-emerald-300 font-bold text-lg">{t('oofCompleted')}</div>
@@ -1084,7 +1084,7 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
             )}
 
             {block.flowState && (
-              <div className="flex items-center p-4 bg-gradient-to-r from-purple-900/40 to-indigo-900/30 rounded-xl border border-purple-700/30 hover:border-purple-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/20">
+              <div className="flex items-center p-2 bg-gradient-to-r from-purple-900/40 to-indigo-900/30 rounded-xl border border-purple-700/30 hover:border-purple-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/20">
                 <div className="text-3xl mr-4 animate-pulse">⚡</div>
                 <div className="flex-1">
                   <div className="text-purple-300 font-bold text-lg">{t('flowState')}</div>
@@ -1095,7 +1095,7 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
             )}
 
             {streakDays > 1 && (
-              <div className="flex items-center p-4 bg-gradient-to-r from-orange-900/40 to-red-900/30 rounded-xl border border-orange-700/30 hover:border-orange-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-orange-500/20">
+              <div className="flex items-center p-2 bg-gradient-to-r from-orange-900/40 to-red-900/30 rounded-xl border border-orange-700/30 hover:border-orange-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-orange-500/20">
                 <div className="text-3xl mr-4 animate-pulse">🔥</div>
                 <div className="flex-1">
                   <div className="text-orange-300 font-bold text-lg">{streakDays} {t('dayLabel')} {t('streak')}</div>
@@ -1106,7 +1106,7 @@ const PostBlockSummary = ({ block, analytics, settings, parking, onStartNew, onV
             )}
 
             {isGoalReached && (
-              <div className="flex items-center p-4 bg-gradient-to-r from-yellow-900/40 to-amber-900/30 rounded-xl border border-yellow-700/30 hover:border-yellow-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-yellow-500/20">
+              <div className="flex items-center p-2 bg-gradient-to-r from-yellow-900/40 to-amber-900/30 rounded-xl border border-yellow-700/30 hover:border-yellow-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-yellow-500/20">
                 <div className="text-3xl mr-4 animate-bounce">🏆</div>
                 <div className="flex-1">
                   <div className="text-yellow-300 font-bold text-lg">{t('achievement')}</div>
@@ -1213,7 +1213,7 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, onUpdat
       <CardContent className="pt-4 bg-transparent">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
-            <div className="flex items-center space-x-2 mb-2">
+            <div className="flex items-center space-x-2 mb-1">
               <Badge className={`${domainConfig.bgColor} ${domainConfig.color} border-0 text-xs font-semibold px-2 py-1`}>
                 {domainConfig.label}
               </Badge>
@@ -1226,7 +1226,7 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, onUpdat
                 </Badge>
               ))}
             </div>
-            <h4 className="font-semibold text-slate-100 mb-2 leading-tight">{oof.title}</h4>
+            <h4 className="font-semibold text-slate-100 mb-1 leading-tight">{oof.title}</h4>
             <div className="text-sm text-slate-300 space-y-1">
               <div className="flex items-center space-x-4">
                 <span className="text-slate-300">📊 {oof.estimatedMinutes}{translate(language, 'minPlan')}</span>
@@ -1257,13 +1257,13 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, onUpdat
         </div>
         
         {oof.definitionOfDone && (
-          <p className="text-slate-300 text-sm mb-2 bg-slate-800/5 p-2 rounded-lg border border-slate-700/50">
+          <p className="text-slate-300 text-sm mb-1 bg-slate-800/5 p-2 rounded-lg border border-slate-700/50">
             ✅ DoD: {oof.definitionOfDone}
           </p>
         )}
         {oof.definitionOfDoneList && oof.definitionOfDoneList.length > 0 && (
-          <div className="bg-slate-800/5 p-3 rounded-lg border border-slate-700/50 mb-2">
-            <h5 className="text-slate-200 font-semibold text-sm mb-2 flex items-center">
+          <div className="bg-slate-800/5 p-3 rounded-lg border border-slate-700/50 mb-1">
+            <h5 className="text-slate-200 font-semibold text-sm mb-1 flex items-center">
               <span className="mr-2">✅</span>
               {translate(language, 'definitionOfDone')} ({oof.definitionOfDoneList.filter(item => item.completed).length}/{oof.definitionOfDoneList.length})
             </h5>
@@ -1359,7 +1359,7 @@ const SmartParkingList = ({ parking, onAdd, onToggle, onDelete, onCategorize, cu
   });
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Input field for quick add */}
       <div className="w-full mb-4">
         <AddInline
@@ -1425,7 +1425,7 @@ const SmartParkingList = ({ parking, onAdd, onToggle, onDelete, onCategorize, cu
                   />
                   <div className="flex-1 min-w-0 text-left">
                     {/* Text and Category - Mobile Optimized */}
-                    <div className="mb-2">
+                    <div className="mb-1">
                       <div className="mb-1">
                         <span className={`text-sm md:text-base font-medium leading-relaxed break-words block text-left ${item.done ? 'text-slate-400 line-through' : 'text-slate-100'}`}>
                           {item.text}
@@ -1531,15 +1531,15 @@ const AnimatedDigit = ({ value, label, language = 'EN' }: { value: string; label
   }, [value, displayValue]);
 
   return (
-    <div className="flex-1 bg-slate-800/20 backdrop-blur-sm border border-slate-600/30 rounded-xl p-3 sm:p-4 text-center group hover:border-slate-500/50 transition-all duration-300 hover:bg-slate-800/30">
-      <div className={`text-2xl sm:text-3xl md:text-4xl font-mono font-bold mb-1 sm:mb-2 tabular-nums transition-all duration-300 ${
+    <div className="flex-1 bg-slate-800/20 backdrop-blur-sm border border-slate-600/30 rounded-lg p-1 sm:p-2 text-center group hover:border-slate-500/50 transition-all duration-300 hover:bg-slate-800/30">
+      <div className={`text-lg sm:text-xl md:text-2xl font-mono font-bold mb-0 sm:mb-1 tabular-nums transition-all duration-300 ${
         isAnimating
           ? 'text-emerald-300 scale-110 transform'
           : 'text-emerald-400 group-hover:text-emerald-300'
         }`}>
         {displayValue}
       </div>
-      <div className="text-xs sm:text-sm uppercase tracking-wider text-slate-400 font-semibold">
+      <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
         {translate(language, label.toLowerCase())}
       </div>
     </div>
@@ -1664,7 +1664,7 @@ const DefinitionOfDoneEditor = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Legacy text area for backward compatibility */}
       <Textarea
         placeholder={translate(language, 'oofDefinitionPlaceholder')}
@@ -1684,7 +1684,7 @@ const DefinitionOfDoneEditor = ({
         {/* Progress bar */}
         {definitionOfDoneList.length > 0 && (
           <div className="mb-4">
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center mb-1">
               <span className="text-slate-300 text-sm font-medium">{translate(language, 'progress')}</span>
               <span className="text-slate-300 text-sm">
                 {definitionOfDoneList.filter(item => item.completed).length}/{definitionOfDoneList.length} {translate(language, 'completed').toLowerCase()}
@@ -2671,7 +2671,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
   }
 
   return (
-    <div className="min-h-screen text-slate-100" style={{ backgroundColor: '#000000' }}>
+    <div className="min-h-[400px] text-slate-100 py-1" style={{ backgroundColor: '#000000' }}>
       {/* Quantum Background */}
       <div
         ref={quantumMountRef}
@@ -2680,14 +2680,14 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       />
       {/* Enhanced Header with Quick Stats */}
       <div className="bg-transparent border-b border-slate-600/20 sticky top-0 z-50 shadow-2xl">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-4 lg:space-y-0">
+        <div className="max-w-3xl mx-auto px-2 py-1">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-1 lg:space-y-0">
             <div>
-              <h1 className="text-2xl font-bold text-slate-50 flex items-center space-x-2">
-                <Brain className="w-8 h-8 text-indigo-400" />
+              <h1 className="text-xl font-bold text-slate-50 flex items-center space-x-2">
+                <Brain className="w-6 h-6 text-indigo-400" />
                 <span>Deep Work OS</span>
               </h1>
-              <p className="text-slate-300 mt-1">{translate(language, 'intelligentProductivitySystem')}</p>
+              <p className="text-slate-300 mt-0 text-sm">{translate(language, 'intelligentProductivitySystem')}</p>
             </div>
 
             <div className="flex flex-col items-end w-full lg:w-auto">
@@ -2733,7 +2733,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
           
           {/* Selected OOF Card - Always Visible */}
           {run.oofId && (
-            <div className="mt-6">
+            <div className="mt-2">
               {(() => {
                 const selectedOOF = oofs.find(o => o.id === run.oofId);
                 if (selectedOOF) {
@@ -2758,7 +2758,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
 
           {/* Active Timer - Show when running */}
           {run.active && (
-            <div className="mt-6">
+            <div className="mt-2">
               <SmartTimer
                 run={run}
                 onTogglePause={togglePause}
@@ -2771,14 +2771,14 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
           )}
 
           {/* Timer Section - Always Visible */}
-          <div className="space-y-6 mt-6">
+          <div className="space-y-2 mt-2">
             {!run.active ? (
               <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
                 <CardContent className="pt-8">
-                  <div className="text-center space-y-6">
+                  <div className="text-center space-y-2">
                     <div className="space-y-2">
                       <Clock className="w-16 h-16 text-slate-300 mx-auto" />
-                      <h3 className="text-xl font-semibold text-slate-100 mb-2">{translate(language, 'readyToStart')}</h3>
+                      <h3 className="text-xl font-semibold text-slate-100 mb-1">{translate(language, 'readyToStart')}</h3>
                       <p className="text-slate-300">{translate(language, 'chooseTask')}</p>
                     </div>
 
@@ -2812,7 +2812,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-2">
                 {/* Enhanced Hints */}
                 <Card className="bg-gradient-to-r from-slate-800/60 to-slate-700/40 backdrop-blur-sm border border-slate-600/50 shadow-xl">
                   <CardContent className="pt-5">
@@ -2829,7 +2829,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                     </Button>
 
                     {showHints && (
-                      <div className="mt-6 space-y-4">
+                      <div className="mt-2 space-y-2">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <Card className="bg-gradient-to-br from-emerald-900/30 to-emerald-800/20 border border-emerald-700/50 shadow-lg">
                             <CardContent className="pt-5">
@@ -2895,7 +2895,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
           </div>
 
           {/* Enhanced Tab Navigation - Mobile Responsive */}
-          <div className="mt-6">
+          <div className="mt-2">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 bg-slate-800/5 backdrop-blur-md border border-slate-600/50 w-full gap-0.5 md:gap-1 h-auto p-1">
                 <TabsTrigger value="focus" className="data-[state=active]:bg-slate-600 data-[state=active]:text-slate-50 text-slate-300 hover:text-slate-200 flex flex-col md:flex-row items-center justify-center py-2 md:py-1 px-1 md:px-3 text-xs md:text-sm min-h-[3rem] md:min-h-0">
@@ -2920,11 +2920,11 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
 
 
           {/* Tab Content Sections */}
-          <div className="mt-6">
+          <div className="mt-1">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <div className="mt-6 max-w-7xl mx-auto">
+              <div className="mt-1 max-w-3xl mx-auto">
                 {/* Tasks Tab - Enhanced OOF Management */}
-                <TabsContent value="focus" className="space-y-6">
+                <TabsContent value="focus" className="space-y-2">
                   {/* OOF Creation Form */}
                   <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
                     <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
@@ -2944,9 +2944,9 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                       </CardTitle>
                     </CardHeader>
                     {showCreateOOF && (
-                    <CardContent className="space-y-4 pt-6">
+                    <CardContent className="space-y-2 pt-2">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div className="space-y-4">
+                        <div className="space-y-2">
                           <Input
                             placeholder={translate(language,'oofTitlePlaceholder')}
                             value={newOOF.title}
@@ -2956,7 +2956,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                           
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center justify-between mb-1">
                                 <label className="text-slate-200 text-sm font-medium">{translate(language,'domain')}</label>
                                 <button
                                   type="button"
@@ -2980,7 +2980,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                             </div>
                             
                             <div>
-                              <label className="text-slate-200 text-sm font-medium mb-2 block">{translate(language,'priority')}</label>
+                              <label className="text-slate-200 text-sm font-medium mb-1 block">{translate(language,'priority')}</label>
                               <select
                                 value={newOOF.priority}
                                 onChange={(e) => setNewOOF(prev => ({ ...prev, priority: e.target.value as Priority }))}
@@ -2996,7 +2996,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                           
                           <div className="grid grid-cols-3 gap-4">
                             <div>
-                              <label className="text-slate-200 text-sm font-medium mb-2 block">{translate(language,'time')}</label>
+                              <label className="text-slate-200 text-sm font-medium mb-1 block">{translate(language,'time')}</label>
                               <Input
                                 type="number"
                                 value={newOOF.estimatedMinutes as unknown as number}
@@ -3006,7 +3006,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                             </div>
                             
                             <div>
-                              <label className="text-slate-200 text-sm font-medium mb-2 block">{translate(language,'difficulty')}</label>
+                              <label className="text-slate-200 text-sm font-medium mb-1 block">{translate(language,'difficulty')}</label>
                               <div className="px-2 mt-2">
                                 <Slider
                                   value={[newOOF.difficulty]}
@@ -3021,7 +3021,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                             </div>
                             
                             <div>
-                              <label className="text-slate-200 text-sm font-medium mb-2 block">{translate(language,'energy')}</label>
+                              <label className="text-slate-200 text-sm font-medium mb-1 block">{translate(language,'energy')}</label>
                               <div className="px-2 mt-2">
                                 <Slider
                                   value={[newOOF.energy]}
@@ -3037,7 +3037,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                           </div>
                         </div>
                         
-                        <div className="space-y-4">
+                        <div className="space-y-2">
                           <DefinitionOfDoneEditor
                             definitionOfDone={newOOF.definitionOfDone}
                             definitionOfDoneList={newOOF.definitionOfDoneList}
@@ -3138,7 +3138,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                 </TabsContent>
                 
                 {/* Parking Tab - Enhanced Distraction Management */}
-                <TabsContent value="parking" className="space-y-6">
+                <TabsContent value="parking" className="space-y-2">
                   <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
                     <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                       <CardTitle className="text-slate-50 flex items-center space-x-2">
@@ -3146,7 +3146,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                         <span>{translate(language, 'smartParkingList')}</span>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="pt-6">
+                    <CardContent className="pt-2">
                       <SmartParkingList
                         parking={parking}
                         onAdd={addParking}
@@ -3161,9 +3161,9 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                 </TabsContent>
                 
                 {/* Analytics Tab - Enhanced Insights */}
-                <TabsContent value="analytics" className="space-y-6">
+                <TabsContent value="analytics" className="space-y-2">
                   {/* Key Metrics Dashboard */}
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
                     <Card className="lg:col-span-2 bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
                       <CardHeader className="bg-slate-700/10">
                         <CardTitle className="text-slate-100 flex items-center space-x-2">
@@ -3171,10 +3171,10 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                           <span>{translate(language, 'todaysProductivity')}</span>
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="pt-6">
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                      <CardContent className="pt-2">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                           <div className="text-center p-4 bg-emerald-900/20 border border-emerald-700/50 rounded-lg">
-                            <div className="text-4xl font-bold text-emerald-300 mb-1">{Math.round(analytics.today.dh * 10) / 10}{t('hoursShort')}</div>
+                            <div className="text-3xl font-bold text-emerald-300 mb-1">{Math.round(analytics.today.dh * 10) / 10}{t('hoursShort')}</div>
                             <div className="text-slate-200 text-sm font-medium mb-1">{translate(language, 'deepHours')}</div>
                             <div className="w-full bg-slate-700 rounded-full h-2 mt-2">
                               <div 
@@ -3185,19 +3185,19 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                           </div>
                           
                           <div className="text-center p-4 bg-blue-900/20 border border-blue-700/50 rounded-lg">
-                            <div className="text-4xl font-bold text-blue-300 mb-1">{analytics.today.avgDQ}</div>
+                            <div className="text-3xl font-bold text-blue-300 mb-1">{analytics.today.avgDQ}</div>
                             <div className="text-slate-200 text-sm font-medium mb-1">{translate(language, 'avgDQ')}</div>
                             <div className="text-xs text-slate-300">{translate(language, 'qualityFocus')}</div>
                           </div>
                           
                           <div className="text-center p-4 bg-cyan-900/20 border border-cyan-700/50 rounded-lg">
-                            <div className="text-4xl font-bold text-cyan-300 mb-1">{analytics.dwi}</div>
+                            <div className="text-3xl font-bold text-cyan-300 mb-1">{analytics.dwi}</div>
                             <div className="text-slate-200 text-sm font-medium mb-1">{translate(language, 'depthIndex')}</div>
                             <div className="text-xs text-slate-300">DH×DQ+OU+0.5×LR</div>
                           </div>
                           
                           <div className="text-center p-4 bg-purple-900/20 border border-purple-700/50 rounded-lg">
-                            <div className="text-4xl font-bold text-purple-300 flex items-center justify-center mb-1">
+                            <div className="text-3xl font-bold text-purple-300 flex items-center justify-center mb-1">
                               {analytics.today.flowSessions > 0 && <Zap className="w-8 h-8 mr-1" />}
                               {analytics.today.flowSessions}
                             </div>
@@ -3215,7 +3215,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                           <span>{translate(language, 'achievements')}</span>
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-4 pt-6">
+                      <CardContent className="space-y-2 pt-2">
                         <div className="flex items-center justify-between p-4 bg-slate-700 border border-slate-600 rounded-lg">
                           <div>
                             <div className="text-slate-100 font-bold">{translate(language, 'dailyGoalLabel')}</div>
@@ -3239,7 +3239,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                         </div>
                         
                         <div className="p-4 bg-slate-700 border border-slate-600 rounded-lg">
-                          <div className="text-slate-100 font-semibold mb-2">{translate(language, 'bestTimeOfDay')}</div>
+                          <div className="text-slate-100 font-semibold mb-1">{translate(language, 'bestTimeOfDay')}</div>
                           <div className="text-slate-200 text-lg capitalize bg-slate-800/5 backdrop-blur-md px-3 py-1 rounded inline-block">
                             {analytics.bestTimeOfDay === 'morning' && `🌅 ${translate(language, 'morning')}`}
                             {analytics.bestTimeOfDay === 'afternoon' && `☀️ ${translate(language, 'afternoon')}`}
@@ -3251,7 +3251,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                   </div>
                   
                   {/* Enhanced Charts */}
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-2">
                     <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
                       <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                         <CardTitle className="text-slate-50 flex items-center space-x-2">
@@ -3259,7 +3259,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                           <span>{translate(language, 'productivityDynamics')}</span>
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="pt-6">
+                      <CardContent className="pt-2">
                         <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-700/50 backdrop-blur-sm">
                           <ResponsiveContainer width="100%" height={300}>
                             <ComposedChart data={chartData}>
@@ -3309,7 +3309,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                           <span>{translate(language, 'qualityMood')}</span>
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="pt-6">
+                      <CardContent className="pt-2">
                         <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-700/50 backdrop-blur-sm">
                           <ResponsiveContainer width="100%" height={300}>
                             <LineChart data={chartData}>
@@ -3371,7 +3371,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                         <span>{translate(language, 'deepBlocksLog')}</span>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="pt-6">
+                    <CardContent className="pt-2">
                       <div className="bg-slate-900/50 rounded-xl border border-slate-700/50 backdrop-blur-sm shadow-lg overflow-hidden">
                         <div className="overflow-x-auto max-h-[500px] pb-2">
                           <table className="min-w-[900px] w-full text-sm">
@@ -3441,7 +3441,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                 
                 
                 {/* Settings Tab - System Configuration */}
-                <TabsContent value="settings" className="space-y-6">
+                <TabsContent value="settings" className="space-y-2">
                   <Card className="bg-slate-800/5 backdrop-blur-md border-slate-600/40 shadow-2xl">
                     <CardHeader className="bg-slate-700/5 backdrop-blur-md border-b border-slate-600/40">
                       <CardTitle className="text-slate-50 flex items-center space-x-2">
@@ -3449,15 +3449,15 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                         <span>{translate(language, 'systemSettings')}</span>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-6 pt-6">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div className="space-y-4">
+                    <CardContent className="space-y-2 pt-2">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                        <div className="space-y-2">
                           <h4 className="text-slate-100 font-bold text-lg mb-4 flex items-center">
                             <Settings className="w-5 h-5 mr-2 text-indigo-400" />
                             {translate(language, 'basicSettings')}
                           </h4>
                           
-                          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
+                          <div className="flex items-center justify-between p-2 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <div>
                               <div className="text-slate-100 font-bold">{translate(language, 'notifications')}</div>
                               <div className="text-slate-300 text-sm">{translate(language, 'showReminders')}</div>
@@ -3469,7 +3469,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                             />
                           </div>
                           
-                          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
+                          <div className="flex items-center justify-between p-2 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <div>
                               <div className="text-slate-100 font-bold">{translate(language, 'soundSignals')}</div>
                               <div className="text-slate-300 text-sm">{translate(language, 'soundOnComplete')}</div>
@@ -3481,7 +3481,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                             />
                           </div>
                           
-                          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
+                          <div className="flex items-center justify-between p-2 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <div>
                               <div className="text-slate-100 font-bold">{translate(language, 'autoBreaks')}</div>
                               <div className="text-slate-300 text-sm">{translate(language, 'suggestBreaks')}</div>
@@ -3493,7 +3493,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                             />
                           </div>
                           
-                          <div className="space-y-3 p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
+                          <div className="space-y-3 p-2 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <label className="text-slate-100 text-sm font-bold mb-3 block">{translate(language, 'defaultDuration')}</label>
                             <select
                               value={settings.preferredBlockSize}
@@ -3508,13 +3508,13 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                           </div>
                         </div>
                         
-                        <div className="space-y-4">
+                        <div className="space-y-2">
                           <h4 className="text-slate-100 font-bold text-lg mb-4 flex items-center">
                             <Target className="w-5 h-5 mr-2 text-emerald-400" />
                             {translate(language, 'goalsMetrics')}
                           </h4>
                           
-                          <div className="space-y-3 p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
+                          <div className="space-y-3 p-2 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <label className="text-slate-100 text-sm font-bold">{translate(language, 'dailyGoal')}</label>
                             <Input
                               type="number"
@@ -3527,7 +3527,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                             </div>
                           </div>
                           
-                          <div className="space-y-3 p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
+                          <div className="space-y-3 p-2 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <label className="text-slate-100 text-sm font-bold">{translate(language, 'weeklyGoal')}</label>
                             <Input
                               type="number"
@@ -3540,7 +3540,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                             </div>
                           </div>
                           
-                          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
+                          <div className="flex items-center justify-between p-2 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <div>
                               <div className="text-slate-100 font-bold">{translate(language, 'energyTracking')}</div>
                               <div className="text-slate-300 text-sm">{translate(language, 'trackEnergyAnalytics')}</div>
@@ -3551,7 +3551,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                             />
                           </div>
                           
-                          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
+                          <div className="flex items-center justify-between p-2 bg-gradient-to-r from-slate-700/80 to-slate-600/60 backdrop-blur-sm rounded-xl border border-slate-600/50 shadow-lg">
                             <div>
                               <div className="text-slate-100 font-bold">{translate(language, 'advancedAnalytics')}</div>
                               <div className="text-slate-300 text-sm">{translate(language, 'showDetailedMetrics')}</div>
@@ -3564,7 +3564,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                         </div>
                       </div>
                       
-                      <div className="border-t border-slate-600 pt-6">
+                      <div className="border-t border-slate-600 pt-2">
                         <h4 className="text-slate-100 font-bold mb-6 text-lg flex items-center">
                           <Download className="w-5 h-5 mr-2 text-cyan-400" />
                           {translate(language, 'exportImportData')}
@@ -3658,7 +3658,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
 
               {/* Add new domain */}
               <div className="mb-6">
-                <label className="text-slate-200 text-sm font-medium mb-2 block">Add New Domain</label>
+                <label className="text-slate-200 text-sm font-medium mb-1 block">Add New Domain</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -3680,7 +3680,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
 
               {/* Default domains */}
               <div className="mb-4">
-                <h4 className="text-slate-200 text-sm font-medium mb-2">Default Domains</h4>
+                <h4 className="text-slate-200 text-sm font-medium mb-1">Default Domains</h4>
                 <div className="space-y-2">
                   {['Backend', 'Data', 'CS', 'SystemDesign', 'AlgoDS', 'Study', 'Discovery', 'Other'].map(domain => (
                     <div key={domain} className="flex items-center justify-between bg-slate-700/50 px-3 py-2 rounded">
@@ -3694,7 +3694,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
               {/* Custom domains */}
               {customDomains.length > 0 && (
                 <div>
-                  <h4 className="text-slate-200 text-sm font-medium mb-2">Custom Domains</h4>
+                  <h4 className="text-slate-200 text-sm font-medium mb-1">Custom Domains</h4>
                   <div className="space-y-2">
                     {customDomains.map((domain, index) => (
                       <div key={index} className="flex items-center justify-between bg-slate-700 px-3 py-2 rounded">
@@ -3734,7 +3734,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                 </div>
               )}
 
-              <div className="flex justify-end mt-6">
+              <div className="flex justify-end mt-2">
                 <button
                   onClick={() => setShowDomainManager(false)}
                   className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded transition-colors"
