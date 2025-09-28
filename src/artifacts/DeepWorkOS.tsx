@@ -41,7 +41,7 @@ type OOF = {
   completedAt?: number;
 };
 
-type Domain = 'Backend' | 'Data' | 'CS' | 'SystemDesign' | 'AlgoDS' | 'Study' | 'Discovery' | 'Other';
+type Domain = string; // Now allows custom domains in addition to the defaults
 type Priority = 'Low' | 'Medium' | 'High' | 'Critical';
 
 type ParkingItem = {
@@ -603,7 +603,7 @@ const translatePriority = (language: string, priority: Priority) => {
 };
 
 const translateDomain = (language: string, domain: Domain) => {
-  const domainMap: Record<Domain, string> = {
+  const domainMap: Record<string, string> = {
     'Backend': 'domainBackend',
     'Data': 'domainData',
     'CS': 'domainCS',
@@ -613,7 +613,8 @@ const translateDomain = (language: string, domain: Domain) => {
     'Discovery': 'domainDiscovery',
     'Other': 'domainOther'
   };
-  return translate(language, domainMap[domain]);
+  // For custom domains, return the domain name as-is if no translation exists
+  return translate(language, domainMap[domain]) || domain;
 };
 
 const getDefaultTemplates = (language: string): Template[] => [
@@ -1281,18 +1282,27 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
     Critical: { bg: 'bg-red-900/60', text: 'text-red-400', border: 'border-red-700' }
   };
   
-  const getDomainConfig = (language: string) => ({
-    Backend: { label: translateDomain(language, 'Backend'), color: 'text-blue-400', bgColor: 'bg-blue-900/40' },
-    Data: { label: translateDomain(language, 'Data'), color: 'text-emerald-400', bgColor: 'bg-emerald-900/40' },
-    CS: { label: translateDomain(language, 'CS'), color: 'text-purple-400', bgColor: 'bg-purple-900/40' },
-    Other: { label: translateDomain(language, 'Other'), color: 'text-amber-400', bgColor: 'bg-amber-900/40' },
-    SystemDesign: { label: translateDomain(language, 'SystemDesign'), color: 'text-cyan-400', bgColor: 'bg-cyan-900/40' },
-    AlgoDS: { label: translateDomain(language, 'AlgoDS'), color: 'text-rose-400', bgColor: 'bg-rose-900/40' },
-    Study: { label: translateDomain(language, 'Study'), color: 'text-green-400', bgColor: 'bg-green-900/40' },
-    Discovery: { label: translateDomain(language, 'Discovery'), color: 'text-indigo-400', bgColor: 'bg-indigo-900/40' }
-  });
+  const getDomainConfig = (language: string, domain: string) => {
+    const defaultConfigs: Record<string, { label: string, color: string, bgColor: string }> = {
+      Backend: { label: translateDomain(language, 'Backend'), color: 'text-blue-400', bgColor: 'bg-blue-900/40' },
+      Data: { label: translateDomain(language, 'Data'), color: 'text-emerald-400', bgColor: 'bg-emerald-900/40' },
+      CS: { label: translateDomain(language, 'CS'), color: 'text-purple-400', bgColor: 'bg-purple-900/40' },
+      Other: { label: translateDomain(language, 'Other'), color: 'text-amber-400', bgColor: 'bg-amber-900/40' },
+      SystemDesign: { label: translateDomain(language, 'SystemDesign'), color: 'text-cyan-400', bgColor: 'bg-cyan-900/40' },
+      AlgoDS: { label: translateDomain(language, 'AlgoDS'), color: 'text-rose-400', bgColor: 'bg-rose-900/40' },
+      Study: { label: translateDomain(language, 'Study'), color: 'text-green-400', bgColor: 'bg-green-900/40' },
+      Discovery: { label: translateDomain(language, 'Discovery'), color: 'text-indigo-400', bgColor: 'bg-indigo-900/40' }
+    };
 
-  const domainConfig = getDomainConfig(language);
+    // Return specific config or fallback for custom domains
+    return defaultConfigs[domain] || {
+      label: translateDomain(language, domain),
+      color: 'text-slate-400',
+      bgColor: 'bg-slate-900/40'
+    };
+  };
+
+  const domainConfig = getDomainConfig(language, oof.domain);
   
   const completionRate = oof.actualMinutes > 0 ? Math.round((oof.actualMinutes / oof.estimatedMinutes) * 100) : 0;
   
@@ -1302,8 +1312,8 @@ const EnhancedOOFCard = ({ oof, onStart, onEdit, onDelete, onToggleStar, isStarr
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <div className="flex items-center space-x-2 mb-2">
-              <Badge className={`${domainConfig[oof.domain].bgColor} ${domainConfig[oof.domain].color} border-0 text-xs font-semibold px-2 py-1`}>
-                {domainConfig[oof.domain].label}
+              <Badge className={`${domainConfig.bgColor} ${domainConfig.color} border-0 text-xs font-semibold px-2 py-1`}>
+                {domainConfig.label}
               </Badge>
               <Badge className={`${priorityColors[oof.priority].bg} ${priorityColors[oof.priority].text} border-0 text-xs font-semibold px-2 py-1`}>
                 {translatePriority(language, oof.priority)}
@@ -1794,12 +1804,31 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
   const [activeTab, setActiveTab] = useState('focus');
   const [oofFilter, setOofFilter] = useState('all');
   const [editingOOF, setEditingOOF] = useState<OOF | null>(null);
+
+  // Domain management state
+  const [customDomains, setCustomDomains] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('deepwork-custom-domains') || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [showDomainManager, setShowDomainManager] = useState(false);
+  const [newDomainName, setNewDomainName] = useState('');
+  const [editingDomain, setEditingDomain] = useState<{index: number, name: string} | null>(null);
   
+  // Get all available domains (default + custom)
+  const getAllDomains = (): string[] => {
+    const defaultDomains = ['Backend', 'Data', 'CS', 'SystemDesign', 'AlgoDS', 'Study', 'Discovery', 'Other'];
+    return [...defaultDomains, ...customDomains];
+  };
+
   // Helper function to get preferred default domain from localStorage
   const getPreferredDomain = (): Domain => {
     try {
       const stored = localStorage.getItem('deepwork-preferred-domain');
-      if (stored && ['Backend', 'Data', 'CS', 'SystemDesign', 'AlgoDS', 'Study', 'Discovery', 'Other'].includes(stored)) {
+      const allDomains = getAllDomains();
+      if (stored && allDomains.includes(stored)) {
         console.log('🔥 Using stored preferred domain:', stored);
         return stored as Domain;
       }
@@ -1808,6 +1837,38 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     }
     console.log('🔥 Using default domain: Discovery');
     return 'Discovery';
+  };
+
+  // Domain management functions
+  const saveCustomDomains = (domains: string[]) => {
+    try {
+      localStorage.setItem('deepwork-custom-domains', JSON.stringify(domains));
+      setCustomDomains(domains);
+    } catch (error) {
+      console.warn('Error saving custom domains:', error);
+    }
+  };
+
+  const addCustomDomain = (name: string) => {
+    const trimmedName = name.trim();
+    if (!trimmedName || getAllDomains().includes(trimmedName)) return;
+    const newDomains = [...customDomains, trimmedName];
+    saveCustomDomains(newDomains);
+    setNewDomainName('');
+  };
+
+  const editCustomDomain = (index: number, newName: string) => {
+    const trimmedName = newName.trim();
+    if (!trimmedName || getAllDomains().filter((_, i) => i !== index + 8).includes(trimmedName)) return; // +8 to skip default domains
+    const newDomains = [...customDomains];
+    newDomains[index] = trimmedName;
+    saveCustomDomains(newDomains);
+    setEditingDomain(null);
+  };
+
+  const removeCustomDomain = (index: number) => {
+    const newDomains = customDomains.filter((_, i) => i !== index);
+    saveCustomDomains(newDomains);
   };
 
   // Helper function to save preferred domain to localStorage
@@ -2750,20 +2811,26 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
                           
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <label className="text-slate-200 text-sm font-medium mb-2 block">{translate(language,'domain')}</label>
+                              <div className="flex items-center justify-between mb-2">
+                                <label className="text-slate-200 text-sm font-medium">{translate(language,'domain')}</label>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowDomainManager(true)}
+                                  className="text-xs text-indigo-400 hover:text-indigo-300 bg-slate-700 px-2 py-1 rounded border border-slate-600 hover:border-indigo-500 transition-colors"
+                                >
+                                  Manage
+                                </button>
+                              </div>
                               <select
                                 value={newOOF.domain}
                                 onChange={(e) => setNewOOF(prev => ({ ...prev, domain: e.target.value as Domain }))}
                                 className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-slate-100 focus:border-indigo-500"
                               >
-                                <option value="Backend">{translateDomain(language, 'Backend')}</option>
-                                <option value="Data">{translateDomain(language, 'Data')}</option>
-                                <option value="CS">{translateDomain(language, 'CS')}</option>
-                                <option value="SystemDesign">{translateDomain(language, 'SystemDesign')}</option>
-                                <option value="AlgoDS">{translateDomain(language, 'AlgoDS')}</option>
-                                <option value="Study">{translateDomain(language, 'Study')}</option>
-                                <option value="Discovery">{translateDomain(language, 'Discovery')}</option>
-                                <option value="Other">{translateDomain(language, 'Other')}</option>
+                                {getAllDomains().map(domain => (
+                                  <option key={domain} value={domain}>
+                                    {translateDomain(language, domain)}
+                                  </option>
+                                ))}
                               </select>
                             </div>
                             
@@ -3990,6 +4057,112 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
           </div>
         </div>
       </div>
+
+      {/* Domain Management Modal */}
+      {showDomainManager && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-800 border border-slate-600 rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-slate-100">Manage Domains</h3>
+                <button
+                  onClick={() => setShowDomainManager(false)}
+                  className="text-slate-400 hover:text-slate-200 p-1"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Add new domain */}
+              <div className="mb-6">
+                <label className="text-slate-200 text-sm font-medium mb-2 block">Add New Domain</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newDomainName}
+                    onChange={(e) => setNewDomainName(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addCustomDomain(newDomainName)}
+                    placeholder="Enter domain name"
+                    className="flex-1 bg-slate-700 border border-slate-600 rounded px-3 py-2 text-slate-100 placeholder-slate-400 focus:border-indigo-500"
+                  />
+                  <button
+                    onClick={() => addCustomDomain(newDomainName)}
+                    disabled={!newDomainName.trim() || getAllDomains().includes(newDomainName.trim())}
+                    className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              {/* Default domains */}
+              <div className="mb-4">
+                <h4 className="text-slate-200 text-sm font-medium mb-2">Default Domains</h4>
+                <div className="space-y-2">
+                  {['Backend', 'Data', 'CS', 'SystemDesign', 'AlgoDS', 'Study', 'Discovery', 'Other'].map(domain => (
+                    <div key={domain} className="flex items-center justify-between bg-slate-700/50 px-3 py-2 rounded">
+                      <span className="text-slate-200">{translateDomain(language, domain)}</span>
+                      <span className="text-xs text-slate-400">Default</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom domains */}
+              {customDomains.length > 0 && (
+                <div>
+                  <h4 className="text-slate-200 text-sm font-medium mb-2">Custom Domains</h4>
+                  <div className="space-y-2">
+                    {customDomains.map((domain, index) => (
+                      <div key={index} className="flex items-center justify-between bg-slate-700 px-3 py-2 rounded">
+                        {editingDomain?.index === index ? (
+                          <input
+                            type="text"
+                            value={editingDomain.name}
+                            onChange={(e) => setEditingDomain({...editingDomain, name: e.target.value})}
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') editCustomDomain(index, editingDomain.name);
+                              if (e.key === 'Escape') setEditingDomain(null);
+                            }}
+                            onBlur={() => editCustomDomain(index, editingDomain.name)}
+                            autoFocus
+                            className="bg-slate-600 border border-slate-500 rounded px-2 py-1 text-slate-100 text-sm flex-1"
+                          />
+                        ) : (
+                          <span className="text-slate-200">{domain}</span>
+                        )}
+                        <div className="flex gap-2 ml-2">
+                          <button
+                            onClick={() => setEditingDomain({index, name: domain})}
+                            className="text-xs text-indigo-400 hover:text-indigo-300 px-2 py-1 rounded border border-slate-600 hover:border-indigo-500"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => removeCustomDomain(index)}
+                            className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded border border-slate-600 hover:border-red-500"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end mt-6">
+                <button
+                  onClick={() => setShowDomainManager(false)}
+                  className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded transition-colors"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
