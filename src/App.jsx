@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import QuantumCatalog from './components/QuantumCatalog'
 import DeepWorkOS_UA from './artifacts/DeepWorkOS'
+import IntegratedProductivityModel from './artifacts/IntegratedProductivityModel'
 import './styles/globals.css'
 
 // Simple Error Boundary to prevent white screens and show errors
@@ -67,6 +68,8 @@ function App() {
     switch (componentName) {
       case 'DeepWorkOS':
         return <DeepWorkOS_UA language={currentLanguage} onBackToCatalog={navigateToCatalog} />
+      case 'IntegratedProductivityModel':
+        return <IntegratedProductivityModel onBackToCatalog={navigateToCatalog} language={currentLanguage} />
       default:
         return (
           <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex items-center justify-center">

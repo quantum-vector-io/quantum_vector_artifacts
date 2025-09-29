@@ -263,6 +263,28 @@ const QuantumArtifactsCatalogV3 = () => {
     },
     {
       id: 26,
+      title: 'Deep Work OS',
+      category: 'web-apps',
+      tags: ['React', 'Productivity', 'Deep Work'],
+      description: 'Comprehensive deep work management system with time tracking, task management, and analytics',
+      color: '#6366f1',
+      isTop: true,
+      isFavorite: true,
+      component: 'DeepWorkOS'
+    },
+    {
+      id: 27,
+      title: 'Інтегрована Модель: Глибина та Ефективність',
+      category: 'book-apps',
+      tags: ['React', 'Education', 'Productivity', 'Deep Work'],
+      description: 'Інтерактивна модель синтезу першопринципів «7 звичок» С. Кові та «Глибокої роботи» К. Ньюпорта',
+      color: '#8b5cf6',
+      isTop: true,
+      isFavorite: true,
+      component: 'IntegratedProductivityModel'
+    },
+    {
+      id: 28,
       title: 'Quantum Chess',
       category: 'games',
       tags: ['JavaScript', 'Chess', 'Quantum'],
