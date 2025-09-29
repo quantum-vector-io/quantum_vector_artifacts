@@ -215,6 +215,32 @@ TRANSLATIONS.EN.oofDefinitionPlaceholder = 'Definition of Done - how will you kn
 TRANSLATIONS.EN.constraintsPlaceholder = 'Constraints & context';
 TRANSLATIONS.EN.firstStepPlaceholder = 'Specific first step';
 TRANSLATIONS.EN.readyPrompt = 'Choose a task from the "Tasks" tab or start free mode';
+TRANSLATIONS.EN.learnSystem = 'Help Guide';
+TRANSLATIONS.EN.helpGuide = 'Help Guide';
+TRANSLATIONS.EN.userFlow = 'User Flow';
+TRANSLATIONS.EN.systemFeatures = 'System Features';
+TRANSLATIONS.EN.helpGuideTitle = 'Deep Work OS - Help Guide';
+TRANSLATIONS.EN.userFlowTitle = 'User Flow';
+TRANSLATIONS.EN.systemFeaturesTitle = 'Key Features';
+TRANSLATIONS.EN.userFlowStep1 = '1. Plan your deep work session';
+TRANSLATIONS.EN.userFlowStep2 = '2. Set up your environment';
+TRANSLATIONS.EN.userFlowStep3 = '3. Execute focused work';
+TRANSLATIONS.EN.userFlowStep4 = '4. Review and learn';
+TRANSLATIONS.EN.userFlowStep1Desc = 'Create Outcomes of Focus (OOFs) with clear definition of done, constraints, and first steps';
+TRANSLATIONS.EN.userFlowStep2Desc = 'Use pre-work checklist: close tabs, disable notifications, prepare materials';
+TRANSLATIONS.EN.userFlowStep3Desc = 'Start timer, follow single-task principle, use parking lot for distractions';
+TRANSLATIONS.EN.userFlowStep4Desc = 'Complete post-block reflection: rate quality, energy, mood, and log insights';
+TRANSLATIONS.EN.feature1 = 'Smart Task Management';
+TRANSLATIONS.EN.feature2 = 'Focus Timer System';
+TRANSLATIONS.EN.feature3 = 'Distraction Parking';
+TRANSLATIONS.EN.feature4 = 'Progress Analytics';
+TRANSLATIONS.EN.feature5 = 'Checklist Guidance';
+TRANSLATIONS.EN.feature1Desc = 'Create structured OOFs with clear outcomes and actionable first steps';
+TRANSLATIONS.EN.feature2Desc = 'Pomodoro, 60min, and 90min deep focus modes with pause/resume';
+TRANSLATIONS.EN.feature3Desc = 'Capture and categorize distracting thoughts for later processing';
+TRANSLATIONS.EN.feature4Desc = 'Track productivity patterns, mood, energy, and focus quality';
+TRANSLATIONS.EN.feature5Desc = 'Pre, during, and post-work checklists to optimize flow state';
+TRANSLATIONS.EN.closeGuide = 'Close Guide';
 TRANSLATIONS.EN.tipLabel = 'Tip:';
 TRANSLATIONS.EN.hintLongShort = 'Take notes about your progress, blockers, and insights.';
 TRANSLATIONS.EN.check_single_title = 'Single task';
@@ -443,6 +469,32 @@ TRANSLATIONS.UA.oofDefinitionPlaceholder = 'Критерії готовност�
 TRANSLATIONS.UA.constraintsPlaceholder = 'Обмеження та контекст';
 TRANSLATIONS.UA.firstStepPlaceholder = 'Конкретний перший крок';
 TRANSLATIONS.UA.readyPrompt = 'Оберіть завдання з вкладки "Фокус" або запустіть вільний режим';
+TRANSLATIONS.UA.learnSystem = 'Довідка';
+TRANSLATIONS.UA.helpGuide = 'Довідка';
+TRANSLATIONS.UA.userFlow = 'Флоу користувача';
+TRANSLATIONS.UA.systemFeatures = 'Функції системи';
+TRANSLATIONS.UA.helpGuideTitle = 'Deep Work OS - Довідка';
+TRANSLATIONS.UA.userFlowTitle = 'Флоу користувача';
+TRANSLATIONS.UA.systemFeaturesTitle = 'Ключові функції';
+TRANSLATIONS.UA.userFlowStep1 = '1. Плануйте сесію глибокої роботи';
+TRANSLATIONS.UA.userFlowStep2 = '2. Налаштуйте середовище';
+TRANSLATIONS.UA.userFlowStep3 = '3. Виконуйте сфокусовану роботу';
+TRANSLATIONS.UA.userFlowStep4 = '4. Аналізуйте та вчіться';
+TRANSLATIONS.UA.userFlowStep1Desc = 'Створіть ОФ (Outcomes of Focus) з чіткими критеріями готовності, обмеженнями та першими кроками';
+TRANSLATIONS.UA.userFlowStep2Desc = 'Використовуйте чек-лист підготовки: закрийте вкладки, вимкніть сповіщення, підготуйте матеріали';
+TRANSLATIONS.UA.userFlowStep3Desc = 'Запустіть таймер, дотримуйтесь принципу одного завдання, використовуйте парковку для відволікань';
+TRANSLATIONS.UA.userFlowStep4Desc = 'Завершіть рефлексію після блоку: оцініть якість, енергію, настрій та зафіксуйте інсайти';
+TRANSLATIONS.UA.feature1 = 'Розумне управління завданнями';
+TRANSLATIONS.UA.feature2 = 'Система таймерів фокуса';
+TRANSLATIONS.UA.feature3 = 'Парковка відволікань';
+TRANSLATIONS.UA.feature4 = 'Аналітика прогресу';
+TRANSLATIONS.UA.feature5 = 'Чек-листи для керівництва';
+TRANSLATIONS.UA.feature1Desc = 'Створюйте структуровані ОФ з чіткими результатами та конкретними першими кроками';
+TRANSLATIONS.UA.feature2Desc = 'Помодоро, 60хв та 90хв режими глибокого фокуса з можливістю паузи';
+TRANSLATIONS.UA.feature3Desc = 'Фіксуйте та категоризуйте відволікаючі думки для подальшого опрацювання';
+TRANSLATIONS.UA.feature4Desc = 'Відстежуйте патерни продуктивності, настрою, енергії та якості фокуса';
+TRANSLATIONS.UA.feature5Desc = 'Чек-листи до, під час та після роботи для оптимізації стану потоку';
+TRANSLATIONS.UA.closeGuide = 'Закрити довідку';
 TRANSLATIONS.UA.tipLabel = 'Підказка:';
 TRANSLATIONS.UA.hintLongShort = 'Використовуйте шаблони з вкладки "Шаблони" - кнопка "В нотатки" додає їх сюди автоматично';
 TRANSLATIONS.UA.check_single_title = 'Одна справа';
@@ -1785,6 +1837,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
   const [logs, setLogs] = useState<BlockLog[]>(() => ls.get('dw_logs', []));
   const [showSummary, setShowSummary] = useState(false);
   const [lastCompletedBlock, setLastCompletedBlock] = useState<BlockLog | null>(null);
+  const [showHelpGuide, setShowHelpGuide] = useState(false);
   const [settings, setSettings] = useState<Settings>(() => ls.get('dw_settings', {
     notifications: true,
     soundEnabled: true,
@@ -1956,6 +2009,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
 
   // Quantum background refs
   const quantumMountRef = useRef<HTMLDivElement>(null);
+  const quantumHelpMountRef = useRef<HTMLDivElement>(null);
   const quantumSceneRef = useRef<any>(null);
   
   // Persist state changes to localStorage
@@ -2097,6 +2151,91 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
       renderer.dispose();
     };
   }, []);
+
+  // Quantum Background for Help Guide
+  useEffect(() => {
+    if (!quantumHelpMountRef.current || !showHelpGuide) return;
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    // Create starfield background
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgdmlld0JveD0iMCAwIDI1NiAyNTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiBmaWxsPSIjMDAwMDAwIi8+CjxjaXJjbGUgY3g9IjEyOCIgY3k9IjEyOCIgcj0iMiIgZmlsbD0iIzMzNDc2NiIvPgo8Y2lyY2xlIGN4PSI2NCIgY3k9IjY0IiByPSIxIiBmaWxsPSIjNDc1NTY5Ii8+CjxjaXJjbGUgY3g9IjE5MiIgY3k9IjE5MiIgcj0iMSIgZmlsbD0iIzQ3NTU2OSIvPgo8Y2lyY2xlIGN4PSI2NCIgY3k9IjE5MiIgcj0iMSIgZmlsbD0iIzMzNDc2NiIvPgo8Y2lyY2xlIGN4PSIxOTIiIGN5PSI2NCIgcj0iMSIgZmlsbD0iIzMzNDc2NiIvPgo8Y2lyY2xlIGN4PSIzMiIgY3k9IjEyOCIgcj0iMSIgZmlsbD0iIzQ3NTU2OSIvPgo8Y2lyY2xlIGN4PSIyMjQiIGN5PSIxMjgiIHI9IjEiIGZpbGw9IiM0NzU1NjkiLz4KPGNpcmNsZSBjeD0iMTI4IiBjeT0iMzIiIHI9IjEiIGZpbGw9IiMzMzQ3NjYiLz4KPGNpcmNsZSBjeD0iMTI4IiBjeT0iMjI0IiByPSIxIiBmaWxsPSIjMzM0NzY2Ii8+Cjwvc3ZnPgo=');
+    scene.background = texture;
+    renderer.setClearColor(0x000000, 1);
+
+    quantumHelpMountRef.current.appendChild(renderer.domElement);
+
+    camera.position.set(0, 0, 80);
+
+    // Create quantum particles
+    const particleCount = 200;
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 200;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
+
+      const color = new THREE.Color();
+      color.setHSL(Math.random() * 0.3 + 0.5, 0.7, 0.5);
+      colors[i * 3] = color.r;
+      colors[i * 3 + 1] = color.g;
+      colors[i * 3 + 2] = color.b;
+    }
+
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const particleMaterial = new THREE.PointsMaterial({
+      size: 2,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.8
+    });
+
+    const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particleSystem);
+
+    // Animation
+    let animationId: number;
+    const animate = () => {
+      animationId = requestAnimationFrame(animate);
+
+      particleSystem.rotation.x += 0.001;
+      particleSystem.rotation.y += 0.002;
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+    // Handle resize
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener('resize', handleResize);
+      if (quantumHelpMountRef.current && renderer.domElement) {
+        quantumHelpMountRef.current.removeChild(renderer.domElement);
+      }
+      renderer.dispose();
+    };
+  }, [showHelpGuide]);
 
   // Background-resistant timer using timestamps
   useEffect(() => {
@@ -2670,14 +2809,121 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
     );
   }
 
+  // Help Guide Component
+  if (showHelpGuide) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center z-[60] p-4" style={{ backgroundColor: '#000000' }}>
+        {/* Quantum Background for Help Guide */}
+        <div
+          ref={quantumHelpMountRef}
+          className="fixed inset-0"
+          style={{ pointerEvents: 'none', zIndex: 0 }}
+        />
+
+        <div className="bg-transparent border border-slate-700/30 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative z-10">
+          <div className="sticky top-0 bg-slate-800/20 backdrop-blur-sm border-b border-slate-700/30 p-6 rounded-t-2xl">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold text-slate-50 flex items-center space-x-2">
+                <Brain className="w-7 h-7 text-indigo-400" />
+                <span>{translate(language, 'helpGuideTitle')}</span>
+              </h1>
+              <Button
+                onClick={() => setShowHelpGuide(false)}
+                className="bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 hover:text-slate-100"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                {translate(language, 'closeGuide')}
+              </Button>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-8">
+            {/* User Flow Section */}
+            <div>
+              <h2 className="text-xl font-semibold text-slate-100 mb-4 flex items-center space-x-2">
+                <Target className="w-6 h-6 text-emerald-400" />
+                <span>{translate(language, 'userFlowTitle')}</span>
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-slate-800/20 border border-slate-700/30 rounded-xl p-4">
+                  <h3 className="font-semibold text-emerald-300 mb-2">{translate(language, 'userFlowStep1')}</h3>
+                  <p className="text-slate-300 text-sm">{translate(language, 'userFlowStep1Desc')}</p>
+                </div>
+                <div className="bg-slate-800/20 border border-slate-700/30 rounded-xl p-4">
+                  <h3 className="font-semibold text-blue-300 mb-2">{translate(language, 'userFlowStep2')}</h3>
+                  <p className="text-slate-300 text-sm">{translate(language, 'userFlowStep2Desc')}</p>
+                </div>
+                <div className="bg-slate-800/20 border border-slate-700/30 rounded-xl p-4">
+                  <h3 className="font-semibold text-amber-300 mb-2">{translate(language, 'userFlowStep3')}</h3>
+                  <p className="text-slate-300 text-sm">{translate(language, 'userFlowStep3Desc')}</p>
+                </div>
+                <div className="bg-slate-800/20 border border-slate-700/30 rounded-xl p-4">
+                  <h3 className="font-semibold text-purple-300 mb-2">{translate(language, 'userFlowStep4')}</h3>
+                  <p className="text-slate-300 text-sm">{translate(language, 'userFlowStep4Desc')}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* System Features Section */}
+            <div>
+              <h2 className="text-xl font-semibold text-slate-100 mb-4 flex items-center space-x-2">
+                <Zap className="w-6 h-6 text-indigo-400" />
+                <span>{translate(language, 'systemFeaturesTitle')}</span>
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border border-indigo-700/30 rounded-xl p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Target className="w-5 h-5 text-indigo-400" />
+                    <h3 className="font-semibold text-indigo-200">{translate(language, 'feature1')}</h3>
+                  </div>
+                  <p className="text-slate-300 text-sm">{translate(language, 'feature1Desc')}</p>
+                </div>
+                <div className="bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border border-emerald-700/30 rounded-xl p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Timer className="w-5 h-5 text-emerald-400" />
+                    <h3 className="font-semibold text-emerald-200">{translate(language, 'feature2')}</h3>
+                  </div>
+                  <p className="text-slate-300 text-sm">{translate(language, 'feature2Desc')}</p>
+                </div>
+                <div className="bg-gradient-to-br from-amber-900/20 to-orange-900/20 border border-amber-700/30 rounded-xl p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <NotebookPen className="w-5 h-5 text-amber-400" />
+                    <h3 className="font-semibold text-amber-200">{translate(language, 'feature3')}</h3>
+                  </div>
+                  <p className="text-slate-300 text-sm">{translate(language, 'feature3Desc')}</p>
+                </div>
+                <div className="bg-gradient-to-br from-blue-900/20 to-cyan-900/20 border border-blue-700/30 rounded-xl p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <BarChart3 className="w-5 h-5 text-blue-400" />
+                    <h3 className="font-semibold text-blue-200">{translate(language, 'feature4')}</h3>
+                  </div>
+                  <p className="text-slate-300 text-sm">{translate(language, 'feature4Desc')}</p>
+                </div>
+                <div className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-700/30 rounded-xl p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <HelpCircle className="w-5 h-5 text-purple-400" />
+                    <h3 className="font-semibold text-purple-200">{translate(language, 'feature5')}</h3>
+                  </div>
+                  <p className="text-slate-300 text-sm">{translate(language, 'feature5Desc')}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-[400px] text-slate-100 py-1" style={{ backgroundColor: '#000000' }}>
       {/* Quantum Background */}
-      <div
-        ref={quantumMountRef}
-        className="fixed inset-0"
-        style={{ pointerEvents: 'none', zIndex: 0 }}
-      />
+      {!showHelpGuide && (
+        <div
+          ref={quantumMountRef}
+          className="fixed inset-0"
+          style={{ pointerEvents: 'none', zIndex: 0 }}
+        />
+      )}
       {/* Enhanced Header with Quick Stats */}
       <div className="bg-transparent border-b border-slate-600/20 sticky top-0 z-50 shadow-2xl">
         <div className="max-w-3xl mx-auto px-2 py-1">
@@ -2691,7 +2937,14 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
             </div>
 
             <div className="flex flex-col items-end w-full lg:w-auto">
-              <div className="flex flex-col sm:flex-row items-center gap-3 mb-3">
+              <div className="flex flex-row items-center gap-3 mb-3">
+                <Button
+                  onClick={() => setShowHelpGuide(true)}
+                  className="bg-gradient-to-r from-emerald-600/20 to-teal-600/20 hover:from-emerald-500/30 hover:to-teal-500/30 border border-emerald-400/30 text-emerald-300 hover:text-emerald-200 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-emerald-500/25 font-semibold"
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  {translate(language,'learnSystem')}
+                </Button>
                 <Button
                   onClick={() => onBackToCatalog ? onBackToCatalog() : window.location.href = '/'}
                   className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 hover:from-indigo-500/30 hover:to-purple-500/30 border border-indigo-400/30 text-indigo-300 hover:text-indigo-200 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-indigo-500/25 font-semibold"
