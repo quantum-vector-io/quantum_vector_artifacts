@@ -4,7 +4,7 @@ import * as THREE from 'three';
 const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChange = () => {} }) => {
    const mountRef = useRef(null);
    const sceneRef = useRef(null);
-   const [selectedCategory, setSelectedCategory] = useState('all');
+   const [selectedCategory, setSelectedCategory] = useState('top');
    const [searchTerm, setSearchTerm] = useState('');
    const [hoveredProject, setHoveredProject] = useState(null);
    const [activeScrollZone, setActiveScrollZone] = useState('main');
@@ -218,12 +218,25 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
       isTop: true,
       isFavorite: true,
       status: 'coming-soon'
+    },
+    {
+      id: 15,
+      title: language === 'EN' ? 'Integrated Model: Depth & Effectiveness' : 'Інтегрована Модель: Глибина та Ефективність',
+      category: 'book-apps',
+      tags: [language === 'EN' ? 'React' : 'React', language === 'EN' ? 'Education' : 'Освіта', language === 'EN' ? 'Productivity' : 'Продуктивність', language === 'EN' ? 'Deep Work' : 'Глибока Робота'],
+      description: language === 'EN' ? 'Interactive model synthesizing "7 Habits" by S. Covey and "Deep Work" by C. Newport principles' : 'Інтерактивна модель синтезу першопринципів «7 звичок» С. Кові та «Глибокої роботи» К. Ньюпорта',
+      color: '#8b5cf6',
+      isTop: true,
+      isFavorite: true,
+      status: 'working',
+      component: 'IntegratedProductivityModel'
     }
   ];
 
   const categories = [
     { id: 'top', name: L.catTopProjects, icon: '⭐', special: true },
     { id: 'favorites', name: L.catMyFavourite, icon: '❤️', special: true },
+    { id: 'coming-soon', name: language === 'EN' ? 'Coming Soon' : 'Незабаром', icon: '🚀', special: true },
     { id: 'all', name: L.catAllProjects, icon: '🌐' },
     { id: 'data-viz', name: L.catDataVisualization, icon: '📊' },
     { id: 'ai-tools', name: L.catAiTools, icon: '🤖' },
@@ -240,9 +253,11 @@ const QuantumCatalog = ({ onNavigateToArtifact, language = 'EN', onLanguageChang
       // Category filter
       let matchesCategory = true;
       if (selectedCategory === 'top') {
-        matchesCategory = project.isTop;
+        matchesCategory = project.isTop && project.status === 'working';
       } else if (selectedCategory === 'favorites') {
         matchesCategory = project.isFavorite;
+      } else if (selectedCategory === 'coming-soon') {
+        matchesCategory = project.status === 'coming-soon';
       } else if (selectedCategory !== 'all') {
         matchesCategory = project.category === selectedCategory;
       }
