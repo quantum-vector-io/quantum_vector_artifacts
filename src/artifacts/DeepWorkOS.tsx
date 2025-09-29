@@ -2937,7 +2937,7 @@ const DeepWorkOS_UA = ({ language = 'EN', onBackToCatalog }: { language?: string
             </div>
 
             <div className="flex flex-col items-end w-full lg:w-auto">
-              <div className="flex flex-col sm:flex-row items-center gap-3 mb-3">
+              <div className="flex flex-row items-center gap-3 mb-3">
                 <Button
                   onClick={() => setShowHelpGuide(true)}
                   className="bg-gradient-to-r from-emerald-600/20 to-teal-600/20 hover:from-emerald-500/30 hover:to-teal-500/30 border border-emerald-400/30 text-emerald-300 hover:text-emerald-200 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-emerald-500/25 font-semibold"
